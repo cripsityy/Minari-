@@ -19,11 +19,7 @@
                         <div class="hero-content">
                             <h1>Your Everyday Fashion Boutique</h1>
                             <p>Discover the latest trends in fashion with our exclusive collections designed for your everyday style.</p>
-                            <div class="mt-4">
-                                <a href="#categories" class="btn btn-primary me-2">Shop Now</a>
-                                <a href="{{ route('login') }}" class="btn btn-outline-primary me-2">Login as User</a>
-                                <a href="{{ route('admin.login') }}" class="btn btn-secondary">Admin Login</a>
-                            </div>
+                            
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -41,7 +37,7 @@
                 <div class="style-scroll px-5">
                     @for($i = 1; $i <= 8; $i++)
                     <div class="style-item">
-                        <img src="{{ asset('images/g1.png' . $i . 'g8.png') }}" alt="Style {{ $i }}">
+                        <img src="{{ asset('images/g' . $i . '.png') }}" alt="Style {{ $i }}">
                     </div>
                     @endfor
                 </div>
@@ -52,15 +48,16 @@
                 <h2 class="section-title">Product Category</h2>
                 <div class="category-scroll px-5">
                     <div class="category-card">
-                        <a href="{{ route('category.shirtblouse') }}" style="text-decoration: none;">
+                        <a href="{{ route('category', ['cat' => 'shirtblouse']) }}" style="text-decoration: none;">
                             <div class="category-image">
                                 <img src="{{ asset('images/shirt.png') }}" alt="Shirt">
                             </div>
                             <h3>Shirt and Blouse</h3>
                         </a>
-                    </div>               
+                    </div>
+      
                     <div class="category-card">
-                        <a href="{{ route('category.sweeter') }}" style="text-decoration: none;">
+                        <a href="{{ route('category', ['cat' => 'sweeter']) }}" style="text-decoration: none;">
                             <div class="category-image">
                                 <img src="{{ asset('images/sweaters.png') }}" alt="Sweaters">
                             </div>
@@ -68,7 +65,7 @@
                         </a>
                     </div> 
                     <div class="category-card">
-                        <a href="{{ route('category.tshirt') }}" style="text-decoration: none;">
+                        <a href="{{ route('category', ['cat' => 'tshirt']) }}" style="text-decoration: none;">
                             <div class="category-image">
                                 <img src="{{ asset('images/tshirt.png') }}" alt="T-Shirt">
                             </div>
@@ -76,7 +73,7 @@
                         </a>
                     </div>               
                     <div class="category-card">
-                        <a href="{{ route('category.pants') }}" style="text-decoration: none;">
+                        <a href="{{ route('category', ['cat' => 'pants']) }}" style="text-decoration: none;">
                             <div class="category-image">
                                 <img src="{{ asset('images/pants.png') }}" alt="Pants">
                             </div>
@@ -84,7 +81,7 @@
                         </a>
                     </div>               
                     <div class="category-card">
-                        <a href="{{ route('category.skirt') }}" style="text-decoration: none;">
+                        <a href="{{ route('category', ['cat' => 'skirt']) }}" style="text-decoration: none;">
                             <div class="category-image">
                                 <img src="{{ asset('images/dress.png') }}" alt="Dress">
                             </div>
@@ -92,7 +89,7 @@
                         </a>
                     </div>              
                     <div class="category-card">
-                        <a href="{{ route('category.accessories') }}" style="text-decoration: none;">
+                        <a href="{{ route('category', ['cat' => 'accessories']) }}" style="text-decoration: none;">
                             <div class="category-image">
                                 <img src="{{ asset('images/accessories.png') }}" alt="Accessories">
                             </div>
@@ -174,8 +171,14 @@
                 </div>
             </div>
         </footer>
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        
+        <script>
+    window.APP_ROLE = "{{ session('role') ?? 'guest' }}";
+</script>
+             
         <script src="{{ asset('js/navbar.js') }}"></script>
-        <script src="{{ asset('js/landing.js') }}"></script>
+        <script src="{{ asset('js/landing.js') }}"></script>                
     </body>
 </html>

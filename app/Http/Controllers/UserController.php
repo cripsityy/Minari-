@@ -11,7 +11,7 @@ class UserController extends Controller
     
     public function account()
     {
-        return view('user.account');
+        return view('user.akun');
     }
     
     public function whislist()
@@ -26,7 +26,7 @@ class UserController extends Controller
     
     public function search()
     {
-        return view('user.search');
+        return view('user.menu');
     }
     
     public function menu()
@@ -36,11 +36,34 @@ class UserController extends Controller
     
     public function orderHistory()
     {
-        return view('user.order-history');
+        return view('user.orderhistory');
     }
     
     public function guestAccount()
     {
-        return view('user.account-guest');
+        return view('user.akun');
     }
+     public function category(Request $request)
+    {
+        // nanti category.js yang ngatur produk berdasarkan ?cat=
+        return view('user.category'); // resources/views/category.blade.php
+    }
+
+    public function detailProduk(Request $request)
+    {
+        // nanti bisa pakai $request->query('product') kalau mau dynamic
+        return view('user.detailproduk');
+    }
+    public function payment() {
+        return view('user.detailorder');
+    }
+
+    public function paymentMethod() {
+        return view('user.paymentmeth');
+    }
+
+    public function orderConfirm() {
+        return view('user.orderconfirm');
+    }
+
 }

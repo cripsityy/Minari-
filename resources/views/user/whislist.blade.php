@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MINARI | Wishlist</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  {{-- CSS --}}
+  <link rel="stylesheet" href="{{ asset('css/whislist.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
+</head>
+<body>
+  <header id="navMount"></header>
+
+  {{-- Gate (muncul jika role = guest) --}}
+  <main id="gate" class="gate-wrap">
+    <div class="container">
+      <div class="gate-panel mx-auto">
+        <h1 class="gate-title">
+          You haven’t logged in yet<br>
+          Please log in to continue
+        </h1>
+        <a id="loginBtn" class="gate-btn" href="{{ route('login') }}">Log in</a>
+      </div>
+    </div>
+  </main>
+
+  {{-- Konten wishlist (muncul jika role != guest) --}}
+  <section id="wishContent" class="wish-wrap" style="display:none;">
+    <div class="container">
+
+      <!-- Title -->
+      <h1 class="wish-title">Wishlist</h1>
+
+      <!-- Tabs + Search line -->
+      <div class="wish-tabs">
+        <button class="wish-tab active" data-tab="product">Product</button>
+        <button class="wish-tab" data-tab="category" disabled>Category</button>
+      </div>
+
+      <!-- Top meta line -->
+      <div class="wish-meta">
+        <div>
+          <span id="resultCount">Results: 0 product</span>
+        </div>
+        <div class="wish-sort">
+          <span>Sort by</span>
+          <select id="sortSelect" class="form-select form-select-sm wish-select">
+            <option value="recent">Most recent</option>
+            <option value="price-asc">Price ↑</option>
+            <option value="price-desc">Price ↓</option>
+            <option value="name-asc">Name A–Z</option>
+            <option value="name-desc">Name Z–A</option>
+          </select>
+        </div>
+      </div>
+
+      <hr class="wish-sep">
+
+      <!-- List -->
+      <div id="wishList" class="wish-list"></div>
+
+    </div>
+  </section>
+
+  <!-- Toast kecil -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="miniToast" class="toast align-items-center" data-bs-delay="1600" role="status" aria-live="polite">
+      <div class="d-flex">
+        <div class="toast-body">Saved.</div>
+        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+ 
+
+  {{-- Sinkron role Laravel → navbar (opsional kalau kamu pakai session role) --}}
+  <script>
+    window.APP_ROLE = "{{ session('role') ?? 'guest' }}";
+</script>
+<script src="{{ asset('js/navbar.js') }}"></script>
+
+   <script src="{{ asset('js/navbar.js') }}"></script>
+  <script src="{{ asset('js/whislist.js') }}"></script>
+</body>
+</html>

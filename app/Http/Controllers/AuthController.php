@@ -11,7 +11,7 @@ class AuthController extends Controller
     
     public function showAdminLogin()
     {
-        return view('auth.admin-login');
+        return view('auth.login');
     }
     
     public function showRegister()
@@ -20,23 +20,37 @@ class AuthController extends Controller
     }
     
     public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'username' => 'required',
-            'password' => 'required',
-        ]);
-        
-        if ($request->username === 'user' && $request->password === 'user') {
-            $request->session()->regenerate();
-            $request->session()->put('role', 'user');
-            $request->session()->put('user_id', 1);
-            $request->session()->put('username', 'user');
-            
-            return redirect()->route('user.dashboard');
+        {
+            $credentials = $request->validate([
+                'username' => 'required',
+                'password' => 'required',
+            ]);
+
+            $u = $credentials['username'];
+            $p = $credentials['password'];
+
+            // HARD-CODE buat demo
+            if ($u === 'admin' && $p === 'admin') {
+                $request->session()->regenerate();
+                $request->session()->put('role', 'admin');
+                $request->session()->put('username', 'admin');
+
+                return redirect()->route('admin.dashboard');
+            }
+
+            if ($u === 'user' && $p === 'user') {
+                $request->session()->regenerate();
+                $request->session()->put('role', 'user');
+                $request->session()->put('username', 'user');
+
+                return redirect()->route('user.dashboard');
+            }
+
+            // kalau salah
+            return back()
+                ->withErrors(['username' => 'Username / password salah (coba: user/user atau admin/admin)'])
+                ->withInput();
         }
-        
-        return back()->withErrors(['username' => 'Invalid credentials.']);
-    }
     
     public function adminLogin(Request $request)
     {
@@ -70,14 +84,13 @@ class AuthController extends Controller
         $request->session()->put('user_id', rand(100, 999));
         $request->session()->put('username', $request->username);
         
-        return redirect()->route('user.dashboard');
+        return redirect()->route('landing');
     }
     
     public function logout(Request $request)
     {
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
         return redirect()->route('landing');
     }
 }

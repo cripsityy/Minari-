@@ -1,80 +1,70 @@
+// login.js
+
 document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('loginForm');
-    
-    if (form) {
-        form.addEventListener('submit', (e) => {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            
-            if (username === '' || password === '') {
-                e.preventDefault();
-                alert('Please fill in all fields');
-                return false;
-            }
-            
-            if (username === 'user' && password === 'user') {
-                localStorage.setItem('role', 'user');
-                localStorage.setItem('displayName', 'User');
-                return true;
-            }
-            
-            if (username === 'admin' && password === 'admin') {
-                localStorage.setItem('role', 'admin');
-                localStorage.setItem('adminLoggedIn', 'true');
-                return true;
-            }
-            
-            return true;
-        });
+  const form   = document.getElementById('loginForm');
+  const userEl = document.getElementById('username');
+  const passEl = document.getElementById('password');
+  const errEl  = document.getElementById('loginError'); // <small> opsional untuk error
+
+  // Kalau sudah login, opsional: langsung lempar ke landing
+  try {
+    const roleNow = NavbarRole.getRole?.();
+    if (roleNow && roleNow !== NavbarRole.Role.GUEST) {
+      // Sudah logged in
+      // location.href = 'landing.html';  // aktifkan jika mau auto-redirect
     }
-    
-    const googleBtn = document.getElementById('googleLogin');
-    if (googleBtn) {
-        googleBtn.addEventListener('click', () => {
-            alert('Google login would be implemented here');
-        });
+  } catch (e) {}
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const u = userEl.value.trim();
+    const p = passEl.value.trim();
+
+    // Kredensial contoh (hard-coded)
+    let role = null;
+    if (u === 'admin' && p === 'admin') {
+      role = NavbarRole.Role.ADMIN;
+    } else if (u === 'user' && p === 'user') {
+      role = NavbarRole.Role.USER;
     }
-    
-    const inputs = document.querySelectorAll('input[required]');
-    inputs.forEach(input => {
-        input.addEventListener('blur', function() {
-            if (this.value.trim() === '') {
-                this.classList.add('is-invalid');
-            } else {
-                this.classList.remove('is-invalid');
-                this.classList.add('is-valid');
-            }
-        });
-        
-        input.addEventListener('input', function() {
-            if (this.value.trim() !== '') {
-                this.classList.remove('is-invalid');
-            }
-        });
-    });
-    
-    const passwordInput = document.getElementById('password');
-    const toggleBtn = document.createElement('button');
-    toggleBtn.type = 'button';
-    toggleBtn.innerHTML = '<i class="fas fa-eye"></i>';
-    toggleBtn.className = 'btn btn-outline-secondary';
-    toggleBtn.style.cssText = 'position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: transparent;';
-    
-    if (passwordInput) {
-        passwordInput.parentElement.style.position = 'relative';
-        passwordInput.parentElement.appendChild(toggleBtn);
-        
-        toggleBtn.addEventListener('click', function() {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
-        });
+
+    if (!role) {
+      if (errEl) {
+        errEl.textContent = 'Username atau password salah. Coba: user/user atau admin/admin';
+        errEl.style.display = 'block';
+      } else {
+        alert('Username atau password salah. Coba: user/user atau admin/admin');
+      }
+      return;
     }
-    
-    const usernameInput = document.getElementById('username');
-    if (usernameInput) {
-        setTimeout(() => {
-            usernameInput.focus();
-        }, 100);
+
+    // Set role → navbar akan mengikuti
+    NavbarRole.setRole(role);
+
+    // Bersihkan flag lama yang mungkin masih ada dari script lama
+    localStorage.removeItem('adminLoggedIn');
+
+    // Opsional simpan nama user
+    localStorage.setItem('displayName', role === NavbarRole.Role.ADMIN ? 'Admin' : 'User');
+
+    // Arahkan ke landing (navbar akan auto-render sesuai role)
+    if (role === NavbarRole.Role.ADMIN) {
+      location.href = 'dashboardadmin.html'; // ganti dengan nama file dashboard admin kamu
+    } else {
+      location.href = 'landing.html'; // user biasa tetap ke landing
     }
+
+    if (!localStorage.getItem('userData')) {
+      localStorage.setItem('userData', JSON.stringify({
+        name: 'Aliyah Rahma',
+        phone: '08123456789',
+        email: 'aliyah@gmail.com',
+        birth: '2004-06-15',
+        address: 'Jl. Mawar No. 10, Bandung'
+      }));
+    }
+
+  });
 });
+

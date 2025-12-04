@@ -1,3 +1,5 @@
+
+
 document.addEventListener('DOMContentLoaded', function() {
     function initializeSidebar() {
         const sidebarItems = document.querySelectorAll('.sidebar-item');
