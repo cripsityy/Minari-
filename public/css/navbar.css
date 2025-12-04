@@ -1,0 +1,68 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    overflow-x: hidden;
+}
+
+.navbar {
+    background-color: #FFF6F0 !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar.scrolled {
+    transition: background-color 0.4s ease, box-shadow 0.4s ease;
+    background-color: transparent !important;
+    box-shadow: none;
+}
+
+.navbar-brand img {
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));
+}
+
+.navbar a img {
+    transition: transform 0.2s ease;
+}
+
+.navbar a img:hover {
+    transform: scale(1.15);
+}
+
+:root {
+    --nav-h: 72px;
+}
+
+body {
+    padding-top: var(--nav-h);
+}
+
+#navMount .navbar,
+#navMount .navbar.navbar-expand-lg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: auto !important;
+    max-height: 120px;
+    padding-block: 12px !important;
+}
+
+#navMount .navbar .container {
+    height: auto !important;
+    min-height: unset !important;
+    padding-block: 0 !important;
+}
+
+#navMount .navbar .container {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}

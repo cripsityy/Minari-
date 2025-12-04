@@ -1,0 +1,74 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(176.11deg, #FBAF99 34.08%, rgba(251, 175, 153, 0.33) 74.19%);
+    min-height: 100vh;
+}
+
+.login-section {
+    min-height: calc(100vh - var(--nav-h, 72px));
+    padding: 20px;
+}
+
+.login-box {
+    background: #FFFFFF;
+    max-width: 400px;
+    width: 100%;
+    border: none;
+}
+
+.login-btn {
+    background: #FBAF99;
+    color: #000;
+    border: none;
+    padding: 12px;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+
+.login-btn:hover {
+    background: #F99D84;
+    transform: translateY(-2px);
+}
+
+.google-btn {
+    background: #FFFFFF;
+    color: #000;
+    border: 2px solid #FFE5DD;
+    padding: 12px;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+
+.google-btn:hover {
+    background: #f8f9fa;
+    border-color: #FBAF99;
+}
+
+.form-control {
+    border: 2px solid #FFE5DD;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.form-control:focus {
+    border-color: #FBAF99;
+    box-shadow: none;
+}
+
+a {
+    color: #FBAF99;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #F99D84;
+    text-decoration: underline;
+}

@@ -1,0 +1,20 @@
+<?php
+namespace App\Http\Middleware;
+use Closure;
+use Illuminate\Http\Request;
+
+class CheckRole
+{
+    public function handle(Request $request, Closure $next, $role)
+    {
+        if (!$request->session()->has('role')) {
+            return redirect()->route('login');
+        }
+        
+        if ($request->session()->get('role') !== $role) {
+            return redirect()->route('landing')->with('error', 'Unauthorized access');
+        }
+        
+        return $next($request);
+    }
+}
