@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MINARI | Products</title>
+  <title>{{ $category->name }} - MINARI</title>
 
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- CSS -->
   <link rel="stylesheet" href="{{ asset('css/category.css') }}">
@@ -18,20 +21,107 @@
 
   <!-- Hero -->
   <section class="hero">
-    <img id="heroImg" src="" alt="" class="hero__img">
-    <div id="heroTitle" class="hero__title"></div>
+    @if($category->image)
+        <img id="heroImg" src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" class="hero__img">
+    @else
+        <img id="heroImg" src="{{ asset('images/default-category.jpg') }}" alt="{{ $category->name }}" class="hero__img">
+    @endif
+    <div id="heroTitle" class="hero__title">{{ $category->name }}</div>
   </section>
 
   <!-- Grid produk -->
   <main class="container-fluid p-0">
-    <div id="productGrid" class="row g-0"></div>
+    <div id="productGrid" class="row g-0">
+        @if($products->count() > 0)
+            @foreach($products as $product)
+                <div class="col-6 col-md-4 col-lg-3" data-product-id="{{ $product->id }}">
+                    <a href="{{ route('products.detail', $product->slug) }}" class="p-card-link">
+                        <article class="p-card">
+                            @if($product->discount_price)
+                                <div class="discount-badge">
+                                    -{{ number_format((($product->price - $product->discount_price) / $product->price) * 100, 0) }}%
+                                </div>
+                            @endif
+                            
+                            <div class="p-thumb">
+                                <img src="{{ $product->image_url }}" alt="{{ $product->name }}" loading="lazy">
+                            </div>
+                            <div class="p-info">
+                                <div class="p-info-row">
+                                    <div class="p-text">
+                                        <h6 class="p-name">{{ $product->name }}</h6>
+                                        <div class="p-meta">
+                                            <div class="p-price">
+                                                @if($product->discount_price)
+                                                    <span class="old-price">
+                                                        Rp {{ number_format($product->price, 0, ',', '.') }}
+                                                    </span>
+                                                    <span class="current-price">
+                                                        Rp {{ number_format($product->discount_price, 0, ',', '.') }}
+                                                    </span>
+                                                @else
+                                                    <span class="current-price">
+                                                        Rp {{ number_format($product->price, 0, ',', '.') }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            @if($product->average_rating > 0)
+                                                <div class="product-rating">
+                                                    <i class="fas fa-star"></i> {{ number_format($product->average_rating, 1) }}
+                                                </div>
+                                            @endif
+                                        </div>
+                                        @if(!$product->is_in_stock)
+                                            <small class="out-of-stock-text">
+                                                <i class="fas fa-times-circle"></i> Out of Stock
+                                            </small>
+                                        @endif
+                                    </div>
+                                    <div class="p-mini-actions">
+                                        <button class="p-wish" aria-label="Wishlist" 
+                                                onclick="event.preventDefault(); addToWishlist({{ $product->id }}, this)">
+                                            <img src="{{ asset('images/whislist.png') }}" alt="wishlist">
+                                        </button>
+                                        <button class="p-cart" aria-label="Add to cart" 
+                                                onclick="event.preventDefault(); addToCart({{ $product->id }})">
+                                            <img src="{{ asset('images/chart.png') }}" alt="cart">
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </a>
+                </div>
+            @endforeach
+        @else
+            <div class="col-12">
+                <div class="product-empty-state">
+                    <i class="fas fa-box-open"></i>
+                    <h3>No Products Found</h3>
+                    <p>There are no products available in this category at the moment.</p>
+                    <a href="{{ route('home') }}" class="btn btn-primary mt-3 back-home-btn">
+                        <i class="fas fa-arrow-left"></i> Back to Home
+                    </a>
+                </div>
+            </div>
+        @endif
+    </div>
+    
+    <!-- Pagination -->
+    @if($products->count() > 0)
+        <div class="container mt-4 mb-5">
+            <div class="d-flex justify-content-center">
+                {{ $products->links() }}
+            </div>
+        </div>
+    @endif
   </main>
 
   <!-- Toast: added to cart -->
   <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="miniToast" class="toast align-items-center" data-bs-delay="1600" role="status" aria-live="polite">
       <div class="d-flex">
-        <div class="toast-body">Item has been added to your cart.</div>
+        <div class="toast-body" id="toastMessage">Item has been added to your cart.</div>
         <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
     </div>
@@ -59,7 +149,8 @@
 
   {{-- Sync role dari Laravel ke JS untuk navbar --}}
   <script>
-    window.APP_ROLE = "{{ session('role') ?? 'guest' }}";
+    window.APP_ROLE = "{{ Auth::check() ? (Auth::user()->hasRole('admin') ? 'admin' : 'user') : 'guest' }}";
+    window.CSRF_TOKEN = "{{ csrf_token() }}";
   </script>
 
   <!-- Navbar script -->
