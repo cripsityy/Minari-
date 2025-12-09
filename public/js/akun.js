@@ -1,4 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
+  // Cek apakah user sudah login
+  if (!window.IS_AUTHENTICATED || window.IS_AUTHENTICATED === 'false') {
+    // Jika guest, redirect ke login
+    window.location.href = '/login';
+    return;
+  }
+
   const fieldName     = document.getElementById('fieldName');
   const fieldPhone    = document.getElementById('fieldPhone');
   const fieldEmail    = document.getElementById('fieldEmail');
@@ -8,76 +15,44 @@ document.addEventListener('DOMContentLoaded', function () {
   const primaryAction = document.getElementById('primaryAction');
   const roleBadge     = document.getElementById('roleBadge');
   const userEmoji     = document.getElementById('userEmoji');
+  const logoutForm    = document.getElementById('logoutForm');
 
-  const role     = localStorage.getItem('role') || 'guest';
-  const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+  // Fetch user data dari server
+  function fetchUserData() {
+    fetch('/api/user/profile')
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          fillData(data.user);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching user data:', error);
+      });
+  }
 
   function fillData(data = {}) {
-    fieldName.textContent    = data.name    || '-';
-    fieldPhone.textContent   = data.phone   || '-';
-    fieldEmail.textContent   = data.email   || '-';
-    fieldBirth.textContent   = data.birth   || '-';
-    fieldAddress.textContent = data.address || '-';
-    if (data.emoji && userEmoji) userEmoji.textContent = data.emoji;
+    if (fieldName) fieldName.textContent    = data.name    || '-';
+    if (fieldPhone) fieldPhone.textContent   = data.phone   || '-';
+    if (fieldEmail) fieldEmail.textContent   = data.email   || '-';
+    if (fieldBirth) fieldBirth.textContent   = data.birth_date || '-';
+    if (fieldAddress) fieldAddress.textContent = data.address || '-';
+    if (userEmoji) {
+      userEmoji.textContent = data.role === 'admin' ? '🛠️' : '👩‍🦰';
+    }
+    if (roleBadge) {
+      roleBadge.textContent = data.role === 'admin' ? 'Admin' : 'User';
+    }
   }
-
-  function asGuest() {
-    roleBadge.textContent = 'Status: Guest';
-    fillData({});
-    primaryAction.textContent = 'LOG IN';
-    primaryAction.href = '/login';
-    addAddressLink.style.display = 'none';
-  }
-
-  function asUser() {
-    roleBadge.textContent = 'Status: User';
-    fillData(userData);
-
-    primaryAction.textContent = 'LOG OUT';
-    primaryAction.href = '#';
-    primaryAction.addEventListener('click', (e) => {
-      e.preventDefault();
-      localStorage.clear();
-      window.location.href = '/login';
-    });
-
-    addAddressLink.style.display = '';
-  }
-
-  function asAdmin() {
-    roleBadge.textContent = 'Status: Admin';
-    fillData({
-      name: 'Admin MINARI',
-      phone: '0800-ADMIN',
-      email: 'admin@minari.com',
-      birth: '—',
-      address: 'MINARI HQ Office',
-      emoji: '🛠️'
-    });
-
-    primaryAction.textContent = 'LOG OUT';
-    primaryAction.href = '#';
-    primaryAction.addEventListener('click', (e) => {
-      e.preventDefault();
-      localStorage.clear();
-      window.location.href = '/login';
-    });
-
-    addAddressLink.style.display = '';
-  }
-
-  // Tentukan UI berdasarkan role
-  if (role === 'user')   asUser();
-  else if (role === 'admin') asAdmin();
-  else asGuest();
 
   // ADD NEW SHIPPING ADDRESS
-  addAddressLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (localStorage.getItem('role') === 'user') {
+  if (addAddressLink) {
+    addAddressLink.addEventListener('click', (e) => {
+      e.preventDefault();
       window.location.href = '/shipping/add'; // ganti sesuai route Laravel kamu
-    } else {
-      window.location.href = '/login';
-    }
-  });
+    });
+  }
+
+  // Fetch data saat halaman load
+  fetchUserData();
 });

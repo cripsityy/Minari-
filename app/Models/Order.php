@@ -102,4 +102,14 @@ class Order extends Model
             default => 'badge-pending'
         };
     }
+
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
+    }
+
+    public function shipping()
+    {
+        return $this->hasOne(Shipping::class);
+    }
 }

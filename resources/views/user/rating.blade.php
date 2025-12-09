@@ -11,7 +11,7 @@
     {{-- CSS --}}
     <link rel="stylesheet" href="{{ asset('css/rating.css') }}">
     <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
-
+    @include('partials.navbar-scripts')
     {{-- Role Sync --}}
     <script>
         window.APP_ROLE = "{{ session('role') ?? 'guest' }}";

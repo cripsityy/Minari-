@@ -21,7 +21,7 @@ function tplGuest() {
   return `
   <nav class="navbar navbar-expand-lg fixed-top py-3">
     <div class="container">
-      <a class="navbar-brand" href="/b">
+      <a class="navbar-brand" href="/">
         <img src="/images/logofix.png" alt="MINARI Logo" width="100" height="auto" class="me-2">
       </a>
 
@@ -40,7 +40,7 @@ function tplGuest() {
   <div id="accMini" class="accmini" aria-hidden="true" role="dialog">
     <div class="accmini__row">
       <img src="/images/akun.png" width="16" height="16" class="accmini__icon" alt="">
-      <a id="accMiniName" class="accmini__name" href="/account">Guest</a>
+      <a id="accMiniName" class="accmini__name" href="/login">Guest</a>
     </div>
     <a id="accMiniBtn" class="accmini__btn" href="/login">Log in</a>
   </div>`;
@@ -74,7 +74,7 @@ function tplUser() {
 
     <div class="accmini__row">
       <img src="/images/order history.png" width="16" height="16" class="accmini__icon" alt="">
-      <a class="accmini__link" href="/orders/history" style="text-decoration: none; color: black;">Order history</a>
+      <a class="accmini__link" href="/orderhistory" style="text-decoration: none; color: black;">Order history</a>
     </div>
 
     <a id="accMiniBtn" class="accmini__btn" href="#">Log out</a>

@@ -1,133 +1,255 @@
-// cart.js — versi Laravel + support guest login modal
-
-// halaman payment
-const PAYMENT_PAGE = '/payment'; 
+// cart.js — versi Laravel dengan support guest & user
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log("ROLE SEKARANG:", window.APP_ROLE); // debug
+    console.log("ROLE SEKARANG:", window.APP_ROLE);
+    
+    const selectAll = document.getElementById('selectAll');
+    const cartList = document.getElementById('cartList');
+    const totalPrice = document.getElementById('totalPrice');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-  const selectAll   = document.getElementById('selectAll');
-  const cartList    = document.getElementById('cartList');
-  const totalPrice  = document.getElementById('totalPrice');
-  const checkoutBtn = document.getElementById('checkoutBtn');
+    if (!cartList) return;
 
-  if (!selectAll || !cartList || !totalPrice || !checkoutBtn) return;
+    const toNum = (v) => Number(String(v).replace(/[^\d]/g, '')) || 0;
+    const fmtIDR = (n) => 'Rp ' + (Number(n) || 0).toLocaleString('id-ID'); // Fixed: remove dot after Rp
 
-  const toNum = (v) => Number(String(v).replace(/[^\d]/g, '')) || 0;
-  const fmtIDR = (n) => 'Rp. ' + (Number(n) || 0).toLocaleString('id-ID');
+    function getRows() {
+        return [...cartList.querySelectorAll('.cart-item')];
+    }
 
-  function getRows(){
-    return [...cartList.querySelectorAll('.cart-item')];
-  }
+    function computeTotal() {
+        let total = 0;
+        getRows().forEach(row => {
+            const checked = row.querySelector('.item-check')?.checked;
+            const price = Number(row.dataset.price || 0);
+            const qtyInp = row.querySelector('.item-qty');
+            const qty = Math.max(1, Number(qtyInp?.value || 1));
+            if (checked) total += price * qty;
+        });
+        
+        if (totalPrice) {
+            totalPrice.textContent = fmtIDR(total);
+        }
+        
+        if (checkoutBtn) {
+            checkoutBtn.disabled = total === 0;
+        }
+        
+        return total;
+    }
 
-  function computeTotal(){
-    let total = 0;
-    getRows().forEach(row => {
-      const checked = row.querySelector('.item-check')?.checked;
-      const price   = Number(row.dataset.price || 0);
-      const qtyInp  = row.querySelector('.item-qty');
-      const qty     = Math.max(1, Number(qtyInp?.value || 1));
-      if (checked) total += price * qty;
+    function syncSelectAll() {
+        if (!selectAll) return;
+        
+        const checks = [...cartList.querySelectorAll('.item-check')];
+        const checkedCount = checks.filter(c => c.checked).length;
+        selectAll.checked = checkedCount > 0 && checkedCount === checks.length;
+        selectAll.indeterminate = checkedCount > 0 && checkedCount < checks.length;
+    }
+
+    // === Event: Select All
+    if (selectAll) {
+        selectAll.addEventListener('change', () => {
+            cartList.querySelectorAll('.item-check').forEach(c => c.checked = selectAll.checked);
+            computeTotal();
+        });
+    }
+
+    // === Update quantity via API
+    async function updateQuantity(itemId, quantity, isGuest) {
+        const endpoint = isGuest ? `/api/guest-cart/${itemId}` : `/api/cart/${itemId}`;
+        try {
+            const response = await fetch(endpoint, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ quantity: quantity })
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                computeTotal();
+            }
+        } catch (error) {
+            console.error('Error updating cart:', error);
+        }
+    }
+
+    // === Remove item via API
+    async function removeItem(itemId, isGuest, rowElement) {
+        if (!confirm('Are you sure you want to remove this item?')) return;
+        
+        const endpoint = isGuest ? `/api/guest-cart/${itemId}` : `/api/cart/${itemId}`;
+        try {
+            const response = await fetch(endpoint, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                }
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                rowElement.remove();
+                computeTotal();
+                syncSelectAll();
+                
+                // If cart is empty, refresh page
+                if (getRows().length === 0) {
+                    setTimeout(() => location.reload(), 500);
+                }
+            }
+        } catch (error) {
+            console.error('Error removing item:', error);
+        }
+    }
+
+    // === Delegasi tombol +/- 
+    cartList.addEventListener('click', (e) => {
+        const row = e.target.closest('.cart-item');
+        if (!row) return;
+
+        const itemId = row.dataset.id;
+        const isGuest = row.dataset.isGuest === 'true';
+        const inp = row.querySelector('.item-qty');
+        
+        if (!inp) return;
+
+        let quantity = Math.max(1, Number(inp.value || 1));
+
+        if (e.target.classList.contains('btnPlus')) {
+            quantity += 1;
+        }
+        
+        if (e.target.classList.contains('btnMinus') && quantity > 1) {
+            quantity -= 1;
+        }
+        
+        if (e.target.classList.contains('remove-item') || e.target.closest('.remove-item')) {
+            removeItem(itemId, isGuest, row);
+            return;
+        }
+
+        // Only update if quantity changed
+        if (quantity !== Number(inp.value)) {
+            inp.value = quantity;
+            
+            // Update via API
+            updateQuantity(itemId, quantity, isGuest);
+            
+            // Update local total
+            computeTotal();
+        }
     });
-    totalPrice.textContent = fmtIDR(total);
-    checkoutBtn.disabled = total === 0;
-    return total;
-  }
 
-  function syncSelectAll(){
-    const checks = [...cartList.querySelectorAll('.item-check')];
-    const checkedCount = checks.filter(c => c.checked).length;
-    selectAll.checked = checkedCount > 0 && checkedCount === checks.length;
-    selectAll.indeterminate = checkedCount > 0 && checkedCount < checks.length;
-  }
+    // === Perubahan qty manual
+    cartList.addEventListener('change', (e) => {
+        const el = e.target;
+        
+        if (el.classList.contains('item-qty')) {
+            const row = el.closest('.cart-item');
+            if (!row) return;
+            
+            const itemId = row.dataset.id;
+            const isGuest = row.dataset.isGuest === 'true';
+            let quantity = Math.max(1, Number(el.value || 1));
+            el.value = quantity;
+            
+            // Update via API
+            updateQuantity(itemId, quantity, isGuest);
+            computeTotal();
+        }
+        
+        if (el.classList.contains('item-check')) {
+            syncSelectAll();
+            computeTotal();
+        }
+    });
 
-  // === Event: Select All
-  selectAll.addEventListener('change', () => {
-    cartList.querySelectorAll('.item-check').forEach(c => c.checked = selectAll.checked);
+    // === Checkout
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', () => {
+            const role = window.APP_ROLE || 'guest';
+            console.log('Checkout diklik, role =', role);
+
+            // 1) Kalau GUEST → buka modal login
+            if (role === 'guest') {
+                const loginModalEl = document.getElementById('loginModal');
+                if (loginModalEl && window.bootstrap) {
+                    const modal = bootstrap.Modal.getOrCreateInstance(loginModalEl);
+                    modal.show();
+                } else {
+                    // fallback kalau bootstrap js belum ketemu
+                    window.location.href = '/login?redirect=' + encodeURIComponent('/cart');
+                }
+                return;
+            }
+
+            // 2) Kalau ADMIN → tidak bisa checkout
+            if (role === 'admin') {
+                alert('Admin cannot checkout. Please use a user account.');
+                return;
+            }
+
+            // 3) Kalau USER → lanjut ke checkout
+            window.location.href = '/cart/checkout';
+        });
+    }
+
+    // init
     computeTotal();
-  });
-
-  // === Delegasi tombol +/- 
-  cartList.addEventListener('click', (e) => {
-    const row = e.target.closest('.cart-item');
-    if (!row) return;
-
-    if (e.target.classList.contains('btnPlus')) {
-      const inp = row.querySelector('.item-qty');
-      inp.value = Math.max(1, Number(inp.value || 1) + 1);
-      computeTotal();
-    }
-    if (e.target.classList.contains('btnMinus')) {
-      const inp = row.querySelector('.item-qty');
-      inp.value = Math.max(1, Number(inp.value || 1) - 1);
-      computeTotal();
-    }
-  });
-
-  // === Perubahan qty / centang item
-  cartList.addEventListener('change', (e) => {
-    const el = e.target;
-    if (el.classList.contains('item-qty')) {
-      el.value = Math.max(1, Number(el.value || 1));
-      computeTotal();
-    }
-    if (el.classList.contains('item-check')) {
-      syncSelectAll();
-      computeTotal();
-    }
-  });
-
-  // === Checkout
-  checkoutBtn.addEventListener('click', () => {
-    const role = window.APP_ROLE || 'guest';
-    console.log('Checkout diklik, role =', role);
-
-    // 1) Kalau GUEST → buka modal login
-    if (role === 'guest') {
-      const loginModalEl = document.getElementById('loginModal');
-      if (loginModalEl && window.bootstrap) {
-        const modal = bootstrap.Modal.getOrCreateInstance(loginModalEl);
-        modal.show();
-      } else {
-        // fallback kalau bootstrap js belum ketemu
-        window.location.href = '/login';
-      }
-      return;
-    }
-
-    // 2) Kalau USER / ADMIN → lanjut proses checkout biasa
-    const rows = getRows();
-    const selected = [];
-
-    rows.forEach(row => {
-      const checked = row.querySelector('.item-check')?.checked;
-      if (!checked) return;
-
-      const id     = row.dataset.id || '';
-      const price  = Number(row.dataset.price || 0);
-      const qty    = Math.max(1, Number(row.querySelector('.item-qty')?.value || 1));
-      const imgEl  = row.querySelector('img');
-      const nameEl = row.querySelector('.fw-semibold');
-      const image  = imgEl ? imgEl.getAttribute('src') : '';
-      const name   = nameEl ? nameEl.textContent.trim() : 'Item';
-
-      selected.push({ id, name, image, price, quantity: qty });
-    });
-
-    if (!selected.length) {
-      alert('Please select at least one item to checkout');
-      return;
-    }
-
-    const total = toNum(totalPrice.textContent);
-
-    localStorage.setItem('selectedCartItems', JSON.stringify(selected));
-    localStorage.setItem('cartTotal', String(total));
-    localStorage.setItem('currentOrderNumber', 'ORD' + Date.now().toString().slice(-6));
-
-    window.location.href = PAYMENT_PAGE;
-  });
-
-  // init
-  computeTotal();
+    syncSelectAll();
 });
+
+// === Global function untuk menambahkan ke cart dari halaman lain
+window.addToCart = async function(productId, productName, price, image = '') {
+    const role = window.APP_ROLE || 'guest';
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    
+    const endpoint = role === 'guest' ? '/api/guest-cart/add' : '/api/cart/add';
+    const body = role === 'guest' ? {
+        product_id: productId,
+        name: productName,
+        price: price,
+        quantity: 1,
+        size: '',
+        color: '',
+        image: image
+    } : {
+        product_id: productId,
+        quantity: 1,
+        size: '',
+        color: ''
+    };
+    
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(body)
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            alert('Item added to cart!');
+            // Update cart count in navbar if available
+            if (window.NavbarRole?.updateCartCount) {
+                window.NavbarRole.updateCartCount(data.cart_count);
+            }
+            return true;
+        }
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+    }
+    
+    return false;
+};

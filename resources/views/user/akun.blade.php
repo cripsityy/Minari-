@@ -7,6 +7,7 @@
 
   {{-- Bootstrap --}}
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+ @include('partials.navbar-scripts')
 
   {{-- CSS --}}
   <link rel="stylesheet" href="{{ asset('css/akum.css') }}">
@@ -27,9 +28,21 @@
           <!-- icon user -->
           <div class="text-center mb-4">
             <div class="user-circle mx-auto">
-              <span class="user-emoji" id="userEmoji">👩‍🦰</span>
+              <span class="user-emoji" id="userEmoji">
+                @auth
+                  👩‍🦰
+                @else
+                  👤
+                @endauth
+              </span>
             </div>
-            <div class="mt-2 small text-muted" id="roleBadge" aria-live="polite"></div>
+            <div class="mt-2 small text-muted" id="roleBadge" aria-live="polite">
+              @auth
+                {{ Auth::user()->hasRole('admin') ? 'Admin' : 'User' }}
+              @else
+                Guest
+              @endauth
+            </div>
           </div>
 
           <!-- fields -->
@@ -37,38 +50,77 @@
             <div class="col-12 col-md-6">
               <div class="acc-field">
                 <div class="acc-label">NAME</div>
-                <div class="acc-value" id="fieldName">-</div>
+                <div class="acc-value" id="fieldName">
+                  @auth
+                    {{ Auth::user()->name ?? '-' }}
+                  @else
+                    -
+                  @endauth
+                </div>
               </div>
 
               <div class="acc-field">
                 <div class="acc-label">TELEPHONE NO.</div>
-                <div class="acc-value" id="fieldPhone">-</div>
+                <div class="acc-value" id="fieldPhone">
+                  @auth
+                    {{ Auth::user()->phone ?? '-' }}
+                  @else
+                    -
+                  @endauth
+                </div>
               </div>
 
               <div class="acc-field">
                 <div class="acc-label">EMAIL</div>
-                <div class="acc-value" id="fieldEmail">-</div>
+                <div class="acc-value" id="fieldEmail">
+                  @auth
+                    {{ Auth::user()->email ?? '-' }}
+                  @else
+                    -
+                  @endauth
+                </div>
               </div>
             </div>
 
             <div class="col-12 col-md-6">
               <div class="acc-field">
                 <div class="acc-label">BIRTHDAY DATE</div>
-                <div class="acc-value" id="fieldBirth">-</div>
+                <div class="acc-value" id="fieldBirth">
+                  @auth
+                    {{ Auth::user()->birth_date ?? '-' }}
+                  @else
+                    -
+                  @endauth
+                </div>
               </div>
 
               <div class="acc-field">
                 <div class="acc-label">ADDRESS</div>
-                <div class="acc-value" id="fieldAddress">-</div>
+                <div class="acc-value" id="fieldAddress">
+                  @auth
+                    {{ Auth::user()->address ?? '-' }}
+                  @else
+                    -
+                  @endauth
+                </div>
               </div>
 
-              <a href="#" id="addAddressLink" class="acc-add-address">ADD NEW SHIPPING ADDRESS</a>
+              @auth
+                <a href="#" id="addAddressLink" class="acc-add-address">ADD NEW SHIPPING ADDRESS</a>
+              @endauth
             </div>
           </div>
 
           <!-- actions -->
           <div class="mt-4 d-grid gap-2">
-            <a href="{{ route('login') }}" id="primaryAction" class="btn btn-account w-100">LOG IN</a>
+            @auth
+              <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="w-100">
+                @csrf
+                <button type="submit" class="btn btn-account w-100">LOG OUT</button>
+              </form>
+            @else
+              <a href="{{ route('login') }}" id="primaryAction" class="btn btn-account w-100">LOG IN</a>
+            @endauth
           </div>
 
         </div>
@@ -109,13 +161,15 @@
   {{-- JS --}}
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-
-<script>
-    window.APP_ROLE = "{{ session('role') ?? 'guest' }}";
-</script>
-<script src="{{ asset('js/navbar.js') }}"></script>
-
-      <script src="{{ asset('js/akun.js') }}"></script>
+  <script>
+    window.APP_ROLE = "{{ Auth::check() ? (Auth::user()->hasRole('admin') ? 'admin' : 'user') : 'guest' }}";
+    window.IS_AUTHENTICATED = {{ Auth::check() ? 'true' : 'false' }};
+  </script>
+  
   <script src="{{ asset('js/navbar.js') }}"></script>
+  
+  @auth
+    <script src="{{ asset('js/akun.js') }}"></script>
+  @endauth
 </body>
 </html>

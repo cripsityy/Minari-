@@ -6,7 +6,7 @@
     <title>Product Review - MINARI</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    @include('partials.navbar-scripts')
     {{-- CSS --}}
     <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/review.css') }}">
