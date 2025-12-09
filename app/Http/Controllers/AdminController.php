@@ -10,9 +10,15 @@ use App\Models\Review;
 use App\Models\Promotion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:admin']);
+    }
+    
     public function dashboard()
     {
         $stats = [
@@ -34,7 +40,7 @@ class AdminController extends Controller
     
     public function account()
     {
-        $admin = auth()->user();
+        $admin = Auth::user();
         return view('admin.account', compact('admin'));
     }
     

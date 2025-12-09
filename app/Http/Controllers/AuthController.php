@@ -14,8 +14,6 @@ class AuthController extends Controller
     
     public function showLogin()
     {
-        // Clear old session data jika ada
-        session()->forget('role');
         return view('auth.login');
     }
     
@@ -33,7 +31,6 @@ class AuthController extends Controller
     
     public function login(Request $request)
     {
-        // Validasi input - FIX: username required
         $validator = Validator::make($request->all(), [
             'username' => 'required|string',
             'password' => 'required|string|min:6',
@@ -43,24 +40,22 @@ class AuthController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        // Cari user berdasarkan username ATAU email
-        $user = User::where('username', $request->username)
-                    ->orWhere('email', $request->username)
-                    ->first();
-
-        // Check credentials - FIX: gunakan Auth::attempt
+        // Coba login dengan username atau email
+        $loginType = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        
         $credentials = [
-            'username' => $user->username ?? $request->username,
+            $loginType => $request->username,
             'password' => $request->password
         ];
         
+        // Attempt login
         if (!Auth::attempt($credentials)) {
             return back()->withErrors([
                 'username' => 'Username atau password salah.',
             ])->withInput()->with('error', 'Login gagal');
         }
 
-        // Regenerate session SEBELUM set data
+        // Regenerate session
         $request->session()->regenerate();
         
         // Get authenticated user
@@ -69,27 +64,17 @@ class AuthController extends Controller
         // Set session role
         if ($user->hasRole('admin')) {
             session(['role' => 'admin']);
+            return redirect()->route('admin.dashboard')
+                ->with('success', 'Selamat datang, Admin!');
         } else {
             session(['role' => 'user']);
+            return redirect()->route('home')
+                ->with('success', 'Login berhasil!');
         }
-        
-        // Transfer guest cart
-        $this->transferGuestCart();
-        
-        // Redirect berdasarkan role
-        if (session('role') === 'admin') {
-        return redirect()->route('admin.dashboard')
-            ->with('success', 'Selamat datang, Admin!');
-        }
-        
-        // Redirect ke home page
-        return redirect()->route('home')
-            ->with('success', 'Login berhasil!');
     }
     
     public function adminLogin(Request $request)
     {
-        // Sederhanakan: pakai login biasa
         return $this->login($request);
     }
     
@@ -118,7 +103,6 @@ class AuthController extends Controller
         }
 
         try {
-            // Create user
             $user = User::create([
                 'name' => $request->name,
                 'username' => $request->username,
@@ -141,8 +125,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
             session(['role' => 'user']);
             
-            // Redirect
-            return redirect()->route('user.dashboard')
+            return redirect()->route('home')
                 ->with('success', 'Registrasi berhasil! Selamat datang di MINARI!');
 
         } catch (\Exception $e) {
@@ -156,37 +139,23 @@ class AuthController extends Controller
     
     public function logout(Request $request)
     {
-        // Logout user
+        // 1. Logout dari Auth Laravel
         Auth::logout();
         
-        // Clear session
+        // 2. Hapus semua session data
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         
-        return redirect('/')->with('success', 'Logout berhasil.');
+        // 3. Clear session manual
+        session()->flush();
+        
+        // 4. Redirect ke home
+        return redirect('/')->with('success', 'Logout berhasil!');
     }
     
-    // ========== HELPER METHODS ==========
-    
-    private function transferGuestCart()
+    // ========== LOGOUT GET (UNTUK NAVBAR JS) ==========
+    public function logoutGet()
     {
-        if (Auth::check()) {
-            $guestCart = session()->get('guest_cart', []);
-            
-            if (!empty($guestCart)) {
-                $user = Auth::user();
-                
-                foreach ($guestCart as $item) {
-                    if (!isset($item['product_id'])) {
-                        continue;
-                    }
-                    
-                    // Logic transfer cart
-                    // Sesuaikan dengan model Cart kamu
-                }
-                
-                session()->forget('guest_cart');
-            }
-        }
+        return $this->logout(request());
     }
 }

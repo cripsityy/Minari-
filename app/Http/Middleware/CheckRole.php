@@ -12,22 +12,20 @@ class CheckRole
     {
         // Cek apakah user sudah login
         if (!Auth::check()) {
-            return redirect()->route('login');
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
         }
         
-        // Jika pakai session untuk role
+        $user = Auth::user();
+        
+        // Cek role berdasarkan session
         if ($request->session()->has('role')) {
             if ($request->session()->get('role') !== $role) {
-                return redirect()->route('landing')->with('error', 'Unauthorized access');
+                return redirect()->route('home')->with('error', 'Akses ditolak.');
             }
-        }
-        // Jika pakai Spatie Role/Permission
-        else if (!Auth::user()->hasRole($role)) {
-            return redirect()->route('landing')->with('error', 'Unauthorized access');
-        }
-        // Jika pakai field role di database
-        else if (Auth::user()->role !== $role) {
-            return redirect()->route('landing')->with('error', 'Unauthorized access');
+        } 
+        // Jika tidak ada session, cek Spatie Role
+        elseif (method_exists($user, 'hasRole') && !$user->hasRole($role)) {
+            return redirect()->route('home')->with('error', 'Akses ditolak.');
         }
         
         return $next($request);

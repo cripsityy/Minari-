@@ -5,28 +5,17 @@ const Role = {
   ADMIN: 'admin'
 };
 
-function getRole() {
-  // Ambil dari Laravel (window.APP_ROLE), default guest
-  return window.APP_ROLE || Role.GUEST;
-}
-function setRole(r) {
-  window.APP_ROLE = r;
-}
-function clearRole() {
-  window.APP_ROLE = Role.GUEST;
-}
-
 // ====== Templates ======
 function tplGuest() {
   return `
-  <nav class="navbar navbar-expand-lg fixed-top py-3">
+  <nav class="navbar navbar-expand-lg fixed-top py-3" style="background-color: #FFF6F0 !important; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
     <div class="container">
       <a class="navbar-brand" href="/">
         <img src="/images/logofix.png" alt="MINARI Logo" width="100" height="auto" class="me-2">
       </a>
 
       <div class="d-flex align-items-center ms-auto gap-3">
-        <button id="accBtn" class="btn p-0 border-0 bg-transparent" aria-label="Account">
+        <button id="accBtn" class="btn p-0 border-0" style="background: transparent !important; cursor: pointer;">
           <img src="/images/akun.png" alt="User" width="24" height="24">
         </button>
         <a href="/wishlist"><img src="/images/whislist.png" alt="Favorite" width="24" height="24"></a>
@@ -37,25 +26,25 @@ function tplGuest() {
     </div>
   </nav>
 
-  <div id="accMini" class="accmini" aria-hidden="true" role="dialog">
-    <div class="accmini__row">
+  <div id="accMini" class="accmini" style="display: none; position: fixed; z-index: 9999; background: #FFF6F0; border: 1px solid #ead9d2; border-radius: 12px; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15); padding: 14px 12px 12px; width: 220px;">
+    <div class="accmini__row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
       <img src="/images/akun.png" width="16" height="16" class="accmini__icon" alt="">
-      <a id="accMiniName" class="accmini__name" href="/login">Guest</a>
+      <a class="accmini__name" href="/login" style="font-weight: 500; color: #1f1f1f; text-decoration: none;">Guest</a>
     </div>
-    <a id="accMiniBtn" class="accmini__btn" href="/login">Log in</a>
+    <a class="accmini__btn" href="/login" style="display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 36px; background-color: #ffffff; border: 1.5px solid #d9c8c1; border-radius: 10px; color: #1e1e1e; font-weight: 600; text-decoration: none; font-size: 14px; cursor: pointer; transition: all 0.25s ease; margin-top: 8px;">Log in</a>
   </div>`;
 }
 
 function tplUser() {
   return `
-  <nav class="navbar navbar-expand-lg sticky-top py-3">
+  <nav class="navbar navbar-expand-lg fixed-top py-3" style="background-color: #FFF6F0 !important; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
     <div class="container">
-      <a class="navbar-brand" href="/b">
+      <a class="navbar-brand" href="/">
         <img src="/images/logofix.png" alt="MINARI Logo" width="100" height="auto" class="me-2">
       </a>
 
       <div class="d-flex align-items-center ms-auto gap-3">
-        <button id="accBtn" class="btn p-0 border-0 bg-transparent" aria-label="Account">
+        <button id="accBtn" class="btn p-0 border-0" style="background: transparent !important; cursor: pointer;">
           <img src="/images/akun.png" alt="User" width="24" height="24">
         </button>
         <a href="/wishlist"><img src="/images/whislist.png" alt="Favorite" width="24" height="24"></a>
@@ -66,31 +55,29 @@ function tplUser() {
     </div>
   </nav>
 
-  <div id="accMini" class="accmini" aria-hidden="true" role="dialog">
-    <div class="accmini__row">
+  <div id="accMini" class="accmini" style="display: none; position: fixed; z-index: 9999; background: #FFF6F0; border: 1px solid #ead9d2; border-radius: 12px; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15); padding: 14px 12px 12px; width: 220px;">
+    <div class="accmini__row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
       <img src="/images/akun.png" width="16" height="16" class="accmini__icon" alt="">
-      <a id="accMiniName" class="accmini__link" href="/akun" style="text-decoration: none; color: black;">Account</a>
+      <a class="accmini__link" href="/user/account" style="font-weight: 500; color: #1f1f1f; text-decoration: none;">Account</a>
     </div>
-
-    <div class="accmini__row">
+    <div class="accmini__row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
       <img src="/images/order history.png" width="16" height="16" class="accmini__icon" alt="">
-      <a class="accmini__link" href="/orderhistory" style="text-decoration: none; color: black;">Order history</a>
+      <a class="accmini__link" href="/orderhistory" style="font-weight: 500; color: #1f1f1f; text-decoration: none;">Order history</a>
     </div>
-
-    <a id="accMiniBtn" class="accmini__btn" href="#">Log out</a>
+    <button id="logoutBtn" class="accmini__btn" style="display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 36px; background-color: #ffffff; border: 1.5px solid #d9c8c1; border-radius: 10px; color: #1e1e1e; font-weight: 600; text-decoration: none; font-size: 14px; cursor: pointer; transition: all 0.25s ease; margin-top: 8px;">Log out</button>
   </div>`;
 }
 
 function tplAdmin() {
   return `
-  <nav class="navbar navbar-expand-lg sticky-top py-3">
+  <nav class="navbar navbar-expand-lg fixed-top py-3" style="background-color: #FFF6F0 !important; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
     <div class="container">
-      <a class="navbar-brand" href="/b">
+      <a class="navbar-brand" href="/">
         <img src="/images/logofix.png" alt="MINARI Logo" width="100" height="auto" class="me-2">
       </a>
 
       <div class="d-flex align-items-center ms-auto gap-3">
-        <button id="accBtn" class="btn p-0 border-0 bg-transparent" aria-label="Admin">
+        <button id="accBtn" class="btn p-0 border-0" style="background: transparent !important; cursor: pointer;">
           <img src="/images/akun.png" alt="Admin" width="24" height="24">
         </button>
         <a href="/menu"><img src="/images/searchnav.png" alt="Search" width="24" height="24"></a>
@@ -100,134 +87,116 @@ function tplAdmin() {
     </div>
   </nav>
 
-  <div id="accMini" class="accmini" aria-hidden="true" role="dialog">
-    <div class="accmini__row">
+  <div id="accMini" class="accmini" style="display: none; position: fixed; z-index: 9999; background: #FFF6F0; border: 1px solid #ead9d2; border-radius: 12px; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15); padding: 14px 12px 12px; width: 220px;">
+    <div class="accmini__row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
       <img src="/images/akun.png" width="16" height="16" class="accmini__icon" alt="">
-      <a id="accMiniName" class="accmini__link" href="/user/account" style="text-decoration: none; color: black;">Admin</a>
+      <a class="accmini__link" href="/admin/account" style="font-weight: 500; color: #1f1f1f; text-decoration: none;">Admin</a>
     </div>
-
-    <div class="accmini__row">
+    <div class="accmini__row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
       <img src="/images/add.png" width="16" height="16" class="accmini__icon" alt="">
-      <a class="accmini__link" href="/admin/dashboard" style="text-decoration: none; color: black;">Dashboard</a>
+      <a class="accmini__link" href="/admin/dashboard" style="font-weight: 500; color: #1f1f1f; text-decoration: none;">Dashboard</a>
     </div>
-
-    <a id="accMiniBtn" class="accmini__btn" href="#">Log out</a>
+    <button id="logoutBtn" class="accmini__btn" style="display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 36px; background-color: #ffffff; border: 1.5px solid #d9c8c1; border-radius: 10px; color: #1e1e1e; font-weight: 600; text-decoration: none; font-size: 14px; cursor: pointer; transition: all 0.25s ease; margin-top: 8px;">Log out</button>
   </div>`;
 }
 
-// ====== Render + Interaksi ======
+// ====== Main Render Function ======
 function renderNavbar() {
   const mount = document.getElementById('navMount');
-  if (!mount) return;
-
-  const role = getRole();
-
-  mount.innerHTML =
-    role === Role.ADMIN ? tplAdmin()
-  : role === Role.USER  ? tplUser()
-  : tplGuest();
-
-  const navbar = mount.querySelector('.navbar');
-  if (navbar) {
-    const onScroll = () => {
-      if (window.scrollY > 50) navbar.classList.add('scrolled');
-      else navbar.classList.remove('scrolled');
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
+  if (!mount) {
+    console.error('Element #navMount not found');
+    return;
   }
 
-  const accMini = document.getElementById('accMini');
-  const accBtn  = document.getElementById('accBtn');
-  const nameEl  = document.getElementById('accMiniName');
-  const btn     = document.getElementById('accMiniBtn');
+  // Get role from global variable set by Laravel
+  const role = window.APP_ROLE || Role.GUEST;
+  
+  console.log('Rendering navbar with role:', role);
 
-  function doLogout() {
-    clearRole();
-    closeMenu();
-    location.href = '/logout'; // <-- route logout Laravel
+  // Clear and render template based on role
+  mount.innerHTML = '';
+  if (role === Role.ADMIN) {
+    mount.innerHTML = tplAdmin();
+  } else if (role === Role.USER) {
+    mount.innerHTML = tplUser();
+  } else {
+    mount.innerHTML = tplGuest();
   }
 
-  function syncUI() {
-    if (!nameEl || !btn) return;
-
-    const r = getRole();
-
-    if (r === Role.USER) {
-      nameEl.textContent = 'Account';
-      btn.textContent = 'Log out';
-      btn.onclick = (e) => {
-        e.preventDefault();
-        doLogout();
-      };
-    } else if (r === Role.ADMIN) {
-      nameEl.textContent = 'Admin';
-      btn.textContent = 'Log out';
-      btn.onclick = (e) => {
-        e.preventDefault();
-        doLogout();
-      };
-    } else {
-      nameEl.textContent = 'Guest';
-      btn.textContent = 'Log in';
-      btn.setAttribute('href', '/login');
-      btn.onclick = null;
-    }
-  }
-
-  function positionMenu() {
-    if (!accMini || !accBtn) return;
-    const r = accBtn.getBoundingClientRect();
-    accMini.style.top  = `${r.bottom + 10}px`;
-    accMini.style.left = `${r.left - (220 - r.width)}px`;
-  }
-
-  function onDocClick(e) {
-    if (accMini.contains(e.target) || accBtn.contains(e.target)) return;
-    closeMenu();
-  }
-  function onKey(e) {
-    if (e.key === 'Escape') closeMenu();
-  }
-
-  function openMenu() {
-    if (!accMini || !accBtn) return;
-    syncUI();
-    positionMenu();
-    accMini.classList.add('show');
-
-    document.addEventListener('click', onDocClick, true);
-    document.addEventListener('keydown', onKey);
-    window.addEventListener('resize', positionMenu);
-    window.addEventListener('scroll', positionMenu, { passive: true });
-  }
-
-  function closeMenu() {
-    if (!accMini) return;
-    accMini.classList.remove('show');
-
-    document.removeEventListener('click', onDocClick, true);
-    document.removeEventListener('keydown', onKey);
-    window.removeEventListener('resize', positionMenu);
-    window.removeEventListener('scroll', positionMenu);
-  }
-
-  if (accBtn && accMini) {
-    accBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      accMini.classList.contains('show') ? closeMenu() : openMenu();
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const nav = document.querySelector('#navMount .navbar');
-    if (!nav) return;
-    const h = nav.offsetHeight;
-    document.documentElement.style.setProperty('--nav-h', h + 'px');
-  });
+  // Setup event listeners
+  setTimeout(attachEventListeners, 100);
 }
 
-document.addEventListener('DOMContentLoaded', renderNavbar);
+function attachEventListeners() {
+  console.log('Attaching event listeners...');
+  
+  const accBtn = document.getElementById('accBtn');
+  const accMini = document.getElementById('accMini');
+  
+  console.log('Found elements:', { accBtn, accMini });
+  
+  if (accBtn && accMini) {
+    // Remove any existing event listeners
+    const newAccBtn = accBtn.cloneNode(true);
+    accBtn.parentNode.replaceChild(newAccBtn, accBtn);
+    
+    // Get new reference
+    const currentAccBtn = document.getElementById('accBtn');
+    const currentAccMini = accMini;
+    
+    // Add click event to account button
+    currentAccBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('Account button clicked!');
+      
+      // Get position of button
+      const rect = currentAccBtn.getBoundingClientRect();
+      console.log('Button position:', rect);
+      
+      // Toggle dropdown
+      if (currentAccMini.style.display === 'block' || currentAccMini.style.display === '') {
+        currentAccMini.style.display = 'none';
+      } else {
+        // Position dropdown below button
+        currentAccMini.style.position = 'fixed';
+        currentAccMini.style.top = (rect.bottom + 10) + 'px';
+        currentAccMini.style.right = (window.innerWidth - rect.right + 10) + 'px';
+        currentAccMini.style.display = 'block';
+        currentAccMini.style.opacity = '1';
+      }
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      if (currentAccMini && 
+          !currentAccMini.contains(e.target) && 
+          !currentAccBtn.contains(e.target)) {
+        currentAccMini.style.display = 'none';
+      }
+    });
+    
+    // Handle logout button
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (confirm('Apakah Anda yakin ingin logout?')) {
+          window.location.href = '/logout';
+        }
+      });
+    }
+    
+    console.log('Event listeners attached successfully');
+  }
+}
 
-// Expose (kalau mau dipakai di halaman lain)
-window.NavbarRole = { setRole, getRole, clearRole, Role };
+// Initialize
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', renderNavbar);
+} else {
+  renderNavbar();
+}
+
+// Re-render on window load for safety
+window.addEventListener('load', renderNavbar);

@@ -30,12 +30,6 @@
             <!-- Title -->
             <h1 class="wish-title">Wishlist</h1>
             
-            <!-- Tabs + Search line -->
-            <div class="wish-tabs">
-                <button class="wish-tab active" data-tab="product">Product</button>
-                <button class="wish-tab" data-tab="category" disabled>Category</button>
-            </div>
-            
             <!-- Top meta line -->
             <div class="wish-meta">
                 <div>
