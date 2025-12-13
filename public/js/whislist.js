@@ -35,11 +35,11 @@ async function fetchWishlist() {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
-        
+
         if (response.status === 401) {
             return null; // Unauthorized
         }
-        
+
         if (!response.ok) throw new Error('Failed to fetch wishlist');
         return await response.json();
     } catch (error) {
@@ -66,7 +66,7 @@ async function removeFromWishlist(id) {
 
 async function addToCart(productId) {
     try {
-        const response = await fetch('/api/cart/add', {
+        const response = await fetch('/api/cart', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -91,7 +91,7 @@ async function addToCart(productId) {
 function renderGuestView() {
     const content = document.getElementById('wishContent');
     if (!content) return;
-    
+
     content.innerHTML = `
         <div class="container">
             <h1 class="wish-title">Wishlist</h1>
@@ -108,11 +108,11 @@ function renderGuestView() {
 function renderWishlistItems(items) {
     const root = document.getElementById('wishList');
     const counter = document.getElementById('resultCount');
-    
+
     if (!root || !counter) return;
-    
+
     counter.textContent = `Results: ${items.length} product${items.length !== 1 ? 's' : ''}`;
-    
+
     if (items.length === 0) {
         root.innerHTML = `
             <div class="empty-wishlist text-center py-5">
@@ -123,13 +123,13 @@ function renderWishlistItems(items) {
         `;
         return;
     }
-    
+
     root.innerHTML = items.map(item => {
         const product = item.product || item;
-        const imageUrl = product.image 
+        const imageUrl = product.image
             ? `/storage/${product.image}`
             : '/images/default-product.jpg';
-        
+
         return `
             <article class="w-item" data-id="${product.id}" data-wishlist-id="${item.id}">
                 <div class="w-img">
@@ -162,16 +162,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderGuestView();
         return;
     }
-    
+
     const items = await fetchWishlist();
     if (items === null) {
         // Session expired
         renderGuestView();
         return;
     }
-    
+
     renderWishlistItems(items);
-    
+
     // Event listeners
     const wishListContainer = document.getElementById('wishList');
     if (wishListContainer) {
@@ -179,9 +179,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const removeBtn = e.target.closest('.js-remove');
             const addCartBtn = e.target.closest('.js-addcart');
             const card = e.target.closest('.w-item');
-            
+
             if (!card) return;
-            
+
             if (removeBtn) {
                 const wishlistId = card.dataset.wishlistId;
                 const result = await removeFromWishlist(wishlistId);
@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     showToast(result.message);
                 }
             }
-            
+
             if (addCartBtn) {
                 const productId = card.dataset.id;
                 const result = await addToCart(productId);

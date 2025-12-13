@@ -12,7 +12,9 @@
     @include('partials.navbar-scripts')
     {{-- CSS --}}
     <link rel="stylesheet" href="{{ asset('css/style4.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style4.css') }}">
     <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
 <body>
@@ -48,48 +50,60 @@
                         </div>
 
                         <div class="order-content">
-                            <div class="product-info">
-                                <div class="product-image">
-                                    @if(isset($order->items[0]->product_image))
-                                        <img src="{{ asset($order->items[0]->product_image) }}" alt="Product">
-                                    @else
-                                        {{-- Default images berdasarkan order id --}}
-                                        @if($order->id == '0103')
-                                            <img src="{{ asset('images/cardigangreen.png') }}" alt="Soft green cardigan">
-                                        @elseif($order->id == '0102')
-                                            <img src="{{ asset('images/whitetshirt.png') }}" alt="White shirt">
-                                        @else
-                                            <img src="{{ asset('images/dress.jpg') }}" alt="Product">
-                                        @endif
-                                    @endif
+                            @foreach($order->items as $item)
+                                <div class="product-info mb-3 border-bottom pb-3">
+                                    <div class="product-image">
+                                        <img src="{{ $item->product_image ?? ($item->product->image ? asset('storage/'.$item->product->image) : asset('images/default-product.jpg')) }}" alt="{{ $item->product_name }}">
+                                    </div>
+                                    <div class="product-details w-100">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h4>{{ $item->product_name }}</h4>
+                                                <p class="product-specs">
+                                                    Qty: {{ $item->quantity }} • 
+                                                    Size: {{ $item->size ?? '-' }}
+                                                </p>
+                                                <p class="product-price">{{ $item->price }}</p>
+                                            </div>
+                                            
+                                            {{-- Review Button --}}
+                                            @if($order->status == 'Completed' || $order->status == 'Delivered' || $order->status == 'Sent')
+                                                 @php
+                                                    $hasReview = $item->product && $item->product->reviews->where('order_id', $order->id)->where('user_id', auth()->id())->first();
+                                                @endphp
+                                                
+                                                @if(!$hasReview)
+                                                    <button class="btn btn-sm btn-outline-warning" 
+                                                            onclick="openReviewModal('{{ $order->id }}', '{{ $item->product_id }}', '{{ $item->product_name }}')">
+                                                        Write Review
+                                                    </button>
+                                                @else
+                                                    <span class="badge bg-success">Reviewed</span>
+                                                @endif
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="product-details">
-                                    <h4>{{ $order->items[0]->product_name ?? 'Product Name' }}</h4>
-                                    <p class="product-specs">
-                                        Qty: {{ $order->items[0]->quantity ?? 1 }} • 
-                                        Size: {{ $order->items[0]->size ?? 'M' }}
-                                    </p>
-                                    <p class="product-price">{{ $order->items[0]->price ?? 'Rp. 0,00' }}</p>
-                                </div>
-                            </div>
+                            @endforeach
 
-                            <div class="order-summary">
+                            <div class="order-summary mt-3">
                                 <div class="delivery-info">
                                     <span class="material-icons">location_on</span> 
-                                    Delivered to: {{ $order->delivery ?? 'Home' }}
+                                    Delivered to: {{ $order->delivery ?? ($order->shipping_address ?? 'Home') }}
                                 </div>
                                 <div class="payment-info">
                                     <span class="material-icons">payments</span> 
                                     {{ $order->payment_method ?? 'Cash on Delivery' }}
                                 </div>
                                 <div class="total-price">
-                                    Total: {{ $order->total ?? 'Rp. 0,00' }}
+                                    Total: {{ $order->total ?? ('Rp ' . number_format($order->total_amount ?? 0, 0, ',', '.')) }}
                                 </div>
                             </div>
                         </div>
 
                         <div class="order-actions">
-                            <a href="{{ route('orderdetail', ['id' => $order->id]) }}" class="btn-view-details">View Details</a>
+                            <a href="{{ route('order.detail', ['id' => $order->id]) }}" class="btn-view-details">View Details</a>
+                            <a href="{{ route('rating.page', ['order_id' => $order->id]) }}" class="btn btn-outline-warning ms-2">Rate Product</a>
                         </div>
                     </div>
                 @endforeach
@@ -133,7 +147,7 @@
                     </div>
 
                     <div class="order-actions">
-                        <a href="/orderdetail/0103" class="btn-view-details">View Details</a>
+                        <a href="#" class="btn-view-details">View Details</a>
                     </div>
                 </div>
                 <!-- ... tambahkan order statis lainnya ... -->
@@ -151,7 +165,135 @@
 </script>
 
 <script src="{{ asset('js/navbar.js') }}"></script>
+<script src="{{ asset('js/navbar.js') }}"></script>
 <script src="{{ asset('js/orderhistory.js') }}"></script>
+
+<!-- Review Modal -->
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Write a Review</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="reviewForm">
+            <input type="hidden" id="reviewOrderId" name="order_id">
+            <input type="hidden" id="reviewProductId" name="product_id">
+            
+            <p id="reviewProductName" class="fw-bold mb-3"></p>
+            
+            <div class="mb-3">
+                <label class="form-label">Rating</label>
+                <div class="rating-input h3 text-warning" style="cursor: pointer;">
+                    <i class="far fa-star" data-value="1"></i>
+                    <i class="far fa-star" data-value="2"></i>
+                    <i class="far fa-star" data-value="3"></i>
+                    <i class="far fa-star" data-value="4"></i>
+                    <i class="far fa-star" data-value="5"></i>
+                </div>
+                <input type="hidden" name="rating" id="reviewRating" required>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Comment</label>
+                <textarea class="form-control" name="comment" rows="3" required></textarea>
+            </div>
+            
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" name="is_anonymous" id="anonCheck">
+                <label class="form-check-label" for="anonCheck">
+                    Review anonymously
+                </label>
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="submitReview()">Submit Review</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    let reviewModal;
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        reviewModal = new bootstrap.Modal(document.getElementById('reviewModal'));
+        
+        // Star rating handler
+        document.querySelectorAll('.rating-input i').forEach(star => {
+            star.addEventListener('click', function() {
+                const val = this.dataset.value;
+                document.getElementById('reviewRating').value = val;
+                
+                // Update visuals
+                document.querySelectorAll('.rating-input i').forEach((s, index) => {
+                    if (index < val) {
+                        s.classList.remove('far');
+                        s.classList.add('fas');
+                    } else {
+                        s.classList.remove('fas');
+                        s.classList.add('far');
+                    }
+                });
+            });
+        });
+    });
+
+    function openReviewModal(orderId, productId, productName) {
+        document.getElementById('reviewOrderId').value = orderId;
+        document.getElementById('reviewProductId').value = productId;
+        document.getElementById('reviewProductName').textContent = productName;
+        document.getElementById('reviewForm').reset();
+        
+        // Reset stars
+        document.querySelectorAll('.rating-input i').forEach(s => {
+            s.classList.remove('fas');
+            s.classList.add('far');
+        });
+        document.getElementById('reviewRating').value = '';
+        
+        reviewModal.show();
+    }
+    
+    async function submitReview() {
+        if (!document.getElementById('reviewRating').value) {
+            alert('Please select a rating');
+            return;
+        }
+        
+        const form = document.getElementById('reviewForm');
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        data.is_anonymous = document.getElementById('anonCheck').checked ? 1 : 0;
+        
+        try {
+            const response = await fetch('/api/submit-review', { // Assuming this is the endpoint from UserController
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('Review submitted successfully!');
+                reviewModal.hide();
+                location.reload();
+            } else {
+                alert(result.message || 'Failed to submit review');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred');
+        }
+    }
+</script>
 
 </body>
 </html>

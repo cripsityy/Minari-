@@ -20,7 +20,7 @@
 
 <div class="back-navigation">
     <div class="container">
-        <a href="{{ route('payment.page') }}" class="back-link">
+        <a href="javascript:history.back()" class="back-link">
             <i class="fas fa-arrow-left"></i>
             <span>Back to order</span>
         </a>
@@ -63,10 +63,11 @@
 
 <script>
     window.APP_ROLE = "{{ session('role') ?? 'guest' }}";
+    window.ROUTE_PAYMENT = "{{ route('payment') }}";
 </script>
 
 <script src="{{ asset('js/navbar.js') }}"></script>
-<script src="{{ asset('js/paymentmeth..js') }}"></script>
+<script src="{{ asset('js/paymentmeth.js') }}"></script>
 
 </body>
 </html>

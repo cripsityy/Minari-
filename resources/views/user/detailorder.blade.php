@@ -32,82 +32,117 @@
     </div>
 </div>
 
-{{-- MAIN CONTENT --}}
-<div class="main-content">
-    <div class="container">
+<form action="{{ route('place.order') }}" method="POST" id="checkoutForm">
+    @csrf
+    <input type="hidden" name="selected_items" value="{{ implode(',', $selectedIds) }}">
+    <input type="hidden" name="shipping_address" id="inputShippingAddress" value="">
+    <input type="hidden" name="shipping_city" id="inputShippingCity" value="">
+    <input type="hidden" name="shipping_postal_code" id="inputShippingPostalCode" value="">
+    <input type="hidden" name="payment_method" id="inputPaymentMethod" value="cash_on_delivery">
+    <input type="hidden" name="notes" value="">
 
-        {{-- PRODUCT SECTION --}}
-        <div class="product-section" id="productSection">
-            <div class="product-item">
-                <div class="product-image">
-                    <img src="{{ asset('images/cardigangreen.png') }}" alt="Soft green cardigan">
+    {{-- MAIN CONTENT --}}
+    <div class="main-content">
+        <div class="container">
+
+            {{-- PRODUCT SECTION --}}
+            <div class="product-section" id="productSection">
+                @foreach($cartItems as $item)
+                <div class="product-item">
+                    <div class="product-image">
+                        <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : asset('images/default-product.jpg') }}" alt="{{ $item->product->name }}">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">{{ $item->product->name }}</h3>
+                        <p class="product-price">Rp {{ number_format($item->product->final_price ?? $item->product->price, 0, ',', '.') }}</p>
+                        <p class="product-quantity">Quantity: {{ $item->quantity }}</p>
+                        @if($item->size) <p class="small text-muted">Size: {{ $item->size }}</p> @endif
+                        @if($item->color) <p class="small text-muted">Color: {{ $item->color }}</p> @endif
+                    </div>
                 </div>
-                <div class="product-info">
-                    <h3 class="product-name">Soft green cardigan</h3>
-                    <p class="product-price">Rp. 250.000,00</p>
+                @endforeach
+            </div>
+
+            {{-- SHIPPING --}}
+            <div class="info-section">
+                <div class="section-header clickable" onclick="window.location.href='{{ route('shipping.address') }}' + window.location.search">
+                    <h3 class="section-title">Shipping to</h3>
+                    <div class="section-action">
+                        @php
+                            $primaryAddress = $addresses->firstWhere('is_primary', true) ?? $addresses->first();
+                        @endphp
+                        
+                        @if($primaryAddress)
+                            <div class="text-end">
+                                <span class="address-name d-block fw-bold" id="selectedAddressDisplay">{{ $primaryAddress->title }} ({{ $primaryAddress->recipient_name }})</span>
+                                <span class="small text-muted d-block text-truncate" style="max-width: 200px;" id="selectedAddressDetails">{{ $primaryAddress->address_line1 }}, {{ $primaryAddress->city }}</span>
+                                
+                                {{-- Pre-fill hidden inputs --}}
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', () => {
+                                        document.getElementById('inputShippingAddress').value = "{{ $primaryAddress->address_line1 }}";
+                                        document.getElementById('inputShippingCity').value = "{{ $primaryAddress->city }}";
+                                        document.getElementById('inputShippingPostalCode').value = "{{ $primaryAddress->postal_code }}";
+                                    });
+                                </script>
+                            </div>
+                        @else
+                            <span class="address-name text-danger">Select Address</span>
+                        @endif
+                        <i class="fas fa-chevron-right ms-2"></i>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        {{-- SHIPPING --}}
-        <div class="info-section">
-            <div class="section-header clickable" id="shippingSection">
-                <h3 class="section-title">Shipping to</h3>
-                <div class="section-action">
-                    <span class="address-name" id="selectedAddress">House</span>
-                    <i class="fas fa-chevron-right"></i>
+            {{-- SUMMARY --}}
+            <div class="info-section">
+                <h3 class="section-title">Subtotal product</h3>
+                <div class="summary-details">
+                    <div class="summary-row">
+                        <span class="summary-label">{{ $cartItems->sum('quantity') }} Product(s)</span>
+                        <span class="summary-value">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Shipping fee</span>
+                        <span class="summary-value">Rp {{ number_format($shippingCost, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="summary-row total-row">
+                        <span class="summary-label">Total</span>
+                        <span class="summary-value">Rp {{ number_format($total, 0, ',', '.') }}</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        {{-- SUMMARY --}}
-        <div class="info-section">
-            <h3 class="section-title">Subtotal product</h3>
-            <div class="summary-details">
-                <div class="summary-row">
-                    <span class="summary-label" id="productCount">1 Product</span>
-                    <span class="summary-value" id="subtotalAmount">Rp. 250.000,00</span>
-                </div>
-                <div class="summary-row">
-                    <span class="summary-label">Discount</span>
-                    <span class="summary-value">Rp. 0,00</span>
-                </div>
-                <div class="summary-row">
-                    <span class="summary-label">Shipping fee</span>
-                    <span class="summary-value">Rp. 0,00</span>
-                </div>
-                <div class="summary-row total-row">
-                    <span class="summary-label">Total</span>
-                    <span class="summary-value" id="totalAmount">Rp. 250.000,00</span>
+            {{-- PAYMENT --}}
+            <div class="info-section">
+                <div class="section-header clickable" onclick="window.location.href='{{ route('payment.method') }}' + window.location.search">
+                    <h3 class="section-title">Payment method</h3>
+                    <div class="section-action">
+                        <span class="payment-method" id="selectedPaymentDisplay">Cash on Delivery</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        {{-- PAYMENT --}}
-        <div class="info-section">
-            <div class="section-header clickable" id="paymentSection">
-                <h3 class="section-title">Payment method</h3>
-                <div class="section-action">
-                    <span class="payment-method" id="selectedPayment">Cash on Delivery</span>
-                    <i class="fas fa-chevron-right"></i>
-                </div>
-            </div>
         </div>
-
     </div>
-</div>
 
-{{-- FOOTER CHECKOUT --}}
-<div class="checkout-footer">
-    <div class="container">
-        <div class="checkout-content">
-            <div class="total-price">
-                <span class="total-amount" id="footerTotalAmount">Rp. 250.000,00</span>
+    {{-- FOOTER CHECKOUT --}}
+    <div class="checkout-footer">
+        <div class="container">
+            <div class="checkout-content">
+                <div class="total-price">
+                    <span class="total-amount">Rp {{ number_format($total, 0, ',', '.') }}</span>
+                </div>
+                <button type="button" class="checkout-btn" id="realCheckoutBtn">Check Out</button>
             </div>
-            <button class="checkout-btn" id="checkoutBtn">Check Out</button>
         </div>
     </div>
-</div>
+</form>
+
+<script>
+    // Listener moved to external js/detailorder.js
+</script>
 
 {{-- BOOTSTRAP --}}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -115,8 +150,8 @@
 {{-- SYNC ROLE DARI BACKEND --}}
 <script>
     window.APP_ROLE = "{{ session('role') ?? 'guest' }}";
-    window.ROUTE_SHIPPING = "{{ route('shippingadr') }}";
-    window.ROUTE_PAYMENT_METHOD = "{{ route('paymentmeth') }}";
+    window.ROUTE_SHIPPING = "{{ route('shipping.address') }}";
+    window.ROUTE_PAYMENT_METHOD = "{{ route('payment.method') }}";
 </script>
 
 

@@ -230,32 +230,25 @@ class UserController extends Controller
         ->where('id', $id)
         ->firstOrFail();
     
-    return view('user.orderdetail', compact('order'));
+    return view('user.historydetail', compact('order'));
 }
     public function category(Request $request)
     {
         $categorySlug = $request->input('cat', 'shirt-blouse');
         
-        // Map old category names to new slugs
-        $categoryMap = [
-            'shirtblouse' => 'shirt-blouse',
-            'sweeter' => 'sweater-cardigan',
-            'tshirt' => 't-shirt-polo',
-            'pants' => 'pants',
-            'skirt' => 'skirt-dress',
-            'accessories' => 'accessories'
-        ];
-        
-        // Convert old slug to new slug if needed
-        if (isset($categoryMap[$categorySlug])) {
-            $categorySlug = $categoryMap[$categorySlug];
-        }
+        \Illuminate\Support\Facades\Log::info('Category Debug', [
+            'input_slug' => $categorySlug,
+            'request_all' => $request->all()
+        ]);
         
         $category = Category::where('slug', $categorySlug)->first();
         
         if (!$category) {
-            // Fallback to first category
+            \Illuminate\Support\Facades\Log::warning('Category Not Found, Fallback', ['slug' => $categorySlug]);
+            // Fallback to first category if not found
             $category = Category::first();
+        } else {
+             \Illuminate\Support\Facades\Log::info('Category Found', ['id' => $category->id, 'name' => $category->name]);
         }
         
         $products = $category->products()->available()->paginate(12);
@@ -280,14 +273,34 @@ class UserController extends Controller
         return view('user.detailproduk', compact('product', 'relatedProducts', 'reviews'));
     }
     
-    public function payment()
+    public function payment(Request $request)
     {
         $user = Auth::user();
-        $cartItems = $user->carts()->with('product')->get();
         
-        if ($cartItems->isEmpty()) {
-            return redirect()->route('user.cart')->with('error', 'Keranjang belanja kosong');
-        }
+    // Get selected item IDs from query string
+    $itemsParam = $request->query('items', '');
+    $selectedIds = explode(',', $itemsParam);
+    
+    \Illuminate\Support\Facades\Log::info('Payment Debug', [
+        'user_id' => $user->id,
+        'items_param' => $itemsParam,
+        'selected_ids' => $selectedIds
+    ]);
+
+    // Filter cart items by selected IDs
+    $cartItems = $user->carts()
+        ->with('product')
+        ->whereIn('id', $selectedIds)
+        ->get();
+
+    \Illuminate\Support\Facades\Log::info('Cart Items Found', [
+        'count' => $cartItems->count(),
+        'items' => $cartItems->toArray()
+    ]);
+    
+    if ($cartItems->isEmpty()) {
+        return redirect()->route('cart')->with('error', 'Please select items to checkout.');
+    }
         
         $subtotal = $cartItems->sum(function($item) {
             return ($item->product->final_price ?? $item->product->price ?? 0) * $item->quantity;
@@ -296,18 +309,152 @@ class UserController extends Controller
         $shippingCost = 15000;
         $total = $subtotal + $shippingCost;
         
-        return view('user.detailorder', compact('cartItems', 'subtotal', 'shippingCost', 'total'));
+        // Get user addresses
+        $addresses = $user->addresses;
+        
+        return view('user.detailorder', compact('cartItems', 'subtotal', 'shippingCost', 'total', 'addresses', 'selectedIds'));
     }
     
     public function paymentMethod()
     {
         return view('user.paymentmeth');
     }
+
+    public function shippingAddress()
+    {
+        $user = Auth::user();
+        $addresses = $user->addresses()->latest()->get();
+        return view('user.shipping_address', compact('addresses'));
+    }
+
+    public function storeShippingAddress(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:50',
+            'recipient_name' => 'required|string|max:100',
+            'phone' => 'required|string|max:20',
+            'address_line1' => 'required|string|max:255',
+            'city' => 'required|string|max:100',
+            'postal_code' => 'required|string|max:20',
+        ]);
+
+        $user = Auth::user();
+        
+        // If this is the first address, make it primary
+        $isPrimary = $user->addresses()->count() === 0;
+
+        $user->addresses()->create([
+            'title' => $request->title,
+            'recipient_name' => $request->recipient_name,
+            'phone' => $request->phone,
+            'address_line1' => $request->address_line1,
+            'city' => $request->city,
+            'postal_code' => $request->postal_code,
+            'is_primary' => $isPrimary
+        ]);
+
+        // Redirect back to payment or shipping list
+        // If "from" param exists, could redirect there
+        return redirect()->back()->with('success', 'Address added successfully');
+    }
     
+    public function placeOrder(Request $request)
+    {
+        $request->validate([
+            'shipping_address' => 'required|string', // Still required but logic might change to use ID
+            'shipping_city' => 'required|string',
+            'shipping_postal_code' => 'required|string',
+            'payment_method' => 'required|in:cash_on_delivery,bank_transfer,e_wallet',
+            'notes' => 'nullable|string',
+            'selected_items' => 'required|string' // IDs separated by comma
+        ]);
+
+        $user = Auth::user();
+        
+        // Parse selected IDs
+        $selectedIds = explode(',', $request->selected_items);
+        
+        // Fetch specific items
+        $cartItems = $user->carts()
+            ->with('product')
+            ->whereIn('id', $selectedIds)
+            ->get();
+
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart')->with('error', 'No items selected for checkout.');
+        }
+
+        // Calculate totals
+        $subtotal = $cartItems->sum(function($item) {
+            return ($item->product->final_price ?? $item->product->price ?? 0) * $item->quantity;
+        });
+        $shippingCost = 15000; // Fixed shipping cost
+        $tax = 0; // No tax for now
+        $total = $subtotal + $shippingCost + $tax;
+
+        // Create order
+        $order = Order::create([
+            'order_number' => Order::generateOrderNumber(),
+            'user_id' => $user->id,
+            'customer_name' => $user->name,
+            'customer_email' => $user->email,
+            'customer_phone' => $user->phone, // Or from address
+            'shipping_address' => $request->shipping_address, // This might be full string from selected address
+            'shipping_city' => $request->shipping_city,
+            'shipping_postal_code' => $request->shipping_postal_code,
+            'notes' => $request->notes,
+            'subtotal' => $subtotal,
+            'shipping_cost' => $shippingCost,
+            'tax' => $tax,
+            'total' => $total,
+            'payment_method' => $request->payment_method,
+            'payment_status' => 'pending',
+            'order_status' => 'pending'
+        ]);
+
+        // Create order items
+        foreach ($cartItems as $cartItem) {
+            $price = $cartItem->product->final_price ?? $cartItem->product->price ?? 0;
+
+            $order->items()->create([
+                'product_id' => $cartItem->product_id,
+                'product_name' => $cartItem->product->name, // Required column
+                'quantity' => $cartItem->quantity,
+                'price' => $price,
+                'subtotal' => $price * $cartItem->quantity, // Required column (price * qty)
+                'size' => $cartItem->size,
+                'color' => $cartItem->color
+            ]);
+
+            // Decrease product stock
+            $cartItem->product->decrement('stock', $cartItem->quantity); // Consider checking < 0
+            
+            // Delete this specific item from cart
+            $cartItem->delete();
+        }
+
+        return redirect()->route('order.confirm')->with('success', 'Pesanan berhasil dibuat');
+    }
+
     public function orderConfirm()
     {
         $latestOrder = Auth::user()->orders()->latest()->first();
         return view('user.orderconfirm', compact('latestOrder'));
+    }
+
+    public function ratingPage(Request $request)
+    {
+        $orderId = $request->query('order_id');
+        $order = null;
+
+        if ($orderId) {
+            $order = Auth::user()->orders()->with('items.product')->find($orderId);
+        }
+        
+        // If no specific order, maybe show a list of unreviewed items? 
+        // For now, if no order, just return view (it might be empty or handle it)
+        
+        return view('user.rating', compact('order'));
     }
     
     // ========== API METHODS ==========
@@ -535,13 +682,15 @@ class UserController extends Controller
             'order_id' => $request->order_id,
             'rating' => $request->rating,
             'comment' => $request->comment,
+            'rating' => $request->rating,
+            'comment' => $request->comment,
             'is_anonymous' => $request->is_anonymous ?? false,
-            'status' => 'pending' // Admin perlu approve
+            'status' => 'approved' // Auto-approve for immediate display
         ]);
         
         return response()->json([
             'success' => true,
-            'message' => 'Ulasan berhasil dikirim. Menunggu persetujuan admin.'
+            'message' => 'Ulasan berhasil dikirim!'
         ]);
     }
 

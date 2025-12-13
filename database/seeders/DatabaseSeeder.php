@@ -1,8 +1,10 @@
 <?php
+// database/seeders/DatabaseSeeder.php (UPDATE)
 
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Admin;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Promotion;
@@ -13,67 +15,92 @@ use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Clear cached permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
         
         // ======================
-        // 1. CREATE ROLES & PERMISSIONS
+        // 1. CREATE ROLES & PERMISSIONS (UNTUK USER SAJA)
         // ======================
-        $this->command->info('Creating roles and permissions...');
+        $this->command->info('Creating roles and permissions for users...');
         
-        // Create Roles
-        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        // Create Roles hanya untuk user
         $userRole = Role::firstOrCreate(['name' => 'user']);
+        Role::firstOrCreate(['name' => 'admin']); // Tetap buat untuk kompatibilitas
         
-        // Create Permissions
-        $permissions = [
-            'view dashboard',
-            'manage products',
-            'manage categories',
-            'manage orders',
-            'manage users',
-            'manage reviews',
-            'manage promotions',
-            'view reports',
+        // Create Permissions untuk user saja
+        $userPermissions = [
             'view products',
             'place orders',
             'write reviews',
             'manage wishlist'
         ];
         
-        foreach ($permissions as $permission) {
+        foreach ($userPermissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);
         }
         
-        // Assign permissions to roles
-        $adminRole->syncPermissions(Permission::all());
-        $userRole->syncPermissions(['view products', 'place orders', 'write reviews', 'manage wishlist']);
+        $userRole->syncPermissions($userPermissions);
         
-        $this->command->info('✅ Roles and permissions created!');
+        $this->command->info('✅ User roles and permissions created!');
         
         // ======================
-        // 2. CREATE USERS
+        // 2. CREATE ADMINS (TABEL TERPISAH)
         // ======================
-        $this->command->info('Creating users...');
+        $this->command->info('Creating admin accounts...');
         
-        // Create Admin
-        $admin = User::create([
+        // Pastikan tabel admins ada
+        if (!DB::getSchemaBuilder()->hasTable('admins')) {
+            $this->command->error('Tabel admins tidak ditemukan! Jalankan migrasi terlebih dahulu.');
+            return;
+        }
+        
+        // Create Super Admin
+        $superAdmin = Admin::create([
+            'name' => 'Super Admin MINARI',
+            'username' => 'superadmin',
+            'email' => 'superadmin@minari.com',
+            'password' => Hash::make('SuperAdmin123!'),
+            'is_super_admin' => true,
+            'secret_key' => 'MINARI_SUPER_2025',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        
+        // Create Regular Admin
+        $admin = Admin::create([
             'name' => 'Admin MINARI',
             'username' => 'admin',
             'email' => 'admin@minari.com',
-            'phone' => '081234567890',
-            'birth_date' => '1990-01-01',
-            'address' => 'MINARI Headquarters',
-            'email_verified_at' => now(),
-            'password' => bcrypt('admin123'),
-            'remember_token' => Str::random(10),
+            'password' => Hash::make('Admin123!'),
+            'is_super_admin' => false,
+            'secret_key' => 'MINARI_ADMIN_2025',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
-        $admin->assignRole('admin');
+        
+        // Create Manager
+        $manager = Admin::create([
+            'name' => 'Manager MINARI',
+            'username' => 'manager',
+            'email' => 'manager@minari.com',
+            'password' => Hash::make('Manager123!'),
+            'is_super_admin' => false,
+            'secret_key' => 'MINARI_MANAGER_2025',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        
+        $this->command->info('✅ Admin accounts created!');
+        
+        // ======================
+        // 3. CREATE REGULAR USERS
+        // ======================
+        $this->command->info('Creating regular users...');
         
         // Create Regular User
         $user = User::create([
@@ -84,7 +111,7 @@ class DatabaseSeeder extends Seeder
             'birth_date' => '1995-05-15',
             'address' => 'Jl. Contoh No. 123, Jakarta',
             'email_verified_at' => now(),
-            'password' => bcrypt('password123'),
+            'password' => Hash::make('password123'),
             'remember_token' => Str::random(10),
         ]);
         $user->assignRole('user');
@@ -98,7 +125,7 @@ class DatabaseSeeder extends Seeder
                 'phone' => '08123456789',
                 'birth_date' => '1998-08-20',
                 'address' => 'Jl. Mawar No. 10, Bandung',
-                'password' => bcrypt('password123'),
+                'password' => Hash::make('password123'),
             ],
             [
                 'name' => 'Budi Santoso',
@@ -107,7 +134,7 @@ class DatabaseSeeder extends Seeder
                 'phone' => '08234567890',
                 'birth_date' => '1992-03-12',
                 'address' => 'Jl. Melati No. 5, Surabaya',
-                'password' => bcrypt('password123'),
+                'password' => Hash::make('password123'),
             ],
         ];
         
@@ -119,10 +146,10 @@ class DatabaseSeeder extends Seeder
             $newUser->assignRole('user');
         }
         
-        $this->command->info('✅ Users created!');
+        $this->command->info('✅ Regular users created!');
         
         // ======================
-        // 3. CREATE CATEGORIES
+        // 4. CREATE CATEGORIES
         // ======================
         $this->command->info('Creating categories...');
         
@@ -178,7 +205,7 @@ class DatabaseSeeder extends Seeder
         $this->command->info('✅ Categories created!');
         
         // ======================
-        // 4. CREATE PRODUCTS
+        // 5. CREATE PRODUCTS
         // ======================
         $this->command->info('Creating products...');
         
@@ -320,7 +347,7 @@ class DatabaseSeeder extends Seeder
         $this->command->info('✅ Products created!');
         
         // ======================
-        // 5. CREATE PROMOTIONS
+        // 6. CREATE PROMOTIONS
         // ======================
         $this->command->info('Creating promotions...');
         
@@ -355,7 +382,7 @@ class DatabaseSeeder extends Seeder
                 'type' => 'percentage',
                 'value' => 25,
                 'min_purchase' => 150000,
-                'usage_limit' => null, // unlimited
+                'usage_limit' => null,
                 'start_date' => now(),
                 'end_date' => now()->addYear(),
                 'is_active' => true
@@ -369,11 +396,10 @@ class DatabaseSeeder extends Seeder
         $this->command->info('✅ Promotions created!');
         
         // ======================
-        // 6. CREATE ORDERS
+        // 7. CREATE ORDERS
         // ======================
         $this->command->info('Creating orders...');
         
-        // Function to generate order number
         $generateOrderNumber = function() {
             return 'ORD' . date('Ymd') . strtoupper(Str::random(6));
         };
@@ -398,7 +424,6 @@ class DatabaseSeeder extends Seeder
             'delivered_at' => now()->subDays(5)
         ]);
         
-        // Add order items
         $order1->items()->create([
             'product_id' => 1,
             'product_name' => 'Yellow Shirt',
@@ -415,7 +440,6 @@ class DatabaseSeeder extends Seeder
             'subtotal' => 200000
         ]);
         
-        // Create another order
         $order2 = Order::create([
             'order_number' => $generateOrderNumber(),
             'user_id' => $user->id,
@@ -453,7 +477,7 @@ class DatabaseSeeder extends Seeder
         $this->command->info('✅ Orders created!');
         
         // ======================
-        // 7. CREATE REVIEWS
+        // 8. CREATE REVIEWS
         // ======================
         $this->command->info('Creating reviews...');
         
@@ -467,7 +491,7 @@ class DatabaseSeeder extends Seeder
         ]);
         
         Review::create([
-            'user_id' => 3, // Aliyah
+            'user_id' => 3,
             'product_id' => 7,
             'order_id' => $order2->id,
             'rating' => 4,
@@ -478,13 +502,13 @@ class DatabaseSeeder extends Seeder
         $this->command->info('✅ Reviews created!');
         
         // ======================
-        // 8. CREATE WISHLIST ITEMS
+        // 9. CREATE WISHLIST ITEMS
         // ======================
         $this->command->info('Creating wishlist items...');
         
-        $user->wishlists()->create(['product_id' => 1]); // Yellow Shirt
-        $user->wishlists()->create(['product_id' => 4]); // Blue Sweater
-        $user->wishlists()->create(['product_id' => 7]); // Puppy Off-Shoulder T-shirt
+        $user->wishlists()->create(['product_id' => 1]);
+        $user->wishlists()->create(['product_id' => 4]);
+        $user->wishlists()->create(['product_id' => 7]);
         
         $this->command->info('✅ Wishlist items created!');
         
@@ -494,24 +518,41 @@ class DatabaseSeeder extends Seeder
         $this->command->info('=========================================');
         $this->command->info('🎉 DATABASE SEEDING COMPLETED SUCCESSFULLY!');
         $this->command->info('=========================================');
-        $this->command->info('Admin Account:');
-        $this->command->info('  Email: admin@minari.com');
-        $this->command->info('  Password: admin123');
-        $this->command->info('  Username: admin');
+        $this->command->info('=== ADMIN ACCOUNTS (SECRET ACCESS) ===');
+        $this->command->info('🚨 IMPORTANT: Gunakan URL RAHASIA: /admin-access');
         $this->command->info('');
-        $this->command->info('User Account:');
-        $this->command->info('  Email: user@minari.com');
-        $this->command->info('  Password: password123');
+        $this->command->info('Super Admin:');
+        $this->command->info('  URL: http://localhost/admin-access');
+        $this->command->info('  Username: superadmin');
+        $this->command->info('  Password: SuperAdmin123!');
+        $this->command->info('');
+        $this->command->info('Regular Admin:');
+        $this->command->info('  URL: http://localhost/admin-access');
+        $this->command->info('  Username: admin');
+        $this->command->info('  Password: Admin123!');
+        $this->command->info('');
+        $this->command->info('Manager:');
+        $this->command->info('  URL: http://localhost/admin-access');
+        $this->command->info('  Username: manager');
+        $this->command->info('  Password: Manager123!');
+        $this->command->info('');
+        $this->command->info('=== USER ACCOUNTS (PUBLIC ACCESS) ===');
+        $this->command->info('Regular User:');
+        $this->command->info('  URL: http://localhost/login');
         $this->command->info('  Username: johndoe');
+        $this->command->info('  Password: password123');
         $this->command->info('');
         $this->command->info('Other Users:');
         $this->command->info('  Email: aliyah@minari.com (Password: password123)');
         $this->command->info('  Email: budi@minari.com (Password: password123)');
         $this->command->info('');
-        $this->command->info('Promo Codes:');
-        $this->command->info('  - MINARI10 (Diskon 10%)');
-        $this->command->info('  - FREESHIP (Gratis Ongkir)');
-        $this->command->info('  - WELCOME25 (Diskon 25% Pembeli Baru)');
+        $this->command->info('=== SECURITY NOTES ===');
+        $this->command->info('✅ Admin dan user memiliki sistem TERPISAH');
+        $this->command->info('✅ Admin TIDAK bisa login melalui /login');
+        $this->command->info('✅ User TIDAK bisa login melalui /admin-access');
+        $this->command->info('✅ Tampilan login SAMA (tidak mencurigakan)');
+        $this->command->info('✅ Database tabel TERPISAH');
+        $this->command->info('✅ Session TERPISAH');
         $this->command->info('=========================================');
     }
 }

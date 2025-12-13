@@ -20,7 +20,7 @@
 
 <div class="back-navigation">
     <div class="container">
-        <a href="{{ route('payment.page') }}" class="back-link">
+        <a href="javascript:history.back()" class="back-link">
             <i class="fas fa-arrow-left"></i>
             <span>Back to order</span>
         </a>

@@ -48,55 +48,47 @@
             <div class="container-fluid">
                 <h2 class="section-title">Product Category</h2>
                 <div class="category-scroll px-5">
-                    <div class="category-card">
-                        <a href="{{ route('category', ['cat' => 'shirtblouse']) }}" style="text-decoration: none;">
-                            <div class="category-image">
-                                <img src="{{ asset('images/shirt.png') }}" alt="Shirt">
-                            </div>
-                            <h3>Shirt and Blouse</h3>
-                        </a>
-                    </div>
+                    <a href="{{ route('user.category', ['cat' => 'shirt-blouse']) }}" class="category-card text-decoration-none d-block">
+                        <div class="category-image">
+                            <img src="{{ asset('images/shirt.png') }}" alt="Shirt">
+                        </div>
+                        <h3>Shirt and Blouse</h3>
+                    </a>
       
-                    <div class="category-card">
-                        <a href="{{ route('category', ['cat' => 'sweeter']) }}" style="text-decoration: none;">
-                            <div class="category-image">
-                                <img src="{{ asset('images/sweaters.png') }}" alt="Sweaters">
-                            </div>
-                            <h3>Sweaters, Cardigan, and Fleece</h3>
-                        </a>
-                    </div> 
-                    <div class="category-card">
-                        <a href="{{ route('category', ['cat' => 'tshirt']) }}" style="text-decoration: none;">
-                            <div class="category-image">
-                                <img src="{{ asset('images/tshirt.png') }}" alt="T-Shirt">
-                            </div>
-                            <h3>T-shirt and Polo</h3>
-                        </a>
-                    </div>               
-                    <div class="category-card">
-                        <a href="{{ route('category', ['cat' => 'pants']) }}" style="text-decoration: none;">
-                            <div class="category-image">
-                                <img src="{{ asset('images/pants.png') }}" alt="Pants">
-                            </div>
-                            <h3>Pants</h3>
-                        </a>
-                    </div>               
-                    <div class="category-card">
-                        <a href="{{ route('category', ['cat' => 'skirt']) }}" style="text-decoration: none;">
-                            <div class="category-image">
-                                <img src="{{ asset('images/dress.png') }}" alt="Dress">
-                            </div>
-                            <h3>Skirt and Dress</h3>
-                        </a>
-                    </div>              
-                    <div class="category-card">
-                        <a href="{{ route('category', ['cat' => 'accessories']) }}" style="text-decoration: none;">
-                            <div class="category-image">
-                                <img src="{{ asset('images/accessories.png') }}" alt="Accessories">
-                            </div>
-                            <h3>Accessories</h3>
-                        </a>
-                    </div>
+                    <a href="{{ route('user.category', ['cat' => 'sweater-cardigan']) }}" class="category-card text-decoration-none d-block">
+                        <div class="category-image">
+                            <img src="{{ asset('images/sweaters.png') }}" alt="Sweaters">
+                        </div>
+                        <h3>Sweaters, Cardigan, and Fleece</h3>
+                    </a>
+ 
+                    <a href="{{ route('user.category', ['cat' => 't-shirt-polo']) }}" class="category-card text-decoration-none d-block">
+                        <div class="category-image">
+                            <img src="{{ asset('images/tshirt.png') }}" alt="T-Shirt">
+                        </div>
+                        <h3>T-shirt and Polo</h3>
+                    </a>
+               
+                    <a href="{{ route('user.category', ['cat' => 'pants']) }}" class="category-card text-decoration-none d-block">
+                        <div class="category-image">
+                            <img src="{{ asset('images/pants.png') }}" alt="Pants">
+                        </div>
+                        <h3>Pants</h3>
+                    </a>
+               
+                    <a href="{{ route('user.category', ['cat' => 'skirt-dress']) }}" class="category-card text-decoration-none d-block">
+                        <div class="category-image">
+                            <img src="{{ asset('images/dress.png') }}" alt="Dress">
+                        </div>
+                        <h3>Skirt and Dress</h3>
+                    </a>
+              
+                    <a href="{{ route('user.category', ['cat' => 'accessories']) }}" class="category-card text-decoration-none d-block">
+                        <div class="category-image">
+                            <img src="{{ asset('images/accessories.png') }}" alt="Accessories">
+                        </div>
+                        <h3>Accessories</h3>
+                    </a>
                 </div>
             </div>
         </section>

@@ -1,134 +1,98 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const shippingSection = document.getElementById('shippingSection');
     const paymentSection = document.getElementById('paymentSection');
-    const checkoutBtn = document.getElementById('checkoutBtn');
-    const selectedAddress = document.getElementById('selectedAddress');
-    const selectedPayment = document.getElementById('selectedPayment');
-    const productSection = document.getElementById('productSection');
-    const orderTitle = document.getElementById('orderTitle');
-    const productCount = document.getElementById('productCount');
-    const subtotalAmount = document.getElementById('subtotalAmount');
-    const totalAmount = document.getElementById('totalAmount');
-    const footerTotalAmount = document.getElementById('footerTotalAmount');
+    const checkoutBtn = document.getElementById('realCheckoutBtn'); // Corrected ID
+    const checkoutForm = document.getElementById('checkoutForm');
 
-    loadCartData();
     loadSavedPreferences();
 
-    shippingSection.addEventListener('click', () => {
-        window.location.href = window.ROUTE_SHIPPING;
-    });
-
-    paymentSection.addEventListener('click', () => {
-        window.location.href = window.ROUTE_PAYMENT_METHOD;
-    });
-
-    checkoutBtn.addEventListener('click', () => {
-        processPayment();
-    });
-
-    function loadCartData() {
-        const selectedItems = JSON.parse(localStorage.getItem('selectedCartItems') || '[]');
-        const cartTotal = parseInt(localStorage.getItem('cartTotal') || '0');
-        const orderNumber = localStorage.getItem('currentOrderNumber') || 'ORD' + Date.now().toString().slice(-6);
-
-        orderTitle.textContent = `Order #${orderNumber}`;
-
-        if (selectedItems.length === 0) {
-            alert('No items selected. Redirecting to cart.');
-            window.location.href = "/cart";
-            return;
-        }
-
-        displayProductItems(selectedItems);
-        updateOrderSummary(selectedItems, cartTotal);
-    }
-
-    function displayProductItems(items) {
-        productSection.innerHTML = "";
-
-        items.forEach(item => {
-            const productItem = document.createElement("div");
-            productItem.className = "product-item";
-            productItem.innerHTML = `
-                <div class="product-image">
-                    <img src="${item.image}" alt="${item.name}">
-                </div>
-                <div class="product-info">
-                    <h3 class="product-name">${item.name}</h3>
-                    <p class="product-price">Rp. ${formatRupiah(item.price)}</p>
-                    <p class="product-quantity">Quantity: ${item.quantity}</p>
-                </div>
-            `;
-            productSection.appendChild(productItem);
+    // Navigation listeners
+    if (shippingSection) {
+        shippingSection.addEventListener('click', () => {
+            // Append current params to keep selected items
+            const currentParams = window.location.search;
+            window.location.href = (window.ROUTE_SHIPPING || '/shipping-address') + currentParams;
         });
     }
 
-    function updateOrderSummary(items, total) {
-        const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-        const subtotal = total;
-        const shippingFee = 0;
-        const finalTotal = subtotal + shippingFee;
-
-        productCount.textContent = `${itemCount} ${itemCount > 1 ? 'Products' : 'Product'}`;
-        subtotalAmount.textContent = `Rp. ${formatRupiah(subtotal)}`;
-        totalAmount.textContent = `Rp. ${formatRupiah(finalTotal)}`;
-        footerTotalAmount.textContent = `Rp. ${formatRupiah(finalTotal)}`;
+    if (paymentSection) {
+        paymentSection.addEventListener('click', () => {
+            const currentParams = window.location.search;
+            window.location.href = (window.ROUTE_PAYMENT_METHOD || '/payment-method') + currentParams;
+        });
     }
 
-    function formatRupiah(amount) {
-        return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    // Checkout Handler
+    if (checkoutBtn && checkoutForm) {
+        checkoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            // Validate address before submitting
+            const addressInput = document.getElementById('inputShippingAddress');
+            if (!addressInput || !addressInput.value) {
+                alert('Please select a shipping address first.');
+                return;
+            }
+
+            checkoutBtn.textContent = "Processing...";
+            checkoutBtn.disabled = true;
+
+            // Submit
+            checkoutForm.submit();
+        });
     }
 
     function loadSavedPreferences() {
-        const savedAddress = localStorage.getItem('selectedAddress');
+        // 1. Payment Method
         const savedPayment = localStorage.getItem('selectedPaymentMethod');
+        const paymentDisplay = document.getElementById('selectedPaymentDisplay');
+        const paymentInput = document.getElementById('inputPaymentMethod');
 
-        if (savedAddress) {
-            selectedAddress.textContent = getAddressDisplayName(savedAddress);
+        if (savedPayment && paymentDisplay && paymentInput) {
+            const names = {
+                'cod': 'Cash on Delivery',
+                'virtual': 'Virtual Account Transfer',
+                'ewallet': 'E-wallet'
+            };
+
+            // Backend valid values mapping
+            const backendValues = {
+                'cod': 'cash_on_delivery',
+                'virtual': 'bank_transfer',
+                'ewallet': 'e_wallet'
+            };
+
+            paymentDisplay.textContent = names[savedPayment] || savedPayment;
+            // Set the hidden input to the value expected by the controller validation
+            paymentInput.value = backendValues[savedPayment] || savedPayment;
         }
 
-        if (savedPayment) {
-            selectedPayment.textContent = getPaymentDisplayName(savedPayment);
-        }
-    }
+        // 2. Shipping Address
+        const savedAddressData = localStorage.getItem('selectedAddressData');
+        const addressDisplay = document.getElementById('selectedAddressDisplay');
+        const addressDetails = document.getElementById('selectedAddressDetails');
 
-    function getAddressDisplayName(type) {
-        const map = { house: "House", office: "Office", apartment: "Apartment" };
-        return map[type] || "House";
-    }
+        // Hidden inputs
+        const inputAddr = document.getElementById('inputShippingAddress');
+        const inputCity = document.getElementById('inputShippingCity');
+        const inputZip = document.getElementById('inputShippingPostalCode');
 
-    function getPaymentDisplayName(type) {
-        const map = {
-            cod: "Cash on Delivery",
-            virtual: "Virtual Account Transfer",
-            ewallet: "E-wallet"
-        };
-        return map[type] || "Cash on Delivery";
-    }
-
-    function processPayment() {
-        const selectedItems = JSON.parse(localStorage.getItem('selectedCartItems') || '[]');
-        if (selectedItems.length === 0) {
-            alert("No items to checkout");
-            return;
-        }
-
-        checkoutBtn.textContent = "Processing...";
-        checkoutBtn.disabled = true;
-
-        setTimeout(() => {
+        if (savedAddressData) {
             try {
-                localStorage.removeItem('selectedCartItems');
-                localStorage.removeItem('cartTotal');
+                const data = JSON.parse(savedAddressData);
 
-                window.location.href = "/order/confirm";
+                // Update Visuals
+                if (addressDisplay) addressDisplay.textContent = data.display_name;
+                if (addressDetails) addressDetails.textContent = data.details;
+
+                // Update Hidden Inputs (CRITICAL for backend)
+                if (inputAddr && data.address_line1) inputAddr.value = data.address_line1;
+                if (inputCity && data.city) inputCity.value = data.city;
+                if (inputZip && data.postal_code) inputZip.value = data.postal_code;
 
             } catch (e) {
-                console.error(e);
-                checkoutBtn.textContent = "Check Out";
-                checkoutBtn.disabled = false;
-                alert("Failed to proceed. Please try again.");
+                console.error("Error parsing saved address", e);
             }
-        }, 600);
+        }
     }
 });

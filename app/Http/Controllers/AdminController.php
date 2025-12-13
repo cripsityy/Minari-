@@ -1,4 +1,5 @@
 <?php
+// app/Http/Controllers/AdminController.php (UPDATE)
 
 namespace App\Http\Controllers;
 
@@ -16,11 +17,13 @@ class AdminController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', 'role:admin']);
+        $this->middleware(['auth:admin', \App\Http\Middleware\AdminGuard::class]);
     }
     
     public function dashboard()
     {
+        $admin = Auth::guard('admin')->user();
+        
         $stats = [
             'total_orders' => Order::count(),
             'total_revenue' => Order::where('payment_status', 'paid')->sum('total'),
@@ -40,11 +43,11 @@ class AdminController extends Controller
     
     public function account()
     {
-        $admin = Auth::user();
+        $admin = Auth::guard('admin')->user();
         return view('admin.account', compact('admin'));
     }
     
-    // Products Management
+    // Products Management (SISANYA SAMA PERSIS)
     public function products(Request $request)
     {
         $query = Product::with('category');
@@ -99,13 +102,11 @@ class AdminController extends Controller
         $product->material = $request->material;
         $product->status = $request->status;
         
-        // Upload main image
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('products', 'public');
             $product->image = $imagePath;
         }
         
-        // Upload multiple images
         if ($request->hasFile('images')) {
             $images = [];
             foreach ($request->file('images') as $image) {
@@ -154,9 +155,7 @@ class AdminController extends Controller
         $product->material = $request->material;
         $product->status = $request->status;
         
-        // Update main image
         if ($request->hasFile('image')) {
-            // Delete old image
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
             }
@@ -165,9 +164,7 @@ class AdminController extends Controller
             $product->image = $imagePath;
         }
         
-        // Update multiple images
         if ($request->hasFile('images')) {
-            // Delete old images
             if ($product->images) {
                 foreach ($product->images as $oldImage) {
                     Storage::disk('public')->delete($oldImage);
@@ -191,7 +188,6 @@ class AdminController extends Controller
     {
         $product = Product::findOrFail($id);
         
-        // Delete images
         if ($product->image) {
             Storage::disk('public')->delete($product->image);
         }
@@ -265,7 +261,6 @@ class AdminController extends Controller
         $category->status = $request->status;
         
         if ($request->hasFile('image')) {
-            // Delete old image
             if ($category->image) {
                 Storage::disk('public')->delete($category->image);
             }
@@ -283,12 +278,10 @@ class AdminController extends Controller
     {
         $category = Category::findOrFail($id);
         
-        // Check if category has products
         if ($category->products()->count() > 0) {
             return redirect()->route('admin.categories')->with('error', 'Tidak dapat menghapus kategori yang memiliki produk');
         }
         
-        // Delete image
         if ($category->image) {
             Storage::disk('public')->delete($category->image);
         }
@@ -438,7 +431,6 @@ class AdminController extends Controller
         $promotion->end_date = $request->end_date;
         $promotion->is_active = $request->has('is_active');
         
-        // Set applicable categories/products
         if ($request->has('applicable_to') && $request->applicable_to == 'selected') {
             $promotion->applicable_categories = $request->applicable_categories;
             $promotion->applicable_products = $request->applicable_products;

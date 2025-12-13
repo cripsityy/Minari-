@@ -78,96 +78,29 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @forelse($reviews as $review)
                         <tr>
-                            <td>White Jeans</td>
-                            <td>Anneiza</td>
+                            <td>{{ $review->product->name ?? 'Unknown Product' }}</td>
+                            <td>{{ $review->user->name ?? 'Anonymous' }}</td>
                             <td>
                                 <span style="color: #f3a8a8;">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= $review->rating)
+                                            <i class="fas fa-star"></i>
+                                        @else
+                                            <i class="far fa-star"></i>
+                                        @endif
+                                    @endfor
                                 </span>
                             </td>
-                            <td>Bahannya gak kaku dan bagus banget! Warna sesuai foto juga, pengiriman cepat. Bakal order lagi</td>
-                            <td>28 Oct 2025</td>
+                            <td>{{ $review->comment }}</td>
+                            <td>{{ $review->created_at->format('d M Y') }}</td>
                         </tr>
+                        @empty
                         <tr>
-                            <td>Blue Shirt</td>
-                            <td>Lisa</td>
-                            <td>
-                                <span style="color: #f3a8a8;">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                </span>
-                            </td>
-                            <td>Motifnya bagus tapi bahan agak tipis, jadi harus pakai inner. Semoga kualitas ditingkatkan ya</td>
-                            <td>28 Oct 2025</td>
+                            <td colspan="5" class="text-center text-muted py-4">No reviews found</td>
                         </tr>
-                        <tr>
-                            <td>Soft green cardigan</td>
-                            <td>Aliyah</td>
-                            <td>
-                                <span style="color: #f3a8a8;">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                </span>
-                            </td>
-                            <td>Modelnya lucu, cuma agak kebesaran di bagian bahu. Tapi overall oke banget buat outfit santai</td>
-                            <td>27 Oct 2025</td>
-                        </tr>
-                        <tr>
-                            <td>Cherry white long sleeve shirt</td>
-                            <td>Karina</td>
-                            <td>
-                                <span style="color: #f3a8a8;">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                </span>
-                            </td>
-                            <td>Nyaman banget dipakai, bahan lembut tapi sedikit transparan. Tetap suka karena potongannya pas!</td>
-                            <td>27 Oct 2025</td>
-                        </tr>
-                        <tr>
-                            <td>Green jeans crop blouse</td>
-                            <td>Elsa</td>
-                            <td>
-                                <span style="color: #f3a8a8;">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </span>
-                            </td>
-                            <td>Lucu banget crop top-nya! Bahannya lembut dan lentur, nggak panas dipakai.</td>
-                            <td>25 Oct 2025</td>
-                        </tr>
-                        <tr>
-                            <td>Dark blue low rise flare jeans</td>
-                            <td>Cantika</td>
-                            <td>
-                                <span style="color: #f3a8a8;">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </span>
-                            </td>
-                            <td>Sumpah ini jeans-nya nyaman banget dipakai! Bahannya stretch tapi tetap tebal</td>
-                            <td>25 Oct 2025</td>
-                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

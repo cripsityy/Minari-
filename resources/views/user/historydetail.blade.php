@@ -27,7 +27,7 @@
             <a href="{{ route('order.history') }}" class="back-btn me-3">
                 <span class="material-icons">arrow_back</span>
             </a>
-            <h1 class="page-title mb-0">Order Details #0103</h1>
+            <h1 class="page-title mb-0">Order Details {{ $order->order_number ?? '#'.$order->id }}</h1>
         </div>
 
         {{-- DELIVERY BADGE --}}
@@ -35,7 +35,7 @@
             <div class="check-icon">
                 <span class="material-icons">check</span>
             </div>
-            <span>Delivered to Home</span>
+            <span>Delivered to {{ $order->shipping_address ?? 'Home' }}</span>
         </div>
 
         {{-- ORDER INFO --}}
@@ -47,21 +47,22 @@
 
             <div class="info-row">
                 <div class="info-label">Order Number</div>
-                <div class="info-value">#0103</div>
+                <div class="info-value">{{ $order->order_number ?? '#'.$order->id }}</div>
             </div>
 
             <div class="info-row">
                 <div class="info-label">Order Date</div>
-                <div class="info-value">31 Oct 2025</div>
+                <div class="info-value">{{ $order->created_at->format('d M Y') }}</div>
             </div>
 
             <div class="info-row">
                 <div class="info-label">Status</div>
-                <div class="info-value status-value">Sent</div>
+                <div class="info-value status-value">{{ $order->status }}</div>
             </div>
         </div>
 
         {{-- SHIPPING --}}
+        @if($order->shipping)
         <div class="info-section">
             <div class="section-header">
                 <span class="material-icons">📍</span>
@@ -69,25 +70,21 @@
             </div>
 
             <div class="info-row">
-                <div class="info-label">Type</div>
-                <div class="info-value">House</div>
-            </div>
-
-            <div class="info-row">
                 <div class="info-label">Recipient</div>
-                <div class="info-value">Aliyah</div>
+                <div class="info-value">{{ $order->shipping->name }}</div>
             </div>
 
             <div class="info-row">
                 <div class="info-label">Address</div>
-                <div class="info-value">Jl. Merdeka No. 123, Jakarta</div>
+                <div class="info-value">{{ $order->shipping->address }}</div>
             </div>
 
             <div class="info-row">
                 <div class="info-label">Telephone</div>
-                <div class="info-value">0812-3456-7890</div>
+                <div class="info-value">{{ $order->shipping->phone }}</div>
             </div>
         </div>
+        @endif
 
         {{-- ORDERED PRODUCTS --}}
         <div class="info-section">
@@ -96,16 +93,18 @@
                 <h2>Ordered Products</h2>
             </div>
 
-            <div class="product-info">
+            @foreach($order->items as $item)
+            <div class="product-info mb-3 border-bottom pb-3">
                 <div class="product-image">
-                    <img src="{{ asset('images/cardigangreen.png') }}" alt="Soft green cardigan">
+                    <img src="{{ $item->product_image ?? ($item->product->image ? asset('storage/'.$item->product->image) : asset('images/default-product.jpg')) }}" alt="{{ $item->product_name }}">
                 </div>
-                <div class="product-details">
-                    <h4>Soft green cardigan</h4>
-                    <p class="product-specs">Qty: 1 • Size: M</p>
-                    <p class="product-price">Rp. 250.000,00</p>
+                <div class="product-details w-100">
+                    <h4>{{ $item->product_name }}</h4>
+                    <p class="product-specs">Qty: {{ $item->quantity }} • Size: {{ $item->size ?? '-' }}</p>
+                    <p class="product-price">{{ $item->price }}</p>
                 </div>
             </div>
+            @endforeach
         </div>
 
         {{-- PAYMENT SUMMARY --}}
@@ -116,23 +115,13 @@
             </div>
 
             <div class="info-row">
-                <div class="info-label">Sub-Total</div>
-                <div class="info-value">Rp. 250.000,00</div>
-            </div>
-
-            <div class="info-row">
-                <div class="info-label">Delivery</div>
-                <div class="info-value">Free</div>
+                <div class="info-label">Payment Method</div>
+                <div class="info-value">{{ $order->payment_method ?? 'Cash on Delivery' }}</div>
             </div>
 
             <div class="info-row">
                 <div class="info-label payment-total">Total</div>
-                <div class="info-value payment-total">Rp. 250.000,00</div>
-            </div>
-
-            <div class="info-row">
-                <div class="info-label">Payment Method</div>
-                <div class="info-value">Cash on Delivery</div>
+                <div class="info-value payment-total">{{ $order->total_amount ? 'Rp ' . number_format($order->total_amount, 0, ',', '.') : $order->total }}</div>
             </div>
         </div>
 
@@ -141,11 +130,6 @@
             <button class="btn btn-secondary">
                 <span class="material-icons">help</span>
                 Need Help?
-            </button>
-
-            <button class="btn btn-primary">
-                <span class="material-icons">repeat</span>
-                Order Again
             </button>
         </div>
 

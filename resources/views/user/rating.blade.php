@@ -11,6 +11,7 @@
     {{-- CSS --}}
     <link rel="stylesheet" href="{{ asset('css/rating.css') }}">
     <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @include('partials.navbar-scripts')
     {{-- Role Sync --}}
     <script>
@@ -25,36 +26,69 @@
 <main>
     <div class="page-title">Product Rating</div>
 
-    {{-- PRODUCT BOX --}}
-    <div class="product-box">
-        <img src="{{ asset('images/cardigangreen.png') }}" alt="Soft green cardigan">
-        <div class="product-name">Soft green cardigan</div>
-        <div class="product-price">Rp. 250.000,00</div>
-    </div>
+    @if(isset($order) && $order->items->count() > 0)
+        @foreach($order->items as $item)
+            @php
+                // Check if already reviewed (optional optimization, or handled by API)
+                $existingReview = $item->product ? $item->product->reviews()->where('order_id', $order->id)->where('user_id', auth()->id())->first() : null;
+            @endphp
+            
+            <div class="product-box mb-5" id="review-box-{{ $item->product_id }}" style="border-bottom: 2px solid #eee; padding-bottom: 20px;">
+                {{-- Product Info --}}
+                <div class="d-flex align-items-center mb-3">
+                    <img src="{{ $item->product->image ? asset('storage/'.$item->product->image) : asset('images/default-product.jpg') }}" 
+                         alt="{{ $item->product->name }}" 
+                         style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-right: 15px;">
+                    <div>
+                        <div class="product-name fw-bold" style="font-size: 1.1rem;">{{ $item->product->name }}</div>
+                        <div class="product-price text-muted">Rp. {{ number_format($item->price, 0, ',', '.') }}</div>
+                    </div>
+                </div>
 
-    {{-- RATING SECTION --}}
-    <div class="rating-section">
-        <div class="rating-label">Product Quality</div>
-        <div class="stars" id="stars">
-            <span class="star" data-value="1">★</span>
-            <span class="star" data-value="2">★</span>
-            <span class="star" data-value="3">★</span>
-            <span class="star" data-value="4">★</span>
-            <span class="star" data-value="5">★</span>
+                @if($existingReview)
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> You have reviewed this product.
+                        <div class="mt-2 text-warning">
+                            @for($i=0; $i<$existingReview->rating; $i++) ★ @endfor
+                        </div>
+                        <div class="fst-italic text-muted">"{{ $existingReview->comment }}"</div>
+                    </div>
+                @else
+                    {{-- Rating Form --}}
+                    <div class="rating-section p-0 border-0 bg-transparent shadow-none w-100">
+                        <div class="rating-label">Product Quality</div>
+                        <div class="stars rating-input" data-product-id="{{ $item->product_id }}">
+                            <span class="star" data-value="1">★</span>
+                            <span class="star" data-value="2">★</span>
+                            <span class="star" data-value="3">★</span>
+                            <span class="star" data-value="4">★</span>
+                            <span class="star" data-value="5">★</span>
+                        </div>
+                        <input type="hidden" id="rating-value-{{ $item->product_id }}" value="0">
+
+                        <div class="rating-label mt-3">Comment</div>
+                        <textarea id="comment-{{ $item->product_id }}" class="form-control mb-3" rows="3" placeholder="Write your review here..."></textarea>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="checkbox">
+                                <input type="checkbox" id="hide-user-{{ $item->product_id }}">
+                                <label for="hide-user-{{ $item->product_id }}">Hide My Username</label>
+                            </div>
+                            <button class="btn-submit" 
+                                    onclick="submitProductReview('{{ $order->id }}', '{{ $item->product_id }}')">
+                                Submit Review
+                            </button>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        @endforeach
+    @else
+        <div class="text-center py-5">
+            <p>No order items found to rate.</p>
+            <a href="{{ route('order.history') }}" class="btn btn-dark">Back to History</a>
         </div>
-
-        <div class="rating-label">Comment</div>
-        <textarea id="comment" placeholder="Tulis pendapatmu di sini..."></textarea>
-
-        <div class="checkbox">
-            <input type="checkbox" id="hideUsername">
-            <label for="hideUsername">Hide My Username</label>
-        </div>
-
-        <div class="btn-container">
-            <button class="btn-submit" id="submitRatingBtn">Kirim</button>
-        </div>
-    </div>
+    @endif
 </main>
 
 <footer>

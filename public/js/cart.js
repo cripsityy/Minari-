@@ -2,7 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log("ROLE SEKARANG:", window.APP_ROLE);
-    
+
     const selectAll = document.getElementById('selectAll');
     const cartList = document.getElementById('cartList');
     const totalPrice = document.getElementById('totalPrice');
@@ -27,21 +27,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const qty = Math.max(1, Number(qtyInp?.value || 1));
             if (checked) total += price * qty;
         });
-        
+
         if (totalPrice) {
             totalPrice.textContent = fmtIDR(total);
         }
-        
+
         if (checkoutBtn) {
             checkoutBtn.disabled = total === 0;
         }
-        
+
         return total;
     }
 
     function syncSelectAll() {
         if (!selectAll) return;
-        
+
         const checks = [...cartList.querySelectorAll('.item-check')];
         const checkedCount = checks.filter(c => c.checked).length;
         selectAll.checked = checkedCount > 0 && checkedCount === checks.length;
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const endpoint = isGuest ? `/api/guest-cart/${itemId}` : `/api/cart/${itemId}`;
         try {
             const response = await fetch(endpoint, {
-                method: 'PUT',
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({ quantity: quantity })
             });
-            
+
             const data = await response.json();
             if (data.success) {
                 computeTotal();
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // === Remove item via API
     async function removeItem(itemId, isGuest, rowElement) {
         if (!confirm('Are you sure you want to remove this item?')) return;
-        
+
         const endpoint = isGuest ? `/api/guest-cart/${itemId}` : `/api/cart/${itemId}`;
         try {
             const response = await fetch(endpoint, {
@@ -92,13 +92,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Accept': 'application/json'
                 }
             });
-            
+
             const data = await response.json();
             if (data.success) {
                 rowElement.remove();
                 computeTotal();
                 syncSelectAll();
-                
+
                 // If cart is empty, refresh page
                 if (getRows().length === 0) {
                     setTimeout(() => location.reload(), 500);
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const itemId = row.dataset.id;
         const isGuest = row.dataset.isGuest === 'true';
         const inp = row.querySelector('.item-qty');
-        
+
         if (!inp) return;
 
         let quantity = Math.max(1, Number(inp.value || 1));
@@ -125,11 +125,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.classList.contains('btnPlus')) {
             quantity += 1;
         }
-        
+
         if (e.target.classList.contains('btnMinus') && quantity > 1) {
             quantity -= 1;
         }
-        
+
         if (e.target.classList.contains('remove-item') || e.target.closest('.remove-item')) {
             removeItem(itemId, isGuest, row);
             return;
@@ -138,10 +138,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Only update if quantity changed
         if (quantity !== Number(inp.value)) {
             inp.value = quantity;
-            
+
             // Update via API
             updateQuantity(itemId, quantity, isGuest);
-            
+
             // Update local total
             computeTotal();
         }
@@ -150,21 +150,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // === Perubahan qty manual
     cartList.addEventListener('change', (e) => {
         const el = e.target;
-        
+
         if (el.classList.contains('item-qty')) {
             const row = el.closest('.cart-item');
             if (!row) return;
-            
+
             const itemId = row.dataset.id;
             const isGuest = row.dataset.isGuest === 'true';
             let quantity = Math.max(1, Number(el.value || 1));
             el.value = quantity;
-            
+
             // Update via API
             updateQuantity(itemId, quantity, isGuest);
             computeTotal();
         }
-        
+
         if (el.classList.contains('item-check')) {
             syncSelectAll();
             computeTotal();
@@ -175,29 +175,40 @@ document.addEventListener('DOMContentLoaded', () => {
     if (checkoutBtn) {
         checkoutBtn.addEventListener('click', () => {
             const role = window.APP_ROLE || 'guest';
-            console.log('Checkout diklik, role =', role);
+            console.log('Checkout clicked, role =', role);
 
-            // 1) Kalau GUEST → buka modal login
+            // 1) Guest -> login
             if (role === 'guest') {
                 const loginModalEl = document.getElementById('loginModal');
                 if (loginModalEl && window.bootstrap) {
                     const modal = bootstrap.Modal.getOrCreateInstance(loginModalEl);
                     modal.show();
                 } else {
-                    // fallback kalau bootstrap js belum ketemu
                     window.location.href = '/login?redirect=' + encodeURIComponent('/cart');
                 }
                 return;
             }
 
-            // 2) Kalau ADMIN → tidak bisa checkout
+            // 2) Admin -> no checkout
             if (role === 'admin') {
                 alert('Admin cannot checkout. Please use a user account.');
                 return;
             }
 
-            // 3) Kalau USER → lanjut ke checkout
-            window.location.href = '/cart/checkout';
+            // 3) User -> collect selected items
+            const selectedIds = [];
+            cartList.querySelectorAll('.cart-item').forEach(row => {
+                const checked = row.querySelector('.item-check')?.checked;
+                if (checked) selectedIds.push(row.dataset.id);
+            });
+
+            if (selectedIds.length === 0) {
+                alert('Please select at least one item to checkout.');
+                return;
+            }
+
+            // Redirect to payment with selected IDs
+            window.location.href = '/payment?items=' + selectedIds.join(',');
         });
     }
 
@@ -207,26 +218,26 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // === Global function untuk menambahkan ke cart dari halaman lain
-window.addToCart = async function(productId, productName, price, image = '') {
+window.addToCart = async function (productId, productName, price, image = '', quantity = 1) {
     const role = window.APP_ROLE || 'guest';
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-    
-    const endpoint = role === 'guest' ? '/api/guest-cart/add' : '/api/cart/add';
+
+    const endpoint = role === 'guest' ? '/api/guest/cart' : '/api/cart';
     const body = role === 'guest' ? {
         product_id: productId,
         name: productName,
         price: price,
-        quantity: 1,
+        quantity: quantity,
         size: '',
         color: '',
         image: image
     } : {
         product_id: productId,
-        quantity: 1,
+        quantity: quantity,
         size: '',
         color: ''
     };
-    
+
     try {
         const response = await fetch(endpoint, {
             method: 'POST',
@@ -237,7 +248,7 @@ window.addToCart = async function(productId, productName, price, image = '') {
             },
             body: JSON.stringify(body)
         });
-        
+
         const data = await response.json();
         if (data.success) {
             alert('Item added to cart!');
@@ -250,6 +261,6 @@ window.addToCart = async function(productId, productName, price, image = '') {
     } catch (error) {
         console.error('Error adding to cart:', error);
     }
-    
+
     return false;
 };

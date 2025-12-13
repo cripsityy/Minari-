@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const codMethod = document.getElementById('codMethod');
     const virtualMethod = document.getElementById('virtualMethod');
     const ewalletMethod = document.getElementById('ewalletMethod');
@@ -24,8 +24,10 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('selectedPaymentMethod', method);
         loadSelectedPaymentMethod();
 
+        // Redirect back to order detail immediately, preserving query params
         setTimeout(() => {
-            window.location.href = "/payment";
-        }, 500);
+            const currentParams = window.location.search;
+            window.location.href = (window.ROUTE_PAYMENT || '/payment') + currentParams;
+        }, 100); // Small delay for visual feedback of selection
     }
 });

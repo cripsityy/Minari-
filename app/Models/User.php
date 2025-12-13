@@ -86,4 +86,10 @@ class User extends Authenticatable
     {
         return $this->wishlists()->count();
     }
+
+    // Relasi dengan UserAddress
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(UserAddress::class);
+    }
 }

@@ -22,12 +22,12 @@
         <div class="search-container mb-4">
 
             {{-- LOGO --}}
-            <a href="{{ route('landing') }}">
+            <a href="{{ route('home') }}">
                 <img src="{{ asset('images/logofix.png') }}" alt="MINARI Logo" class="logo-img">
             </a>
 
             {{-- CLOSE BUTTON --}}
-            <a class="close-btn" href="{{ route('landing') }}" style="text-decoration: none;">&times;</a>
+            <a class="close-btn" href="{{ route('home') }}" style="text-decoration: none;">&times;</a>
         </div>
 
         {{-- SEARCH BAR --}}
@@ -42,42 +42,42 @@
         <div class="section row row-cols-1 row-cols-md-3 g-5  pb-5">
 
             <div class="col">
-                <a href="{{ route('category', ['cat' => 'shirtblouse']) }}" class="card-item text-decoration-none">
+                <a href="{{ route('user.category', ['cat' => 'shirt-blouse']) }}" class="card-item text-decoration-none">
                     <img src="{{ asset('images/shirt.png') }}" alt="Shirt and Blouse">
                     <h6>Shirts and Blouse</h6>
                 </a>
             </div>
 
             <div class="col">
-                <a href="{{ route('category', ['cat' => 'sweeter']) }}" class="card-item text-decoration-none">
+                <a href="{{ route('user.category', ['cat' => 'sweater-cardigan']) }}" class="card-item text-decoration-none">
                     <img src="{{ asset('images/sweaters.png') }}" alt="Sweaters, Cardigan, Fleece">
                     <h6>Sweaters, Cardigan, and Fleece</h6>
                 </a>
             </div>
 
             <div class="col">
-                <a href="{{ route('category', ['cat' => 'tshirt']) }}" class="card-item text-decoration-none">
+                <a href="{{ route('user.category', ['cat' => 't-shirt-polo']) }}" class="card-item text-decoration-none">
                     <img src="{{ asset('images/tshirt.png') }}" alt="T-Shirts and Polo">
                     <h6>T-Shirts and Polo</h6>
                 </a>
             </div>
 
             <div class="col">
-                <a href="{{ route('category', ['cat' => 'pants']) }}" class="card-item text-decoration-none">
+                <a href="{{ route('user.category', ['cat' => 'pants']) }}" class="card-item text-decoration-none">
                     <img src="{{ asset('images/pants.png') }}" alt="Pants">
                     <h6>Pants</h6>
                 </a>
             </div>
 
             <div class="col">
-                <a href="{{ route('category', ['cat' => 'skirt']) }}" class="card-item text-decoration-none">
+                <a href="{{ route('user.category', ['cat' => 'skirt-dress']) }}" class="card-item text-decoration-none">
                     <img src="{{ asset('images/dress.png') }}" alt="Skirt and Dress">
                     <h6>Skirt and Dress</h6>
                 </a>
             </div>
 
             <div class="col">
-                <a href="{{ route('category', ['cat' => 'accessories']) }}" class="card-item text-decoration-none">
+                <a href="{{ route('user.category', ['cat' => 'accessories']) }}" class="card-item text-decoration-none">
                     <img src="{{ asset('images/accessories.png') }}" alt="Accessories">
                     <h6>Accessories</h6>
                 </a>

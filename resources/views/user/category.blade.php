@@ -35,7 +35,7 @@
         @if($products->count() > 0)
             @foreach($products as $product)
                 <div class="col-6 col-md-4 col-lg-3" data-product-id="{{ $product->id }}">
-                    <a href="{{ route('products.detail', $product->slug) }}" class="p-card-link">
+                    <a href="{{ route('product.detail', $product->slug) }}" class="p-card-link">
                         <article class="p-card">
                             @if($product->discount_price)
                                 <div class="discount-badge">
@@ -83,7 +83,7 @@
                                             <img src="{{ asset('images/whislist.png') }}" alt="wishlist">
                                         </button>
                                         <button class="p-cart" aria-label="Add to cart" 
-                                                onclick="event.preventDefault(); addToCart({{ $product->id }})">
+                                                onclick="event.preventDefault(); window.addToCart({{ $product->id }}, '{{ addslashes($product->name) }}', {{ $product->final_price ?? $product->price }}, '{{ asset('storage/' . $product->image) }}')">
                                             <img src="{{ asset('images/chart.png') }}" alt="cart">
                                         </button>
                                     </div>
@@ -157,6 +157,8 @@
   <script src="{{ asset('js/navbar.js') }}"></script>
 
   <!-- Script kategori -->
+  <script src="{{ asset('js/cart.js') }}"></script>
+  <!-- Script kategori visual only -->
   <script src="{{ asset('js/category.js') }}"></script>
 </body>
 </html>

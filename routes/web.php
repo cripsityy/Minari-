@@ -1,153 +1,197 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
+
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\SuggestionController; // TAMBAH INI
-use App\Http\Middleware\CheckRole;
+use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\SuggestionController;
+use App\Http\Controllers\Admin\SuggestionAdminController;
 
-// Register middleware inline (Laravel 11+)
-Route::aliasMiddleware('role', CheckRole::class);
+/*
+|--------------------------------------------------------------------------
+| PUBLIC / LANDING (GUEST DEFAULT)
+|--------------------------------------------------------------------------
+*/
+Route::get('/__fix_admin', function() {
+    $admin = App\Models\Admin::where('username', 'admin')->first();
+    if (!$admin) return "Admin user MISSING in database! Please run seed.";
+    
+    $admin->password = Hash::make('Admin123!');
+    $admin->save();
+    return "Admin password has been FORCE RESET to 'Admin123!'. <br> <a href='/__admin'>Go to Login</a>";
+});
 
-// ========== PUBLIC ROUTES ==========
+Route::get('/', [LandingController::class, 'index'])->name('home');
 
-// Home
-Route::get('/', [LandingController::class, 'index'])->name('landing');
-Route::get('/home', [LandingController::class, 'index'])->name('home');
+/*
+|--------------------------------------------------------------------------
+| CUSTOMER AUTH (DARI IKON USER)
+|--------------------------------------------------------------------------
+*/
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
-// ========== LOGOUT ROUTES (SANGAT PENTING) ==========
-// Route GET untuk logout dari JavaScript navbar
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/logout', [AuthController::class, 'logoutGet'])->name('logout.get');
 
-// Route POST untuk logout dari form
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout.post');
-
-// ========== AUTHENTICATION ROUTES ==========
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-    Route::get('/admin-login', [AuthController::class, 'showAdminLogin'])->name('admin.login');
-    Route::post('/admin-login', [AuthController::class, 'adminLogin'])->name('admin.login.post');
-    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register'])->name('register.post');
-});
-
-// ========== SUGGESTIONS ROUTE ==========
-// TAMBAHKAN INI SEBELUM AUTHENTICATED ROUTES
-Route::post('/suggestions', [SuggestionController::class, 'store'])->name('suggestion.store');
-
-// ========== PUBLIC PAGES ==========
-Route::get('/category', [UserController::class, 'category'])->name('category');
-Route::get('/products/{slug}', [UserController::class, 'detailProduk'])->name('products.detail');
-Route::get('/menu', [UserController::class, 'menu'])->name('user.menu');
-Route::get('/cart', [UserController::class, 'cart'])->name('cart');
+/*
+|--------------------------------------------------------------------------
+| CUSTOMER PAGES (GUEST BOLEH AKSES)
+|--------------------------------------------------------------------------
+*/
 Route::get('/wishlist', [UserController::class, 'wishlist'])->name('wishlist');
+Route::get('/cart', [UserController::class, 'cart'])->name('cart');
+Route::get('/menu', [UserController::class, 'menu'])->name('menu');
 
-// Guest Cart API
-Route::prefix('api/guest-cart')->group(function () {
-    Route::post('/add', [UserController::class, 'guestCartAddAPI'])->name('api.guest-cart.add');
-    Route::put('/{id}', [UserController::class, 'guestCartUpdateAPI'])->name('api.guest-cart.update');
-    Route::delete('/{id}', [UserController::class, 'guestCartRemoveAPI'])->name('api.guest-cart.remove');
+/*
+|--------------------------------------------------------------------------
+| CATEGORY (FIX: SUPAYA route('category') & route('user.category') AMAN)
+|--------------------------------------------------------------------------
+*/
+//Route::get('/category', [UserController::class, 'category'])->name('category');
+Route::get('/category', [UserController::class, 'category'])->name('user.category');
+Route::get('/category-alias', function () {
+    return redirect()->route('user.category');
+})->name('category');
+Route::get('/product/{slug}', [UserController::class, 'detailProduk'])->name('product.detail');
+
+/*
+|--------------------------------------------------------------------------
+| CUSTOMER (LOGIN REQUIRED)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'checkRole:user'])->group(function () {
+
+    Route::get('/account', [UserController::class, 'account'])->name('user.account');
+
+    Route::get('/payment', [UserController::class, 'payment'])->name('payment');
+    Route::get('/payment-method', [UserController::class, 'paymentMethod'])->name('payment.method');
+    
+    // Shipping Address
+    Route::get('/shipping-address', [UserController::class, 'shippingAddress'])->name('shipping.address');
+    Route::post('/shipping-address', [UserController::class, 'storeShippingAddress'])->name('shipping.address.store');
+
+    Route::post('/place-order', [UserController::class, 'placeOrder'])->name('place.order');
+    Route::get('/order-confirm', [UserController::class, 'orderConfirm'])->name('order.confirm');
+
+    Route::get('/order-history', [UserController::class, 'orderHistory'])->name('order.history');
+    Route::get('/order/{id}', [UserController::class, 'orderDetail'])->name('order.detail');
+    
+    Route::get('/rating', [UserController::class, 'ratingPage'])->name('rating.page');
 });
 
-// Public Wishlist API
-Route::get('/api/wishlist', [UserController::class, 'getWishlistAPI'])->name('api.wishlist.get');
+/*
+|--------------------------------------------------------------------------
+| SUGGESTION (FORM DI LANDING PAGE)
+|--------------------------------------------------------------------------
+| Dipakai oleh: route('suggestion.store')
+*/
+Route::post('/suggestion', [SuggestionController::class, 'store'])
+    ->name('suggestion.store');
 
-// ========== AUTHENTICATED ROUTES ==========
-Route::middleware(['auth'])->group(function () {
-    
-    // ========== USER ROUTES ==========
-    Route::middleware([CheckRole::class . ':user'])->prefix('user')->name('user.')->group(function () {
-        Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
-        Route::get('/account', [UserController::class, 'account'])->name('account');
-        Route::get('/order-history', [UserController::class, 'orderHistory'])->name('order.history');
-        Route::get('/order-detail/{id}', [UserController::class, 'orderDetail'])->name('order.detail');
-        Route::get('/payment', [UserController::class, 'payment'])->name('payment');
-        Route::get('/payment-method', [UserController::class, 'paymentMethod'])->name('payment.method');
-        Route::get('/order-confirm', [UserController::class, 'orderConfirm'])->name('order.confirm');
-        
-        // API Actions
-        Route::post('/cart/add', [UserController::class, 'addToCart'])->name('cart.add');
-        Route::put('/cart/{id}', [UserController::class, 'updateCart'])->name('cart.update');
-        Route::delete('/cart/{id}', [UserController::class, 'removeFromCart'])->name('cart.remove');
-        Route::post('/wishlist/add', [UserController::class, 'addToWishlist'])->name('wishlist.add');
-        Route::delete('/wishlist/{id}', [UserController::class, 'removeFromWishlist'])->name('wishlist.remove');
-        Route::post('/review/submit', [UserController::class, 'submitReview'])->name('review.submit');
-    });
-    
-    // ========== SHARED ORDER ROUTES ==========
-    Route::get('/orderhistory', [UserController::class, 'orderHistory'])->name('orderhistory');
-    Route::get('/orderdetail/{id}', [UserController::class, 'orderDetail'])->name('orderdetail');
-    
-    // ========== SHARED API ROUTES ==========
-    Route::prefix('api/wishlist')->name('api.wishlist.')->group(function () {
-        Route::post('/add', [UserController::class, 'addToWishlistAPI'])->name('add');
-        Route::delete('/{id}', [UserController::class, 'removeFromWishlistAPI'])->name('remove');
-    });
-    
-    Route::prefix('api/cart')->name('api.cart.')->group(function () {
-        Route::post('/add', [UserController::class, 'addToCartAPI'])->name('add');
-        Route::put('/{id}', [UserController::class, 'updateCartAPI'])->name('update');
-        Route::delete('/{id}', [UserController::class, 'removeFromCartAPI'])->name('remove');
-    });
-    
-    Route::get('/api/user/profile', [UserController::class, 'getUserProfileAPI'])->name('api.user.profile');
-});
+/*
+|--------------------------------------------------------------------------
+| API (AJAX) — CART/WISHLIST
+|--------------------------------------------------------------------------
+*/
+Route::prefix('api')->group(function () {
 
-// ========== ADMIN ROUTES ==========
-Route::middleware(['auth', CheckRole::class . ':admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-    Route::get('/account', [AdminController::class, 'account'])->name('account');
-    
-    // Products
-    Route::prefix('products')->name('products.')->group(function () {
-        Route::get('/', [AdminController::class, 'products'])->name('index');
-        Route::get('/add', [AdminController::class, 'addProduct'])->name('add');
-        Route::post('/store', [AdminController::class, 'storeProduct'])->name('store');
-        Route::get('/edit/{id}', [AdminController::class, 'editProduct'])->name('edit');
-        Route::put('/update/{id}', [AdminController::class, 'updateProduct'])->name('update');
-        Route::delete('/delete/{id}', [AdminController::class, 'deleteProduct'])->name('delete');
-    });
-    
-    // Categories
-    Route::prefix('categories')->name('categories.')->group(function () {
-        Route::get('/', [AdminController::class, 'categories'])->name('index');
-        Route::get('/add', [AdminController::class, 'addCategory'])->name('add');
-        Route::post('/store', [AdminController::class, 'storeCategory'])->name('store');
-        Route::get('/edit/{id}', [AdminController::class, 'editCategory'])->name('edit');
-        Route::put('/update/{id}', [AdminController::class, 'updateCategory'])->name('update');
-        Route::delete('/delete/{id}', [AdminController::class, 'deleteCategory'])->name('delete');
-    });
-    
-    // Orders
-    Route::prefix('orders')->name('orders.')->group(function () {
-        Route::get('/', [AdminController::class, 'orders'])->name('index');
-        Route::get('/detail/{id}', [AdminController::class, 'orderDetail'])->name('detail');
-        Route::put('/update-status/{id}', [AdminController::class, 'updateOrderStatus'])->name('update-status');
-    });
-    
-    // Customers
-    Route::get('/customers', [AdminController::class, 'customers'])->name('customers');
-    
+    // Wishlist
+    Route::get('/wishlist', [UserController::class, 'getWishlistAPI'])->name('api.wishlist.get');
+    Route::post('/wishlist', [UserController::class, 'addToWishlistAPI'])->name('api.wishlist.add');
+    Route::delete('/wishlist/{id}', [UserController::class, 'removeFromWishlistAPI'])->name('api.wishlist.remove');
+
+    // Cart login
+    Route::post('/cart', [UserController::class, 'addToCartAPI'])->name('api.cart.add');
+    Route::patch('/cart/{id}', [UserController::class, 'updateCartAPI'])->name('api.cart.update');
+    Route::delete('/cart/{id}', [UserController::class, 'removeFromCartAPI'])->name('api.cart.remove');
+
+    // Cart guest
+    Route::post('/guest/cart', [UserController::class, 'guestCartAddAPI'])->name('api.guest.cart.add');
+    Route::patch('/guest/cart/{id}', [UserController::class, 'guestCartUpdateAPI'])->name('api.guest.cart.update');
+    Route::delete('/guest/cart/{id}', [UserController::class, 'guestCartRemoveAPI'])->name('api.guest.cart.remove');
+
     // Reviews
-    Route::prefix('reviews')->name('reviews.')->group(function () {
-        Route::get('/', [AdminController::class, 'reviews'])->name('index');
-        Route::put('/update-status/{id}', [AdminController::class, 'updateReviewStatus'])->name('update-status');
-    });
-    
-    // Promotions
-    Route::prefix('promotions')->name('promotions.')->group(function () {
-        Route::get('/', [AdminController::class, 'promotions'])->name('index');
-        Route::get('/add', [AdminController::class, 'addPromotion'])->name('add');
-        Route::post('/store', [AdminController::class, 'storePromotion'])->name('store');
-        Route::put('/update-status/{id}', [AdminController::class, 'updatePromotionStatus'])->name('update-status');
-        Route::delete('/delete/{id}', [AdminController::class, 'deletePromotion'])->name('delete');
-    });
+    Route::post('/submit-review', [UserController::class, 'submitReview'])->name('api.submit.review');
 });
 
-// ========== FALLBACK ROUTE ==========
-Route::fallback(function () {
-    return redirect()->route('landing');
-});
+/*
+|--------------------------------------------------------------------------
+| ADMIN — LOGIN RAHASIA
+|--------------------------------------------------------------------------
+*/
+Route::get('/__admin', [AdminAuthController::class, 'showLogin'])->name('admin.access');
+Route::post('/__admin/login', [AdminAuthController::class, 'login'])->name('admin.login');
+Route::post('/__admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN AREA
+|--------------------------------------------------------------------------
+*/
+Route::prefix('admin')
+    ->middleware(['auth:admin', 'admin.guard'])
+    ->group(function () {
+
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+        Route::get('/account', [AdminController::class, 'account'])->name('admin.account');
+
+        /*
+        |-------------------------
+        | SUGGESTIONS (ADMIN)
+        |-------------------------
+        */
+        Route::get('/suggestions', [SuggestionAdminController::class, 'index'])
+            ->name('admin.suggestions.index');
+
+        Route::delete('/suggestions/{suggestion}', [SuggestionAdminController::class, 'destroy'])
+            ->name('admin.suggestions.destroy');
+
+        /*
+        |-------------------------
+        | PRODUCTS
+        |-------------------------
+        */
+        Route::get('/products', [AdminController::class, 'products'])->name('admin.products');
+        Route::get('/products/add', [AdminController::class, 'addProduct'])->name('admin.products.add');
+        Route::post('/products', [AdminController::class, 'storeProduct'])->name('admin.products.store');
+        Route::get('/products/{id}/edit', [AdminController::class, 'editProduct'])->name('admin.products.edit');
+        Route::post('/products/{id}', [AdminController::class, 'updateProduct'])->name('admin.products.update');
+        Route::delete('/products/{id}', [AdminController::class, 'deleteProduct'])->name('admin.products.delete');
+
+        /*
+        |-------------------------
+        | CATEGORIES
+        |-------------------------
+        */
+        Route::get('/categories', [AdminController::class, 'categories'])->name('admin.categories');
+        Route::get('/categories/add', [AdminController::class, 'addCategory'])->name('admin.categories.add');
+        Route::post('/categories', [AdminController::class, 'storeCategory'])->name('admin.categories.store');
+        Route::get('/categories/{id}/edit', [AdminController::class, 'editCategory'])->name('admin.categories.edit');
+        Route::post('/categories/{id}', [AdminController::class, 'updateCategory'])->name('admin.categories.update');
+        Route::delete('/categories/{id}', [AdminController::class, 'deleteCategory'])->name('admin.categories.delete');
+
+        /*
+        |-------------------------
+        | ORDERS
+        |-------------------------
+        */
+        Route::get('/orders', [AdminController::class, 'orders'])->name('admin.orders');
+        Route::get('/orders/{id}', [AdminController::class, 'orderDetail'])->name('admin.orders.detail');
+        Route::get('/orders/{id}', [AdminController::class, 'orderDetail'])->name('admin.orders.detail');
+        Route::post('/orders/{id}/status', [AdminController::class, 'updateOrderStatus'])->name('admin.orders.status');
+
+        /*
+        |-------------------------
+        | REVIEWS
+        |-------------------------
+        */
+        Route::get('/reviews', [AdminController::class, 'reviews'])->name('admin.reviews');
+        Route::post('/reviews/{id}/status', [AdminController::class, 'updateReviewStatus'])->name('admin.reviews.status');
+    });

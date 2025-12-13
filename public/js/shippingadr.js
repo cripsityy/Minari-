@@ -1,19 +1,19 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const houseAddress = document.getElementById('houseAddress');
     const officeAddress = document.getElementById('officeAddress');
     const addNewAddress = document.getElementById('addNewAddress');
 
     loadSelectedAddress();
 
-    houseAddress.addEventListener('click', function() {
+    houseAddress.addEventListener('click', function () {
         selectAddress('house');
     });
 
-    officeAddress.addEventListener('click', function() {
+    officeAddress.addEventListener('click', function () {
         selectAddress('office');
     });
 
-    addNewAddress.addEventListener('click', function() {
+    addNewAddress.addEventListener('click', function () {
         alert('Fitur tambah alamat baru akan segera tersedia!');
     });
 
@@ -31,9 +31,5 @@ document.addEventListener('DOMContentLoaded', function() {
     function selectAddress(type) {
         localStorage.setItem('selectedAddress', type);
         loadSelectedAddress();
-
-        setTimeout(() => {
-            window.location.href = "/payment";
-        }, 500);
     }
 });

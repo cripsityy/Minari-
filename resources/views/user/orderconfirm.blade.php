@@ -22,8 +22,9 @@
 
 <div class="order-header-section">
     <div class="container">
-        <div class="order-header-content">
-            <h1 class="order-title" id="orderTitle">Order #----</h1>
+            <div class="order-header-content">
+                <h1 class="order-title" id="orderTitle">Order {{ $latestOrder->order_number ?? '#----' }}</h1>
+            </div>
         </div>
     </div>
 </div>
@@ -39,9 +40,14 @@
             <h1 class="confirmation-title">Payment successful!</h1>
             <p class="confirmation-message">Your order will be processed shortly</p>
 
-            <button class="back-to-collection-btn" id="backToHomeBtn">
-                back to our collection
-            </button>
+            <div class="d-flex gap-2 justify-content-center">
+                <button class="back-to-collection-btn" id="backToHomeBtn">
+                    Continue Shopping
+                </button>
+                <a href="{{ route('order.history') }}" class="back-to-collection-btn" style="text-decoration: none; display: inline-block;">
+                    View My Orders
+                </a>
+            </div>
 
             <button class="button" id="reviewBtn">
                 rate our product

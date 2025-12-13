@@ -1,119 +1,34 @@
-function redirectToLogin() {
-    window.location.href = '/login';
-}
+// Hidden Admin Access - Triple Click to Login
+document.addEventListener("DOMContentLoaded", function() {
+    const logoElement = document.querySelector('.logo img');
+    if (logoElement) {
+        let clickCount = 0;
+        let clickTimer;
 
-function redirectToDashboard() {
-    window.location.href = '/admin/dashboard';
-}
-
-function redirectToLanding() {
-    window.location.href = '/';
-}
-
-function handleLogin(event) {
-    event.preventDefault();
-    
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    
-    if (username === 'admin' && password === 'admin') {
-        localStorage.setItem('adminLoggedIn', 'true');
-        localStorage.setItem('role', 'admin');
-        redirectToDashboard();
-    } else {
-        alert('Invalid username or password. Try: admin/admin');
-    }
-}
-
-function handleLogout() {
-    localStorage.removeItem('adminLoggedIn');
-    localStorage.removeItem('role');
-    redirectToLogin();
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-    const navbar = document.querySelector(".navbar");
-    
-    if (navbar) {
-        window.addEventListener("scroll", function () {
-            if (window.scrollY > 50) {
-                navbar.classList.add("scrolled");
-            } else {
-                navbar.classList.remove("scrolled");
+        logoElement.addEventListener('click', function(e) {
+            clickCount++;
+            
+            if (clickCount === 1) {
+                clickTimer = setTimeout(() => {
+                    clickCount = 0;
+                }, 1000); // Reset count after 1 second
+            }
+            
+            if (clickCount >= 3) {
+                clearTimeout(clickTimer);
+                clickCount = 0;
+                // Redirect to hidden admin login
+                window.location.href = '/__admin'; 
             }
         });
+        
+        // Change cursor to indicate something might be there (optional, maybe keep it default to be truly hidden)
+        // logoElement.style.cursor = 'pointer'; 
     }
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll('.style-scroll, .category-scroll').forEach(scrollArea => {
-        let scrollInterval;
-        
-        scrollArea.addEventListener('mousemove', (e) => {
-            const rect = scrollArea.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const center = rect.width / 2;
-            
-            clearInterval(scrollInterval);
-            scrollInterval = setInterval(() => {
-                const speed = 15;
-                if (x > center + 50) {
-                    scrollArea.scrollLeft += speed;
-                } else if (x < center - 50) {
-                    scrollArea.scrollLeft -= speed;
-                }
-            }, 20);
-        });
-        
-        scrollArea.addEventListener('mouseleave', () => {
-            clearInterval(scrollInterval);
-        });
-        
-        const prevBtn = document.createElement('button');
-        prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
-        prevBtn.className = 'scroll-btn scroll-prev';
-        prevBtn.style.cssText = 'position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.8); border: none; border-radius: 50%; width: 40px; height: 40px; z-index: 10;';
-        
-        const nextBtn = document.createElement('button');
-        nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
-        nextBtn.className = 'scroll-btn scroll-next';
-        nextBtn.style.cssText = 'position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.8); border: none; border-radius: 50%; width: 40px; height: 40px; z-index: 10;';
-        
-        scrollArea.parentElement.style.position = 'relative';
-        scrollArea.parentElement.appendChild(prevBtn);
-        scrollArea.parentElement.appendChild(nextBtn);
-        
-        prevBtn.addEventListener('click', () => {
-            scrollArea.scrollLeft -= 300;
-        });
-        
-        nextBtn.addEventListener('click', () => {
-            scrollArea.scrollLeft += 300;
-        });
-    });
-});
-
-function checkLoginStatus() {
-    const isLoggedIn = localStorage.getItem('adminLoggedIn');
-    const currentPath = window.location.pathname;
-    
-    const adminPaths = [
-        '/admin/dashboard',
-        '/admin/products',
-        '/admin/categories',
-        '/admin/orders',
-        '/admin/customers',
-        '/admin/reviews',
-        '/admin/promotions'
-    ];
-    
-    if (adminPaths.includes(currentPath) && !isLoggedIn) {
-        redirectToLogin();
-        return false;
-    }
-    
-    return true;
-}
+// Removed: redirectToLogin, redirectToDashboard, handleLogin, handleLogout, checkLoginStatus
+// These were insecure client-side implementations. We now use server-side Auth logic.
 
 document.addEventListener("DOMContentLoaded", function() {
     const suggestionForm = document.querySelector('footer form');

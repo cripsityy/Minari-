@@ -20,7 +20,7 @@
             <div class="login-right">
                 <h2>Welcome Back!</h2>
                 <p>Sign in to access admin panel</p>
-                <form action="{{ route('admin.login.post') }}" method="POST">
+                <form action="{{ route('admin.login') }}" method="POST">
                     @csrf
                     <div class="form-group">
                         <label for="username">
@@ -39,7 +39,7 @@
                     </button>
                 </form>
                 <div class="back-link">
-                    <a href="{{ route('landing') }}">
+                    <a href="{{ route('home') }}">
                         <i class="fas fa-arrow-left"></i> Back to Home
                     </a>
                 </div>

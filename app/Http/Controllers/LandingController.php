@@ -1,12 +1,18 @@
 <?php
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
+use App\Models\Product;
+use App\Models\Category;
 
 class LandingController extends Controller
 {
     public function index()
     {
-        return view('landing');
+        // Fetch featured/popular products for landing page
+        $featuredProducts = Product::available()->take(8)->get();
+        $categories = Category::withCount('products')->get();
+
+        return view('landing', compact('featuredProducts', 'categories'));
     }
     
     public function shirtblouse()
