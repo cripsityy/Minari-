@@ -95,12 +95,19 @@ class UserController extends Controller
         // Get current guest cart from session
         $cart = session()->get('guest_cart', []);
         
+        // Normalize size and color for consistent comparison
+        $requestSize = $request->size ?? '';
+        $requestColor = $request->color ?? '';
+        
         // Check if item already exists
         $existingIndex = null;
         foreach ($cart as $index => $item) {
+            $itemSize = $item['size'] ?? '';
+            $itemColor = $item['color'] ?? '';
+            
             if ($item['product_id'] == $request->product_id && 
-                $item['size'] == $request->size && 
-                $item['color'] == $request->color) {
+                $itemSize == $requestSize && 
+                $itemColor == $requestColor) {
                 $existingIndex = $index;
                 break;
             }
@@ -110,15 +117,15 @@ class UserController extends Controller
             // Update quantity
             $cart[$existingIndex]['quantity'] += $request->quantity;
         } else {
-            // Add new item
+            // Add new item with normalized size/color
             $cart[] = [
                 'id' => uniqid('guest_'),
                 'product_id' => $request->product_id,
                 'name' => $request->name,
                 'price' => $request->price,
                 'quantity' => $request->quantity,
-                'size' => $request->size ?? '',
-                'color' => $request->color ?? '',
+                'size' => $requestSize,
+                'color' => $requestColor,
                 'image' => $request->image ?? '/images/default-product.jpg'
             ];
         }
@@ -614,11 +621,27 @@ class UserController extends Controller
             ], 400);
         }
         
-        // Check if item already in cart
+        // Normalize size and color to empty string if null
+        $size = $request->size ?? '';
+        $color = $request->color ?? '';
+        
+        // Check if item already in cart (handle both null and empty string)
         $cartItem = $user->carts()
             ->where('product_id', $request->product_id)
-            ->where('size', $request->size)
-            ->where('color', $request->color)
+            ->where(function($query) use ($size) {
+                if ($size === '') {
+                    $query->whereNull('size')->orWhere('size', '');
+                } else {
+                    $query->where('size', $size);
+                }
+            })
+            ->where(function($query) use ($color) {
+                if ($color === '') {
+                    $query->whereNull('color')->orWhere('color', '');
+                } else {
+                    $query->where('color', $color);
+                }
+            })
             ->first();
         
         if ($cartItem) {
@@ -628,8 +651,8 @@ class UserController extends Controller
             $cartItem = $user->carts()->create([
                 'product_id' => $request->product_id,
                 'quantity' => $request->quantity,
-                'size' => $request->size,
-                'color' => $request->color
+                'size' => $size ?: null,
+                'color' => $color ?: null
             ]);
         }
         

@@ -35,16 +35,20 @@
                             @forelse($suggestions as $s)
                             <tr>
                                 <td class="px-4 py-3">
-                                    <div class="fw-bold text-dark">{{ $s->name ?? 'Anonymous' }}</div>
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <div class="fw-bold text-dark">{{ $s->name ?? 'Anonymous' }}</div>
+                                        @if(!$s->name || !$s->email)
+                                            <span class="badge bg-secondary" style="font-size: 0.7rem; padding: 2px 8px;">Guest</span>
+                                        @endif
+                                    </div>
                                     <div class="text-muted small">{{ $s->email ?? 'No Email' }}</div>
-                                    <div class="text-muted small" style="font-size: 0.75rem;">IP: {{ $s->ip_address }}</div>
                                 </td>
                                 <td class="px-4 py-3">
                                     <p class="mb-0 text-secondary" style="white-space: pre-wrap; max-width: 500px;">{{ $s->message }}</p>
                                 </td>
                                 <td class="px-4 py-3">
                                     <div class="text-secondary small">
-                                        <i class="far fa-clock me-1"></i> {{ $s->created_at->format('d M Y H:i') }}
+                                        <i class="far fa-clock me-1"></i> {{ $s->created_at->format('d M Y, H:i') }} WIB
                                     </div>
                                 </td>
                                 <td class="px-4 py-3 text-end">

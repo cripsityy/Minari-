@@ -92,6 +92,51 @@ Route::middleware(['auth', 'checkRole:user'])->group(function () {
 Route::post('/suggestion', [SuggestionController::class, 'store'])
     ->name('suggestion.store');
 
+// Test route for debugging
+Route::get('/test-suggestion', function() {
+    try {
+        $suggestion = \App\Models\Suggestion::create([
+            'name' => null,
+            'email' => null,
+            'message' => 'Test suggestion from guest - manual test',
+            'ip_address' => request()->ip(),
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Suggestion created',
+            'data' => $suggestion,
+            'total_suggestions' => \App\Models\Suggestion::count()
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
+
+// Check all suggestions
+Route::get('/check-suggestions', function() {
+    $suggestions = \App\Models\Suggestion::latest()->get();
+    
+    return response()->json([
+        'total' => $suggestions->count(),
+        'suggestions' => $suggestions->map(function($s) {
+            return [
+                'id' => $s->id,
+                'name' => $s->name,
+                'email' => $s->email,
+                'message' => $s->message,
+                'ip_address' => $s->ip_address,
+                'created_at' => $s->created_at->format('Y-m-d H:i:s')
+            ];
+        })
+    ]);
+});
+
+
+
 /*
 |--------------------------------------------------------------------------
 | API (AJAX) — CART/WISHLIST

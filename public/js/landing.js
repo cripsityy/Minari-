@@ -34,25 +34,20 @@ document.addEventListener("DOMContentLoaded", function () {
     const suggestionForm = document.querySelector('footer form');
     if (suggestionForm) {
         suggestionForm.addEventListener('submit', function (e) {
-            e.preventDefault();
             const message = this.querySelector('input[name="message"]').value;
 
             if (message.trim() === '') {
+                e.preventDefault();
                 alert('Please enter your suggestion');
                 return;
             }
 
+            // Don't prevent default - let the form submit to the server!
             const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
             submitBtn.disabled = true;
 
-            setTimeout(() => {
-                alert('Thank you for your suggestion!');
-                this.reset();
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            }, 1500);
+            // Form will now submit normally to the server
         });
     }
 

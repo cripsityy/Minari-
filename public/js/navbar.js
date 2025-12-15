@@ -68,28 +68,19 @@ function tplUser() {
   </div>`;
 }
 
-// Scroll Effect
+// Scroll Effect - Background hilang saat scroll (tanpa blur)
 function initializeScrollEffect() {
   const navbar = document.getElementById('mainNavbar');
   if (navbar) {
     window.addEventListener('scroll', function () {
-      if (document.body.classList.contains('landing-page') && window.scrollY <= 50) {
-        // Landing Page at Top: Transparent
-        navbar.style.backgroundColor = 'transparent';
-        navbar.style.boxShadow = 'none';
-      } else if (window.scrollY > 50) {
-        // Scrolled Down: Beige/Solid
-        navbar.style.backgroundColor = '#FFF6F0';
-        navbar.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.15)';
+      if (window.scrollY > 50) {
+        // Scrolled Down: Background hilang total (transparent, no blur)
+        navbar.style.setProperty('background-color', 'transparent', 'important');
+        navbar.style.setProperty('box-shadow', 'none', 'important');
       } else {
-        // Top of page (non-landing or general): Beige
-        navbar.style.backgroundColor = '#FFF6F0';
-        navbar.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.15)';
-
-        if (document.body.classList.contains('landing-page')) {
-          navbar.style.backgroundColor = 'transparent';
-          navbar.style.boxShadow = 'none';
-        }
+        // Top of page: Solid background
+        navbar.style.setProperty('background-color', '#FFF6F0', 'important');
+        navbar.style.setProperty('box-shadow', '0 4px 10px rgba(0, 0, 0, 0.15)', 'important');
       }
     });
   }
