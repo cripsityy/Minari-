@@ -39,49 +39,21 @@
         </div>
 
         {{-- CATEGORY SECTION --}}
-        <div class="section row row-cols-1 row-cols-md-3 g-5  pb-5">
-
+        <div class="section row row-cols-1 row-cols-md-3 g-5 pb-5">
+            @foreach($categories as $category)
             <div class="col">
-                <a href="{{ route('user.category', ['cat' => 'shirt-blouse']) }}" class="card-item text-decoration-none">
-                    <img src="{{ asset('images/shirt.png') }}" alt="Shirt and Blouse">
-                    <h6>Shirts and Blouse</h6>
+                <a href="{{ route('user.category', ['cat' => $category->slug]) }}" class="card-item text-decoration-none">
+                    <img src="{{ $category->image_url }}" alt="{{ $category->name }}">
+                    <h6>{{ $category->name }}</h6>
                 </a>
             </div>
-
-            <div class="col">
-                <a href="{{ route('user.category', ['cat' => 'sweater-cardigan']) }}" class="card-item text-decoration-none">
-                    <img src="{{ asset('images/sweaters.png') }}" alt="Sweaters, Cardigan, Fleece">
-                    <h6>Sweaters, Cardigan, and Fleece</h6>
-                </a>
-            </div>
-
-            <div class="col">
-                <a href="{{ route('user.category', ['cat' => 't-shirt-polo']) }}" class="card-item text-decoration-none">
-                    <img src="{{ asset('images/tshirt.png') }}" alt="T-Shirts and Polo">
-                    <h6>T-Shirts and Polo</h6>
-                </a>
-            </div>
-
-            <div class="col">
-                <a href="{{ route('user.category', ['cat' => 'pants']) }}" class="card-item text-decoration-none">
-                    <img src="{{ asset('images/pants.png') }}" alt="Pants">
-                    <h6>Pants</h6>
-                </a>
-            </div>
-
-            <div class="col">
-                <a href="{{ route('user.category', ['cat' => 'skirt-dress']) }}" class="card-item text-decoration-none">
-                    <img src="{{ asset('images/dress.png') }}" alt="Skirt and Dress">
-                    <h6>Skirt and Dress</h6>
-                </a>
-            </div>
-
-            <div class="col">
-                <a href="{{ route('user.category', ['cat' => 'accessories']) }}" class="card-item text-decoration-none">
-                    <img src="{{ asset('images/accessories.png') }}" alt="Accessories">
-                    <h6>Accessories</h6>
-                </a>
-            </div>
+            @endforeach
+            
+            @if($categories->isEmpty())
+                <div class="col-12 text-center">
+                    <p class="text-muted">No categories found.</p>
+                </div>
+            @endif
         </div>
     </div>
 

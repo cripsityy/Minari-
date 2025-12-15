@@ -160,7 +160,7 @@ Route::prefix('admin')
         Route::post('/products', [AdminController::class, 'storeProduct'])->name('admin.products.store');
         Route::get('/products/{id}/edit', [AdminController::class, 'editProduct'])->name('admin.products.edit');
         Route::post('/products/{id}', [AdminController::class, 'updateProduct'])->name('admin.products.update');
-        Route::get('/customers', [AdminController::class, 'customers'])->name('admin.customers');
+
         Route::delete('/products/{id}', [AdminController::class, 'deleteProduct'])->name('admin.products.delete');
 
         /*

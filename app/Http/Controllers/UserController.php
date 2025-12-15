@@ -190,7 +190,8 @@ class UserController extends Controller
     
     public function menu()
     {
-        return view('user.menu');
+        $categories = Category::withCount('products')->get();
+        return view('user.menu', compact('categories'));
     }
     
     public function orderHistory()
@@ -251,7 +252,7 @@ class UserController extends Controller
              \Illuminate\Support\Facades\Log::info('Category Found', ['id' => $category->id, 'name' => $category->name]);
         }
         
-        $products = $category->products()->available()->paginate(12);
+        $products = $category->products()->available()->get();
         
         return view('user.category', compact('category', 'products'));
     }
@@ -306,13 +307,49 @@ class UserController extends Controller
             return ($item->product->final_price ?? $item->product->price ?? 0) * $item->quantity;
         });
         
+        // Calculate Discount (Best available promotion)
+        $discount = 0;
+        $activePromotions = \App\Models\Promotion::where('is_active', true)
+            ->whereDate('start_date', '<=', now())
+            ->whereDate('end_date', '>=', now())
+            ->get();
+
+        foreach ($activePromotions as $promo) {
+            // Check usage limit
+            if ($promo->usage_limit !== null && $promo->used_count >= $promo->usage_limit) {
+                continue;
+            }
+
+            $applicableIds = $promo->applicable_products ?? [];
+            $isAll = in_array('all', $applicableIds) || empty($applicableIds);
+            
+            $promoableAmount = 0;
+            
+            if ($isAll) {
+                $promoableAmount = $subtotal;
+            } else {
+                $promoableAmount = $cartItems->filter(function($item) use ($applicableIds) {
+                    return in_array($item->product_id, $applicableIds);
+                })->sum(function($item) {
+                    return ($item->product->final_price ?? $item->product->price ?? 0) * $item->quantity;
+                });
+            }
+            
+            if ($promoableAmount > 0) {
+                 $potentialDiscount = $promo->calculateDiscount($promoableAmount);
+                 if ($potentialDiscount > $discount) {
+                     $discount = $potentialDiscount;
+                 }
+            }
+        }
+        
         $shippingCost = 15000;
-        $total = $subtotal + $shippingCost;
+        $total = $subtotal + $shippingCost - $discount;
         
         // Get user addresses
         $addresses = $user->addresses;
         
-        return view('user.detailorder', compact('cartItems', 'subtotal', 'shippingCost', 'total', 'addresses', 'selectedIds'));
+        return view('user.detailorder', compact('cartItems', 'subtotal', 'shippingCost', 'discount', 'total', 'addresses', 'selectedIds'));
     }
     
     public function paymentMethod()
@@ -388,9 +425,45 @@ class UserController extends Controller
         $subtotal = $cartItems->sum(function($item) {
             return ($item->product->final_price ?? $item->product->price ?? 0) * $item->quantity;
         });
+        // Calculate Discount logic (replicated for security)
+        $discount = 0;
+        $activePromotions = \App\Models\Promotion::where('is_active', true)
+            ->whereDate('start_date', '<=', now())
+            ->whereDate('end_date', '>=', now())
+            ->get();
+
+        foreach ($activePromotions as $promo) {
+            if ($promo->usage_limit !== null && $promo->used_count >= $promo->usage_limit) {
+                continue;
+            }
+
+            $applicableIds = $promo->applicable_products ?? [];
+            $isAll = in_array('all', $applicableIds) || empty($applicableIds);
+            
+            $promoableAmount = 0;
+            
+            if ($isAll) {
+                $promoableAmount = $subtotal;
+            } else {
+                $promoableAmount = $cartItems->filter(function($item) use ($applicableIds) {
+                    return in_array($item->product_id, $applicableIds);
+                })->sum(function($item) {
+                    return ($item->product->final_price ?? $item->product->price ?? 0) * $item->quantity;
+                });
+            }
+            
+            if ($promoableAmount > 0) {
+                 $potentialDiscount = $promo->calculateDiscount($promoableAmount);
+                 if ($potentialDiscount > $discount) {
+                     $discount = $potentialDiscount;
+                     // Ideally we would trigger $promo->increment('used_count'); here if we want to track usage
+                 }
+            }
+        }
+
         $shippingCost = 15000; // Fixed shipping cost
         $tax = 0; // No tax for now
-        $total = $subtotal + $shippingCost + $tax;
+        $total = $subtotal + $shippingCost + $tax - $discount;
 
         // Create order
         $order = Order::create([
@@ -404,9 +477,10 @@ class UserController extends Controller
             'shipping_postal_code' => $request->shipping_postal_code,
             'notes' => $request->notes,
             'subtotal' => $subtotal,
+            'discount' => $discount,
             'shipping_cost' => $shippingCost,
             'tax' => $tax,
-            'total' => $total,
+            'total' => max(0, $total),
             'payment_method' => $request->payment_method,
             'payment_status' => 'pending',
             'order_status' => 'pending'

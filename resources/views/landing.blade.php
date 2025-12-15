@@ -11,22 +11,31 @@
         <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
         <link rel="stylesheet" href="{{ asset('css/landing.css') }}">
     </head>
-    <body>
+    <body class="landing-page">
         <header id="navMount"></header>
         <section class="hero-section">
             <div class="container">
                 <div class="row align-items-center">
-                    <div class="col-md-6">
+                    <div class="col-md-5">
                         <div class="hero-content">
-                            <h1>Your Everyday Fashion Boutique</h1>
-                            <p>Discover the latest trends in fashion with our exclusive collections designed for your everyday style.</p>
-                            
+                            <h1>Discover Your Style with Us</h1>
+                            <p>Explore the latest fashion trends, styles, and our collections</p>
+                            <!-- Optional Button if needed -->
+                            <!-- <a href="#categories" class="btn btn-dark rounded-pill px-4 py-2">Shop Now</a> -->
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-7 position-relative">
                         <div class="hero-images">
-                            <i class="fas fa-tshirt hero-icon" style="top: 20px; left: 20px;"></i>
-                            <i class="fas fa-dress hero-icon" style="bottom: 50px; right: 30px;"></i>
+                            <!-- Main Bag Object -->
+                            <img src="{{ asset('images/tes.png') }}" class="hero-obj hero-obj-main" alt="Fashion Bag">
+                            
+                            <!-- Floating Elements -->
+                            <img src="{{ asset('images/test1.png') }}" class="hero-obj hero-obj-1" alt="Fire Icon">
+                            <img src="{{ asset('images/test2.png') }}" class="hero-obj hero-obj-2" alt="Like Icon">
+                            <img src="{{ asset('images/test3.png') }}" class="hero-obj hero-obj-3" alt="Coin Icon">
+                            
+                            <!-- Optional: Selection Box Overlay (Static for design match) -->
+                            <!-- <div class="hero-obj-info">105 x 118</div> -->
                         </div>
                     </div>
                 </div>
@@ -75,47 +84,21 @@
             <div class="container-fluid">
                 <h2 class="section-title">Product Category</h2>
                 <div class="category-scroll px-5">
-                    <a href="{{ route('user.category', ['cat' => 'shirt-blouse']) }}" class="category-card text-decoration-none d-block">
+                    @foreach($categories as $category)
+                    <a href="{{ route('user.category', ['cat' => $category->slug]) }}" class="category-card text-decoration-none d-block">
                         <div class="category-image">
-                            <img src="{{ asset('images/shirt.png') }}" alt="Shirt">
+                            <!-- Use image_url accessor which handles default -->
+                            <img src="{{ $category->image_url }}" alt="{{ $category->name }}">
                         </div>
-                        <h3>Shirt and Blouse</h3>
+                        <h3>{{ $category->name }}</h3>
                     </a>
-      
-                    <a href="{{ route('user.category', ['cat' => 'sweater-cardigan']) }}" class="category-card text-decoration-none d-block">
-                        <div class="category-image">
-                            <img src="{{ asset('images/sweaters.png') }}" alt="Sweaters">
+                    @endforeach
+                    
+                    @if($categories->isEmpty())
+                        <div class="text-center w-100 p-5">
+                            <p class="text-muted">No categories available at the moment.</p>
                         </div>
-                        <h3>Sweaters, Cardigan, and Fleece</h3>
-                    </a>
- 
-                    <a href="{{ route('user.category', ['cat' => 't-shirt-polo']) }}" class="category-card text-decoration-none d-block">
-                        <div class="category-image">
-                            <img src="{{ asset('images/tshirt.png') }}" alt="T-Shirt">
-                        </div>
-                        <h3>T-shirt and Polo</h3>
-                    </a>
-               
-                    <a href="{{ route('user.category', ['cat' => 'pants']) }}" class="category-card text-decoration-none d-block">
-                        <div class="category-image">
-                            <img src="{{ asset('images/pants.png') }}" alt="Pants">
-                        </div>
-                        <h3>Pants</h3>
-                    </a>
-               
-                    <a href="{{ route('user.category', ['cat' => 'skirt-dress']) }}" class="category-card text-decoration-none d-block">
-                        <div class="category-image">
-                            <img src="{{ asset('images/dress.png') }}" alt="Dress">
-                        </div>
-                        <h3>Skirt and Dress</h3>
-                    </a>
-              
-                    <a href="{{ route('user.category', ['cat' => 'accessories']) }}" class="category-card text-decoration-none d-block">
-                        <div class="category-image">
-                            <img src="{{ asset('images/accessories.png') }}" alt="Accessories">
-                        </div>
-                        <h3>Accessories</h3>
-                    </a>
+                    @endif
                 </div>
             </div>
         </section>

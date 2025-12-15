@@ -106,6 +106,12 @@
                         <span class="summary-label">Shipping fee</span>
                         <span class="summary-value">Rp {{ number_format($shippingCost, 0, ',', '.') }}</span>
                     </div>
+                    @if(isset($discount) && $discount > 0)
+                    <div class="summary-row text-success">
+                        <span class="summary-label">Discount</span>
+                        <span class="summary-value">- Rp {{ number_format($discount, 0, ',', '.') }}</span>
+                    </div>
+                    @endif
                     <div class="summary-row total-row">
                         <span class="summary-label">Total</span>
                         <span class="summary-value">Rp {{ number_format($total, 0, ',', '.') }}</span>

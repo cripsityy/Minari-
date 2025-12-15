@@ -17,9 +17,13 @@ class SuggestionController extends Controller
             'message' => ['required', 'string', 'max:2000'],
         ]);
 
+        // Auto-fill user data if logged in
+        $name = $validated['name'] ?? (\Illuminate\Support\Facades\Auth::check() ? \Illuminate\Support\Facades\Auth::user()->name : null);
+        $email = $validated['email'] ?? (\Illuminate\Support\Facades\Auth::check() ? \Illuminate\Support\Facades\Auth::user()->email : null);
+
         Suggestion::create([
-            'name' => $validated['name'] ?? null,
-            'email' => $validated['email'] ?? null,
+            'name' => $name,
+            'email' => $email,
             'message' => $validated['message'],
             'ip_address' => $request->ip(),
         ]);

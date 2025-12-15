@@ -43,11 +43,20 @@
           </div>
           --}}
 
+
+
           <div class="quantity">
             <button id="minus">-</button>
             <span id="count">1</span>
             <button id="plus">+</button>
           </div>
+          
+          <style>
+            .size-btn.active {
+                background-color: #000;
+                color: #fff;
+            }
+          </style>
 
           <button class="add-to-cart" id="addToCartBtn">Add to cart</button>
         </div>
@@ -62,6 +71,8 @@
             const plusBtn = document.getElementById('plus');
             const addToCartBtn = document.getElementById('addToCartBtn');
             
+            const maxStock = {{ $product->stock }};
+            
             // Re-bind events since we replaced HTML or just to be safe
             if (minusBtn) {
                 minusBtn.onclick = function() {
@@ -74,24 +85,36 @@
             
             if (plusBtn) {
                 plusBtn.onclick = function() {
-                    quantity++;
-                    countSpan.textContent = quantity;
+                    if (quantity < maxStock) {
+                        quantity++;
+                        countSpan.textContent = quantity;
+                    } else {
+                        alert('Max quantity reached based on available stock.');
+                    }
                 };
             }
             
             if (addToCartBtn) {
                 addToCartBtn.onclick = function(e) {
                     e.preventDefault();
-                    // Call global addToCart function from cart.js
-                    // Params: productId, productName, price, image, quantity
-                    // Note: price and image are mainly for guest cart logic in frontend, but backend validates ID
+                    
+                    const quantity = parseInt(countSpan.textContent) || 1;
+                    const maxStock = {{ $product->stock }};
+
+                    if (quantity > maxStock) {
+                        alert('Max quantity reached based on available stock.');
+                        return;
+                    }
+                    
+                    // Auto-assign size from product data
+                    const selectedSize = "{{ $product->size }}";
+                    
                     const productId = {{ $product->id }};
                     const productName = "{{ $product->name }}";
                     const productPrice = {{ $product->final_price ?? $product->price }};
-                    // Use a placeholder image path if real one is complex, or pass empty since backend handles it for user
                     const productImage = ""; 
                     
-                    window.addToCart(productId, productName, productPrice, productImage, quantity);
+                    window.addToCart(productId, productName, productPrice, productImage, quantity, selectedSize);
                 };
             }
         });

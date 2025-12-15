@@ -4,22 +4,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function initializeSidebar() {
         const sidebarItems = document.querySelectorAll('.sidebar-item');
         if (sidebarItems.length > 0) {
-            const currentPath = window.location.pathname;
-            let foundActive = false;
-
-            sidebarItems.forEach(item => {
-                const href = item.getAttribute('href');
-                if (href && currentPath.includes(href)) {
-                    item.classList.add('active');
-                    foundActive = true;
-                } else {
-                    item.classList.remove('active');
-                }
-            });
-
-            if (!foundActive && sidebarItems.length > 0) {
-                sidebarItems[0].classList.add('active');
-            }
+            // Server-side blade template handles active state now.
+            // Client-side logic removed to prevent conflicts.
 
             sidebarItems.forEach(item => {
                 item.addEventListener('click', function (e) {

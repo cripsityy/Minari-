@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // === Global function untuk menambahkan ke cart dari halaman lain
-window.addToCart = async function (productId, productName, price, image = '', quantity = 1) {
+window.addToCart = async function (productId, productName, price, image = '', quantity = 1, size = '') {
     const role = window.APP_ROLE || 'guest';
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
@@ -228,13 +228,13 @@ window.addToCart = async function (productId, productName, price, image = '', qu
         name: productName,
         price: price,
         quantity: quantity,
-        size: '',
+        size: size,
         color: '',
         image: image
     } : {
         product_id: productId,
         quantity: quantity,
-        size: '',
+        size: size,
         color: ''
     };
 

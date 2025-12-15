@@ -9,7 +9,7 @@ const Role = {
 function tplGuest() {
   return `
   <nav class="navbar navbar-expand-lg fixed-top py-2" id="mainNavbar" style="background-color: #FFF6F0; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); transition: all 0.3s ease;">
-    <div class="container">
+    <div class="container-fluid px-5">
       <a class="navbar-brand" href="/">
         <img src="/images/logofix.png" alt="MINARI Logo" height="40" width="auto" class="me-2">
       </a>
@@ -38,7 +38,7 @@ function tplGuest() {
 function tplUser() {
   return `
   <nav class="navbar navbar-expand-lg fixed-top py-2" id="mainNavbar" style="background-color: #FFF6F0; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); transition: all 0.3s ease;">
-    <div class="container">
+    <div class="container-fluid px-5">
       <a class="navbar-brand" href="/">
         <img src="/images/logofix.png" alt="MINARI Logo" height="40" width="auto" class="me-2">
       </a>
@@ -73,12 +73,23 @@ function initializeScrollEffect() {
   const navbar = document.getElementById('mainNavbar');
   if (navbar) {
     window.addEventListener('scroll', function () {
-      if (window.scrollY > 50) {
+      if (document.body.classList.contains('landing-page') && window.scrollY <= 50) {
+        // Landing Page at Top: Transparent
         navbar.style.backgroundColor = 'transparent';
         navbar.style.boxShadow = 'none';
-      } else {
+      } else if (window.scrollY > 50) {
+        // Scrolled Down: Beige/Solid
         navbar.style.backgroundColor = '#FFF6F0';
         navbar.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.15)';
+      } else {
+        // Top of page (non-landing or general): Beige
+        navbar.style.backgroundColor = '#FFF6F0';
+        navbar.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.15)';
+
+        if (document.body.classList.contains('landing-page')) {
+          navbar.style.backgroundColor = 'transparent';
+          navbar.style.boxShadow = 'none';
+        }
       }
     });
   }

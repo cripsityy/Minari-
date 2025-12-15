@@ -16,6 +16,7 @@ class Category extends Model
         'slug',
         'description',
         'image',
+        'background_image',
         'status'
     ];
 
@@ -27,5 +28,10 @@ class Category extends Model
     public function getImageUrlAttribute()
     {
         return $this->image ? asset('storage/' . $this->image) : asset('images/default-category.jpg');
+    }
+
+    public function getBackgroundImageUrlAttribute()
+    {
+        return $this->background_image ? asset('storage/' . $this->background_image) : asset('images/default-header.jpg');
     }
 }

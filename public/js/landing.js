@@ -1,27 +1,27 @@
 // Hidden Admin Access - Triple Click to Login
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     const logoElement = document.querySelector('.logo img');
     if (logoElement) {
         let clickCount = 0;
         let clickTimer;
 
-        logoElement.addEventListener('click', function(e) {
+        logoElement.addEventListener('click', function (e) {
             clickCount++;
-            
+
             if (clickCount === 1) {
                 clickTimer = setTimeout(() => {
                     clickCount = 0;
                 }, 1000); // Reset count after 1 second
             }
-            
+
             if (clickCount >= 3) {
                 clearTimeout(clickTimer);
                 clickCount = 0;
                 // Redirect to hidden admin login
-                window.location.href = '/__admin'; 
+                window.location.href = '/__admin';
             }
         });
-        
+
         // Change cursor to indicate something might be there (optional, maybe keep it default to be truly hidden)
         // logoElement.style.cursor = 'pointer'; 
     }
@@ -30,23 +30,23 @@ document.addEventListener("DOMContentLoaded", function() {
 // Removed: redirectToLogin, redirectToDashboard, handleLogin, handleLogout, checkLoginStatus
 // These were insecure client-side implementations. We now use server-side Auth logic.
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     const suggestionForm = document.querySelector('footer form');
     if (suggestionForm) {
-        suggestionForm.addEventListener('submit', function(e) {
+        suggestionForm.addEventListener('submit', function (e) {
             e.preventDefault();
             const message = this.querySelector('input[name="message"]').value;
-            
+
             if (message.trim() === '') {
                 alert('Please enter your suggestion');
                 return;
             }
-            
+
             const submitBtn = this.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
             submitBtn.disabled = true;
-            
+
             setTimeout(() => {
                 alert('Thank you for your suggestion!');
                 this.reset();
@@ -55,9 +55,9 @@ document.addEventListener("DOMContentLoaded", function() {
             }, 1500);
         });
     }
-    
+
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
+        anchor.addEventListener('click', function (e) {
             const href = this.getAttribute('href');
             if (href !== '#' && href !== '') {
                 e.preventDefault();
@@ -71,35 +71,25 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     });
-    
+
     document.querySelectorAll('.category-card').forEach(card => {
-        card.addEventListener('mouseenter', function() {
+        card.addEventListener('mouseenter', function () {
             this.style.transform = 'translateY(-10px)';
             this.style.boxShadow = '0 15px 30px rgba(0,0,0,0.15)';
         });
-        
-        card.addEventListener('mouseleave', function() {
+
+        card.addEventListener('mouseleave', function () {
             this.style.transform = 'translateY(0)';
             this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.08)';
         });
     });
-    
+
+    // Testimonial rotation removed by user request
     const testimonials = document.querySelectorAll('.testimonial-card');
     if (testimonials.length > 0) {
-        let currentTestimonial = 0;
-        
-        function showTestimonial(index) {
-            testimonials.forEach((testimonial, i) => {
-                testimonial.style.display = i === index ? 'block' : 'none';
-            });
-        }
-        
-        setInterval(() => {
-            currentTestimonial = (currentTestimonial + 1) % testimonials.length;
-            showTestimonial(currentTestimonial);
-        }, 5000);
+        testimonials.forEach(t => t.style.display = 'flex');
     }
-    
+
     if (window.location.pathname.includes('/admin/')) {
         checkLoginStatus();
     }

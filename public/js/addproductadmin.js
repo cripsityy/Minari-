@@ -78,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    /* 
     const imageUpload = document.querySelector('.image-upload');
     if (imageUpload) {
         imageUpload.addEventListener('click', function () {
@@ -87,4 +88,5 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+    */
 });

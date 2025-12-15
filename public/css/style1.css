@@ -13,10 +13,11 @@ body {
 
 .navbar-custom {
     background: #FFF6F0;
-    padding: 0.8rem 0;
+    padding: 10px 0;
+    /* Increased padding */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    height: 50px;
+    /* height: 50px; Removed fixed height to allow content to fit */
     position: fixed;
     top: 0;
     width: 100%;
@@ -71,13 +72,13 @@ body {
 }
 
 .logo-img {
-    height: 50px;
+    height: 30px;
     width: auto;
     object-fit: contain;
 }
 
 .navbar-icons i {
-    font-size: 20px;
+    font-size: 12px;
     color: #000;
     margin-left: 25px;
     cursor: pointer;
@@ -94,10 +95,11 @@ body {
     padding: 1rem 0;
     position: fixed;
     left: 15px;
-    top: 90px;
+    top: 85px;
+    /* Adjusted to be closer to navbar (approx navbar height) */
     width: 180px;
     height: auto;
-    max-height: calc(100vh - 110px);
+    max-height: calc(100vh - 100px);
     overflow: visible;
     z-index: 999;
 }
@@ -110,7 +112,7 @@ body {
     background: #FDFAFA;
     border-radius: 15px;
     padding: 12px 15px;
-    margin-bottom: 12px;
+    margin-bottom: 30px;
     display: flex;
     align-items: center;
     cursor: pointer;

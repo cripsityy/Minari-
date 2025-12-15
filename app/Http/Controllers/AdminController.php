@@ -68,7 +68,7 @@ class AdminController extends Controller
             $query->where('status', $request->status);
         }
         
-        $products = $query->paginate(15);
+        $products = $query->latest()->get();
         $categories = Category::all();
         
         return view('admin.products', compact('products', 'categories'));
@@ -82,8 +82,15 @@ class AdminController extends Controller
     
     public function storeProduct(Request $request)
     {
+        // Sanitize price (remove thousands separator dots)
+        if ($request->has('price')) {
+            $request->merge([
+                'price' => str_replace('.', '', $request->price)
+            ]);
+        }
+        
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:products,name',
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
@@ -100,7 +107,13 @@ class AdminController extends Controller
         $product->discount_price = $request->discount_price;
         $product->stock = $request->stock;
         $product->description = $request->description;
-        $product->size = is_array($request->size) ? implode(',', $request->size) : $request->size;
+        // Determine size based on category
+        $category = Category::find($request->category_id);
+        if ($category && stripos($category->name, 'Accessories') !== false) {
+            $product->size = '';
+        } else {
+            $product->size = 'All Size';
+        }
         $product->color = $request->color;
         $product->status = $request->status;
         
@@ -135,8 +148,15 @@ class AdminController extends Controller
     {
         $product = Product::findOrFail($id);
         
+        // Sanitize price (remove thousands separator dots)
+        if ($request->has('price')) {
+            $request->merge([
+                'price' => str_replace('.', '', $request->price)
+            ]);
+        }
+        
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:products,name,' . $id,
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
@@ -152,7 +172,13 @@ class AdminController extends Controller
         $product->discount_price = $request->discount_price;
         $product->stock = $request->stock;
         $product->description = $request->description;
-        $product->size = is_array($request->size) ? implode(',', $request->size) : $request->size;
+        // Determine size based on category
+        $category = Category::find($request->category_id);
+        if ($category && stripos($category->name, 'Accessories') !== false) {
+            $product->size = '';
+        } else {
+            $product->size = 'All Size';
+        }
         $product->color = $request->color;
         $product->material = $request->material;
         $product->status = $request->status;
@@ -220,9 +246,10 @@ class AdminController extends Controller
     public function storeCategory(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:categories,name',
             'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'background_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
         
         $category = new Category();
@@ -234,6 +261,11 @@ class AdminController extends Controller
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('categories', 'public');
             $category->image = $imagePath;
+        }
+
+        if ($request->hasFile('background_image')) {
+            $bgPath = $request->file('background_image')->store('categories/backgrounds', 'public');
+            $category->background_image = $bgPath;
         }
         
         $category->save();
@@ -252,9 +284,10 @@ class AdminController extends Controller
         $category = Category::findOrFail($id);
         
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:categories,name,' . $id,
             'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'background_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
         
         $category->name = $request->name;
@@ -269,6 +302,15 @@ class AdminController extends Controller
             
             $imagePath = $request->file('image')->store('categories', 'public');
             $category->image = $imagePath;
+        }
+
+        if ($request->hasFile('background_image')) {
+            if ($category->background_image) {
+                Storage::disk('public')->delete($category->background_image);
+            }
+            
+            $bgPath = $request->file('background_image')->store('categories/backgrounds', 'public');
+            $category->background_image = $bgPath;
         }
         
         $category->save();
@@ -286,6 +328,10 @@ class AdminController extends Controller
         
         if ($category->image) {
             Storage::disk('public')->delete($category->image);
+        }
+
+        if ($category->background_image) {
+            Storage::disk('public')->delete($category->background_image);
         }
         
         $category->delete();
@@ -349,26 +395,7 @@ class AdminController extends Controller
     }
     
     // Customers Management
-    public function customers(Request $request)
-    {
-        $query = User::whereHas('roles', function($q) {
-            $q->where('name', 'user');
-        });
-        
-        if ($request->has('search')) {
-            $query->where(function($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%');
-            });
-        }
-        
-        $customers = $query->withCount('orders')
-                           ->withSum('orders', 'total')
-                           ->latest()
-                           ->paginate(20);
-        
-        return view('admin.customers', compact('customers'));
-    }
+
     
     // Reviews Management
     public function reviews(Request $request)
@@ -401,17 +428,21 @@ class AdminController extends Controller
     // Promotions Management
     public function promotions()
     {
-        $promotions = Promotion::latest()->paginate(15);
+        $promotions = Promotion::latest()->get();
+        \Illuminate\Support\Facades\Log::info('Admin Promotions View', ['count' => $promotions->count(), 'data' => $promotions->toArray()]);
         return view('admin.promotions', compact('promotions'));
     }
 
     public function addPromotion()
     {
-        return view('admin.add-promotion');
+        $products = Product::where('status', 'active')->get();
+        return view('admin.add-promotion', compact('products'));
     }
 
     public function storePromotion(Request $request)
     {
+        \Illuminate\Support\Facades\Log::info('Store Promotion Request', $request->all());
+
         $request->validate([
             'code' => 'required|unique:promotions,code',
             'type' => 'required|in:percentage,fixed',
@@ -420,24 +451,33 @@ class AdminController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
-        $status = $request->input('status', 'active');
-        $isActive = $status !== 'inactive';
+        try {
+            $status = $request->input('status', 'active');
+            $isActive = $status !== 'inactive';
 
-        Promotion::create([
-            'code' => strtoupper($request->code),
-            'name' => $request->code, // Fallback name to code
-            'description' => $request->description,
-            'type' => $request->type,
-            'value' => $request->value,
-            'min_purchase' => $request->min_purchase,
-            'usage_limit' => $request->usage_limit,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'is_active' => $isActive,
-            // 'applicable_products' etc if needed
-        ]);
+            $promotion = Promotion::create([
+                'code' => strtoupper($request->code),
+                'name' => $request->code, // Fallback name to code
+                'description' => $request->description,
+                'type' => $request->type,
+                'value' => $request->value,
+                'min_purchase' => $request->min_purchase,
+                'usage_limit' => $request->usage_limit,
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+                'is_active' => $isActive,
+                'applicable_products' => $request->applicable_products,
+            ]);
 
-        return redirect()->route('admin.promotions')->with('success', 'Promotion created successfully');
+            \Illuminate\Support\Facades\Log::info('Promotion Created Successfully', ['id' => $promotion->id]);
+
+            return redirect()->route('admin.promotions')->with('success', 'Promotion created successfully');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Promotion Creation Failed', ['error' => $e->getMessage()]);
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Failed to add promotion: ' . $e->getMessage()]);
+        }
     }
     
     // Duplicates removed

@@ -21,11 +21,7 @@
 
   <!-- Hero -->
   <section class="hero">
-    @if($category->image)
-        <img id="heroImg" src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" class="hero__img">
-    @else
-        <img id="heroImg" src="{{ asset('images/default-category.jpg') }}" alt="{{ $category->name }}" class="hero__img">
-    @endif
+    <img id="heroImg" src="{{ $category->background_image_url }}" alt="{{ $category->name }}" class="hero__img">
     <div id="heroTitle" class="hero__title">{{ $category->name }}</div>
   </section>
 
@@ -108,13 +104,7 @@
     </div>
     
     <!-- Pagination -->
-    @if($products->count() > 0)
-        <div class="container mt-4 mb-5">
-            <div class="d-flex justify-content-center">
-                {{ $products->links() }}
-            </div>
-        </div>
-    @endif
+
   </main>
 
   <!-- Toast: added to cart -->
