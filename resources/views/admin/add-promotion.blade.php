@@ -10,20 +10,7 @@
         <link rel="stylesheet" href="{{ asset('css/style1.css') }}">
     </head>
     <body>
-        <nav class="navbar-custom fixed-top">
-            <div class="container-fluid">
-                <div class="d-flex justify-content-between align-items-center w-100 px-5">
-                    <div class="logo">
-                        <img src="{{ asset('images/logofix.png') }}" alt="Logo MINARI" style="height: 40px; width: auto;">
-                    </div>
-                    <div class="navbar-icons">
-                        <img src="{{ asset('images/notification.png') }}" alt="Favorite" width="24" height="24"></a>
-                        <img src="{{ asset('images/searchnav.png') }}" alt="Search" width="24" height="24"></a>
-                        <img src="{{ asset('images/email.png') }}" alt="Cart" width="24" height="24"></a>
-                    </div>
-                </div>
-            </div>
-        </nav>
+        @include('admin.partials.navbar')
 
         <div class="sidebar">
             <a href="{{ route('admin.dashboard') }}" class="sidebar-item">
@@ -65,24 +52,23 @@
             </div>
 
             <div class="form-container">
-                <form id="promotionForm">
+                <form action="{{ route('admin.promotions.store') }}" method="POST" id="promotionForm">
+                    @csrf
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label">Promo Code <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="promoCode" placeholder="Enter promo code" required>
-                                <div class="validation-message error" id="promoCodeError"></div>
+                                <input type="text" class="form-control" name="code" placeholder="Enter promo code" style="text-decoration: none;" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label">Discount Type <span class="text-danger">*</span></label>
-                                <select class="form-select" id="discountType" required>
+                                <select class="form-select" name="type" required>
                                     <option value="">Select discount type</option>
                                     <option value="percentage">Percentage</option>
                                     <option value="fixed">Fixed Amount</option>
                                 </select>
-                                <div class="validation-message error" id="discountTypeError"></div>
                             </div>
                         </div>
                     </div>
@@ -91,37 +77,33 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label">Discount Value <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="discountValue" placeholder="Enter discount value" min="0" required>
-                                <div class="validation-message error" id="discountValueError"></div>
+                                <input type="number" class="form-control" name="value" placeholder="Enter discount value" min="0" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label">Minimum Purchase</label>
-                                <input type="number" class="form-control" id="minPurchase" placeholder="Enter minimum purchase amount" min="0">
+                                <input type="number" class="form-control" name="min_purchase" placeholder="Enter minimum purchase amount" min="0">
                             </div>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Description <span class="text-danger">*</span></label>
-                        <textarea class="form-control" id="description" rows="3" placeholder="Enter promotion description" required></textarea>
-                        <div class="validation-message error" id="descriptionError"></div>
+                        <textarea class="form-control" name="description" rows="3" placeholder="Enter promotion description" required></textarea>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label">Start Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" id="startDate" required>
-                                <div class="validation-message error" id="startDateError"></div>
+                                <input type="date" class="form-control" name="start_date" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label">End Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" id="endDate" required>
-                                <div class="validation-message error" id="endDateError"></div>
+                                <input type="date" class="form-control" name="end_date" required>
                             </div>
                         </div>
                     </div>
@@ -130,13 +112,13 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label">Usage Limit</label>
-                                <input type="number" class="form-control" id="usageLimit" placeholder="Enter usage limit" min="0">
+                                <input type="number" class="form-control" name="usage_limit" placeholder="Enter usage limit" min="0">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label">Status</label>
-                                <select class="form-select" id="status">
+                                <select class="form-select" name="status">
                                     <option value="active">Active</option>
                                     <option value="scheduled">Scheduled</option>
                                     <option value="inactive">Inactive</option>
@@ -147,7 +129,7 @@
 
                     <div class="form-group">
                         <label class="form-label">Applicable Products</label>
-                        <select class="form-select" id="applicableProducts" multiple>
+                        <select class="form-select" name="applicable_products[]" multiple>
                             <option value="all">All Products</option>
                             <option value="category1">Summer Collection</option>
                             <option value="category2">Winter Collection</option>

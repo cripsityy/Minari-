@@ -10,20 +10,7 @@
         <link rel="stylesheet" href="{{ asset('css/style1.css') }}">
     </head>
     <body>
-        <nav class="navbar-custom fixed-top">
-            <div class="container-fluid">
-                <div class="d-flex justify-content-between align-items-center w-100 px-5">
-                    <div class="logo">
-                        <img src="{{ asset('images/logofix.png') }}" alt="Logo MINARI" style="height: 40px; width: auto;">
-                    </div>
-                    <div class="navbar-icons">
-                        <img src="{{ asset('images/notification.png') }}" alt="Favorite" width="24" height="24"></a>
-                        <img src="{{ asset('images/searchnav.png') }}" alt="Search" width="24" height="24"></a>
-                        <img src="{{ asset('images/email.png') }}" alt="Cart" width="24" height="24"></a>
-                    </div>
-                </div>
-            </div>
-        </nav>
+        @include('admin.partials.navbar')
 
         <div class="sidebar">
             <a href="{{ route('admin.dashboard') }}" class="sidebar-item">
@@ -80,7 +67,7 @@
                     <tbody>
                         @forelse($reviews as $review)
                         <tr>
-                            <td>{{ $review->product->name ?? 'Unknown Product' }}</td>
+                            <td>{{ $review->product->name ?? 'Deleted Product' }}</td>
                             <td>{{ $review->user->name ?? 'Anonymous' }}</td>
                             <td>
                                 <span style="color: #f3a8a8;">
@@ -93,7 +80,9 @@
                                     @endfor
                                 </span>
                             </td>
-                            <td>{{ $review->comment }}</td>
+                            <td>
+                                <div style="max-width: 300px; white-space: normal;">{{ $review->comment }}</div>
+                            </td>
                             <td>{{ $review->created_at->format('d M Y') }}</td>
                         </tr>
                         @empty

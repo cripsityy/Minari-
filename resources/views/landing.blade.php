@@ -32,6 +32,33 @@
                 </div>
             </div>
         </section>
+
+        @if(isset($promotions) && $promotions->count() > 0)
+        <section class="promotion-section py-5 bg-light">
+            <div class="container">
+                <h2 class="section-title text-center mb-5" style="font-family: 'Playfair Display', serif;">Special Offers</h2>
+                <div class="row g-4 justify-content-center">
+                    @foreach($promotions as $promo)
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100 promo-card" style="border-radius: 15px; overflow: hidden; transition: transform 0.3s;">
+                            <div class="card-body text-center p-4" style="background: #fff;">
+                                <div class="badge bg-dark mb-3 px-3 py-2" style="font-weight: 500; letter-spacing: 1px;">
+                                    {{ $promo->type == 'percentage' ? $promo->value . '% OFF' : 'Rp ' . number_format($promo->value, 0, ',', '.') . ' OFF' }}
+                                </div>
+                                <h4 class="fw-bold mb-2" style="color: #333;">{{ $promo->code }}</h4>
+                                <p class="text-muted mb-3 small">{{ $promo->description }}</p>
+                                <div class="expiry-date text-danger small">
+                                    <i class="far fa-clock me-1"></i> Valid until {{ \Carbon\Carbon::parse($promo->end_date)->format('d M Y') }}
+                                </div>
+                                <button class="btn btn-sm btn-outline-dark mt-3" onclick="navigator.clipboard.writeText('{{ $promo->code }}'); alert('Code copied!')">Copy Code</button>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+        @endif
         <section class="style-section">
             <div class="container-fluid">
                 <h2 class="section-title">MINARI's Style</h2>

@@ -10,20 +10,7 @@
         <link rel="stylesheet" href="{{ asset('css/style1.css') }}">
     </head>
     <body>
-        <nav class="navbar-custom fixed-top">
-            <div class="container-fluid">
-                <div class="d-flex justify-content-between align-items-center w-100 px-5">
-                    <div class="logo">
-                        <img src="{{ asset('images/logofix.png') }}" alt="Logo MINARI" style="height: 40px; width: auto;">
-                    </div>
-                    <div class="navbar-icons">
-                        <img src="{{ asset('images/notification.png') }}" alt="Favorite" width="24" height="24"></a>
-                        <img src="{{ asset('images/searchnav.png') }}" alt="Search" width="24" height="24"></a>
-                        <img src="{{ asset('images/email.png') }}" alt="Cart" width="24" height="24"></a>
-                    </div>
-                </div>
-            </div>
-        </nav>
+        @include('admin.partials.navbar')
 
         <div class="sidebar">
             <a href="{{ route('admin.dashboard') }}" class="sidebar-item active">
@@ -60,15 +47,15 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <h6>Total Sales</h6>
-                    <div class="value" style="color: #F4B4A1;">Rp 150.000.000</div>
+                    <div class="value" style="color: #F4B4A1;">{{ 'Rp ' . number_format($stats['total_revenue'], 0, ',', '.') }}</div>
                 </div>
                 <div class="stat-card">
                     <h6>Total Orders</h6>
-                    <div class="value">700</div>
+                    <div class="value">{{ $stats['total_orders'] }}</div>
                 </div>
                 <div class="stat-card">
                     <h6>Total Customers</h6>
-                    <div class="value">340 Users</div>
+                    <div class="value">{{ $stats['total_customers'] }} Users</div>
                 </div>
             </div>
 
@@ -86,26 +73,21 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @forelse($recentOrders as $order)
                                     <tr>
-                                        <td>Anneiza</td>
-                                        <td>28 Oct 2025</td>
-                                        <td><span class="badge-status badge-pending">Pending</span></td>
+                                        <td>{{ $order->user->name ?? 'Guest' }}</td>
+                                        <td>{{ $order->created_at->format('d M Y') }}</td>
+                                        <td>
+                                            <span class="badge-status {{ $order->status_badge_class }}">
+                                                {{ ucfirst($order->order_status) }}
+                                            </span>
+                                        </td>
                                     </tr>
+                                    @empty
                                     <tr>
-                                        <td>Aliyah</td>
-                                        <td>27 Oct 2025</td>
-                                        <td><span class="badge-status badge-shipped">Shipped</span></td>
+                                        <td colspan="3" class="text-center text-muted">No recent orders</td>
                                     </tr>
-                                    <tr>
-                                        <td>Karina</td>
-                                        <td>27 Oct 2025</td>
-                                        <td><span class="badge-status badge-delivered">Delivered</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Elsa</td>
-                                        <td>25 Oct 2025</td>
-                                        <td><span class="badge-status badge-cancelled">Cancelled</span></td>
-                                    </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
@@ -115,75 +97,54 @@
                 <div class="col-lg-4">
                     <div class="content-card mb-3">
                         <h5 class="mb-3">Top Selling Products</h5>
+                        @forelse($topProducts as $product)
                         <div class="d-flex align-items-center mb-3">
                             <div class="product-img me-3">
-                                <img src="{{ asset('images/chocoblouse.png') }}" alt="Choco Blouse" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                                <img src="{{ $product->image_url }}" alt="{{ $product->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
                             </div>
                             <div>
-                                <strong>Choco Blouse</strong>
-                                <div class="text-muted">45 sales</div>
+                                <strong>{{ $product->name }}</strong>
+                                <div class="text-muted">{{ $product->order_items_sum_quantity ?? 0 }} sales</div>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="product-img me-3">
-                                <img src="{{ asset('images/greenjeanscrop.png') }}" alt="Green Jeans" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
-                            </div>
-                            <div>
-                                <strong>Green Jeans Crop Blouse</strong>
-                                <div class="text-muted">38 sales</div>
-                            </div>
-                        </div>
+                        @empty
+                        <div class="text-center text-muted">No sales yet</div>
+                        @endforelse
                     </div>
 
                     <div class="content-card mb-3">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h5 class="mb-0">Customers Feedback</h5>
-                            <a href="reviewadmin.html" class="text-decoration-none" style="color: #FBAF99; font-size: 14px;">View All</a>
+                            <a href="{{ route('admin.reviews') }}" class="text-decoration-none" style="color: #FBAF99; font-size: 14px;">View All</a>
                         </div>
                         
+                        @forelse($recentReviews as $review)
                         <div class="d-flex align-items-start mb-3">
                             <div class="customer-avatar me-3">
                                 <i class="fas fa-user"></i>
                             </div>
                             <div class="flex-grow-1">
                                 <div class="d-flex justify-content-between align-items-start">
-                                    <strong style="font-size: 14px;">Sarah Johnson</strong>
+                                    <strong style="font-size: 14px;">{{ $review->user->name ?? 'Anonymous' }}</strong>
                                     <div class="rating" style="color: #f3a8a8; font-size: 12px;">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
+                                        @for($i = 1; $i <= 5; $i++)
+                                            @if($i <= $review->rating)
+                                                <i class="fas fa-star"></i>
+                                            @else
+                                                <i class="far fa-star"></i>
+                                            @endif
+                                        @endfor
                                     </div>
                                 </div>
                                 <p class="text-muted mb-1" style="font-size: 13px; line-height: 1.4;">
-                                    "The quality of products is amazing! Fast delivery and excellent service."
+                                    "{{ Str::limit($review->comment, 60) }}"
                                 </p>
-                                <small class="text-muted">2 days ago</small>
+                                <small class="text-muted">{{ $review->created_at->diffForHumans() }}</small>
                             </div>
                         </div>
-
-                        <div class="d-flex align-items-start">
-                            <div class="customer-avatar me-3">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="flex-grow-1">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <strong style="font-size: 14px;">Michael Chen</strong>
-                                    <div class="rating" style="color: #f3a8a8; font-size: 12px;">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star-half-alt"></i>
-                                    </div>
-                                </div>
-                                <p class="text-muted mb-1" style="font-size: 13px; line-height: 1.4;">
-                                    "Beautiful packaging and products arrived in perfect condition."
-                                </p>
-                                <small class="text-muted">1 week ago</small>
-                            </div>
-                        </div>
+                        @empty
+                        <div class="text-center text-muted">No reviews yet</div>
+                        @endforelse
                     </div>
 
                     <div class="content-card">
@@ -191,8 +152,8 @@
                         <a href="{{ route('admin.products.add') }}" class="btn-add w-100 mb-2" style="display: block; text-decoration: none; text-align: center;">
                             <i class="fas fa-plus"></i> Add New Product
                         </a>
-                        <a href="{{ route('admin.categories.edit') }}" class="btn-add w-100 mb-2" style="display: block; text-decoration: none; text-align: center;">
-                            <i class="fas fa-pen"></i> Edit Categories
+                        <a href="{{ route('admin.categories') }}" class="btn-add w-100 mb-2" style="display: block; text-decoration: none; text-align: center;">
+                            <i class="fas fa-pen"></i> Manage Categories
                         </a>
                     </div>
                 </div>

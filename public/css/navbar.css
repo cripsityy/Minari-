@@ -129,3 +129,25 @@ body {
     background-color: #fff2ea;
     box-shadow: none;
 }
+
+/* Scrolled/Transparent Navbar Effect */
+#navMount .navbar.scrolled {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: blur(2px);
+    /* Subtle blur for depth */
+}
+
+#navMount .navbar.scrolled .navbar-brand img,
+#navMount .navbar.scrolled .d-flex img,
+#navMount .navbar.scrolled button img {
+    /* Stronger floating effect */
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
+    transition: all 0.3s ease;
+}
+
+/* Ensure Logo size consistency as requested */
+.navbar-brand img {
+    height: 40px;
+    width: auto;
+}

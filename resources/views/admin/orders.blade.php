@@ -10,20 +10,7 @@
         <link rel="stylesheet" href="{{ asset('css/style1.css') }}">
     </head>
     <body>
-        <nav class="navbar-custom fixed-top">
-            <div class="container-fluid">
-                <div class="d-flex justify-content-between align-items-center w-100 px-5">
-                    <div class="logo">
-                        <img src="{{ asset('images/logofix.png') }}" alt="Logo MINARI" style="height: 40px; width: auto;">
-                    </div>
-                    <div class="navbar-icons">
-                        <img src="{{ asset('images/notification.png') }}" alt="Favorite" width="24" height="24"></a>
-                        <img src="{{ asset('images/searchnav.png') }}" alt="Search" width="24" height="24"></a>
-                        <img src="{{ asset('images/email.png') }}" alt="Cart" width="24" height="24"></a>
-                    </div>
-                </div>
-            </div>
-        </nav>
+        @include('admin.partials.navbar')
 
         <div class="sidebar">
             <a href="{{ route('admin.dashboard') }}" class="sidebar-item">
@@ -69,9 +56,9 @@
                 <table class="table mb-0">
                     <thead>
                         <tr>
-                            <th>Order_ID</th>
-                            <th>Customers</th>
-                            <th>Product</th>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Items</th>
                             <th>Total</th>
                             <th>Payment Status</th>
                             <th>Shipping Status</th>
@@ -79,61 +66,44 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @forelse($orders as $order)
                         <tr>
-                            <td><a href="{{ route('admin.orders.detail', 1) }}" style="color: #000; text-decoration: none;">#0101</a></td>
-                            <td>Anneiza</td>
-                            <td>White Jeans</td>
-                            <td>Rp 300.000</td>
-                            <td><span class="badge-status badge-active">Paid</span></td>
-                            <td><span class="badge-status badge-active">Shipped</span></td>
-                            <td>28.10.2025</td>
+                            <td><a href="{{ route('admin.orders.detail', $order->id) }}" style="color: #000; text-decoration: none;">#{{ $order->order_number }}</a></td>
+                            <td>{{ $order->customer_name }}</td>
+                            <td>
+                                @if($order->items->count() > 0)
+                                    {{ $order->items->first()->product->name ?? 'Item' }}
+                                    @if($order->items->count() > 1)
+                                        <small class="text-muted">(+{{ $order->items->count() - 1 }} others)</small>
+                                    @endif
+                                @else
+                                    <span class="text-muted">No items</span>
+                                @endif
+                            </td>
+                            <td>{{ $order->formatted_total }}</td>
+                            <td>
+                                <span class="badge-status {{ $order->payment_badge_class }}">
+                                    {{ ucfirst($order->payment_status) }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge-status {{ $order->status_badge_class }}">
+                                    {{ ucfirst($order->order_status) }}
+                                </span>
+                            </td>
+                            <td>{{ $order->created_at->format('d.m.Y') }}</td>
                         </tr>
-                            <td><a href="{{ route('admin.orders.detail', 2) }}" style="color: #000; text-decoration: none;">#0102</a></td>
-                            <td>Lisa</td>
-                            <td>Blue Shirt</td>
-                            <td>Rp 175.000</td>
-                            <td><span class="badge-status badge-pending">Unpaid</span></td>
-                            <td><span class="badge-status badge-shipped">Processing</span></td>
-                            <td>28.10.2025</td>
-                        </tr>
+                        @empty
                         <tr>
-                            <td><a href="{{ route('admin.orders.detail', 3) }}" style="color: #000; text-decoration: none;">#0103</a></td>
-                            <td>Aliyah</td>
-                            <td>Soft green cardigan</td>
-                            <td>Rp 250.000</td>
-                            <td><span class="badge-status badge-pending">Unpaid</span></td>
-                            <td><span class="badge-status badge-shipped">Processing</span></td>
-                            <td>27.10.2025</td>
+                            <td colspan="7" class="text-center py-4">No orders found.</td>
                         </tr>
-                        <tr>
-                            <td><a href="{{ route('admin.orders.detail', 4) }}" style="color: #000; text-decoration: none;">#0104</a></td>
-                            <td>Karina</td>
-                            <td>Cherry white long sleeve shirt</td>
-                            <td>Rp 300.000</td>
-                            <td><span class="badge-status badge-active">Paid</span></td>
-                            <td><span class="badge-status badge-active">Shipped</span></td>
-                            <td>27.10.2025</td>
-                        </tr>
-                        <tr>
-                            <td><a href="{{ route('admin.orders.detail', 5) }}" style="color: #000; text-decoration: none;">#0105</a></td>
-                            <td>Elsa</td>
-                            <td>Green jeans crop blouse</td>
-                            <td>Rp 175.000</td>
-                            <td><span class="badge-status badge-cancelled">Pending</span></td>
-                            <td><span class="badge-status badge-cancelled">Pending</span></td>
-                            <td>25.10.2025</td>
-                        </tr>
-                        <tr>
-                            <td><a href="{{ route('admin.orders.detail', 6) }}" style="color: #000; text-decoration: none;">#0106</a></td>
-                            <td>Cantika</td>
-                            <td>Dark blue low rise flare jeans</td>
-                            <td>Rp 300.000</td>
-                            <td><span class="badge-status badge-active">Paid</span></td>
-                            <td><span class="badge-status badge-active">Shipped</span></td>
-                            <td>25.10.2025</td>
-                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
+            </div>
+            
+            <div class="d-flex justify-content-center mt-4">
+                {{ $orders->links() }}
             </div>
         </div>
 

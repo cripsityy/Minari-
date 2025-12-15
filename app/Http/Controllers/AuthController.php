@@ -27,7 +27,7 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'username' => 'required|string',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -40,28 +40,69 @@ class AuthController extends Controller
             'password' => $request->password
         ];
 
-        if (!Auth::attempt($credentials)) {
-            return back()->withErrors([
-                'username' => 'Username atau password salah.',
-            ])->withInput()->with('error', 'Login gagal');
+        // 1. COBA LOGIN SEBAGAI USER (Customer)
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+            $user = Auth::user();
+
+            // Opsional: Jika user punya role admin di tabel users (spatie), kick atau biarkan?
+            // Sesuai request: "login admin sama user disamain aja",
+            // tapi admin 'sebenarnya' ada di tabel admins.
+            // Jadi kalau login di tabel users berhasil, anggap user biasa.
+            // (Kecuali ada logic khusus untuk block admin-in-users-table)
+            
+            if (method_exists($user, 'hasRole') && $user->hasRole('admin')) {
+                // Konsep lama: admin gak boleh login dari depan?
+                // Tapi sekarang disatukan. Kalau dia punya akun user yg role admin,
+                // mungkin kita redirect ke dashboard juga?
+                // TAPI: Admin 'sejati' ada di tabel admins (guard: admin).
+                // Jadi code blok ini mungkin redundant kalau admin-nya beda tabel.
+                // Kita biarkan user masuk sebagai user biasa jika ada di tabel users.
+            }
+
+            session(['role' => 'user']);
+            $this->transferGuestCart();
+
+            return redirect()->route('home')->with('success', 'Login berhasil!');
         }
 
-        $request->session()->regenerate();
+        // 2. JIKA GAGAL USER, COBA LOGIN SEBAGAI ADMIN (Tabel admins)
+        // Kita perlu mapping credentials agar sesuai kolom di tabel admins (biasanya sama)
+        // Guard 'admin' biasanya pakai provider 'admins'
+        
+        if (Auth::guard('admin')->attempt($credentials)) {
+            $admin = Auth::guard('admin')->user();
 
-        $user = Auth::user();
+            // Update last login (optional, copy dari AdminAuthController)
+            if (method_exists($admin, 'update')) {
+                $admin->update([
+                    'last_login_at' => now(),
+                    'last_login_ip' => $request->ip(),
+                ]);
+            }
 
-        // kalau ternyata admin (spatie role), tolak
-        if (method_exists($user, 'hasRole') && $user->hasRole('admin')) {
-            Auth::logout();
-            return back()->withErrors([
-                'username' => 'Username atau password salah.',
-            ])->withInput()->with('error', 'Login gagal');
+            $request->session()->regenerate();
+
+            // Set session khusus admin
+            session([
+                'admin_id' => $admin->id,
+                'admin_role' => $admin->is_super_admin ? 'super_admin' : 'admin',
+                'admin_name' => $admin->name,
+                'role' => 'admin',
+                'admin_secret' => true,
+            ]);
+
+            // Pastikan user session bersih (safety)
+            Auth::guard('web')->logout();
+            session()->forget(['customer_id', 'user_id']);
+
+            return redirect()->route('admin.dashboard')->with('success', 'Selamat datang, Admin!');
         }
 
-        session(['role' => 'user']);
-        $this->transferGuestCart();
-
-        return redirect()->route('home')->with('success', 'Login berhasil!');
+        // 3. JIKA DUA-DUANYA GAGAL
+        return back()->withErrors([
+            'username' => 'Username atau password salah.',
+        ])->withInput()->with('error', 'Login gagal');
     }
 
     public function register(Request $request)

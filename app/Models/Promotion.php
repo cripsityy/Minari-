@@ -49,6 +49,36 @@ class Promotion extends Model
             : 'Rp ' . number_format($this->value, 0, ',', '.');
     }
 
+    public function getStatusAttribute()
+    {
+        if (!$this->is_active) {
+            return 'Inactive';
+        }
+
+        $now = now();
+
+        if ($now->lt($this->start_date)) {
+            return 'Scheduled';
+        }
+
+        if ($now->gt($this->end_date)) {
+            return 'Expired';
+        }
+
+        return 'Active';
+    }
+
+    public function getStatusBadgeClassAttribute()
+    {
+        return match($this->status) {
+            'Active' => 'badge-active',
+            'Scheduled' => 'badge-pending',
+            'Expired' => 'badge-inactive',
+            'Inactive' => 'badge-inactive',
+            default => 'badge-secondary',
+        };
+    }
+    
     public function calculateDiscount($amount)
     {
         if (!$this->is_valid || ($this->min_purchase && $amount < $this->min_purchase)) {

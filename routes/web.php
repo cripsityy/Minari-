@@ -15,14 +15,11 @@ use App\Http\Controllers\Admin\SuggestionAdminController;
 | PUBLIC / LANDING (GUEST DEFAULT)
 |--------------------------------------------------------------------------
 */
-Route::get('/__fix_admin', function() {
-    $admin = App\Models\Admin::where('username', 'admin')->first();
-    if (!$admin) return "Admin user MISSING in database! Please run seed.";
-    
-    $admin->password = Hash::make('Admin123!');
-    $admin->save();
-    return "Admin password has been FORCE RESET to 'Admin123!'. <br> <a href='/__admin'>Go to Login</a>";
-});
+/*
+|--------------------------------------------------------------------------
+| PUBLIC / LANDING (GUEST DEFAULT)
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', [LandingController::class, 'index'])->name('home');
 
@@ -163,6 +160,7 @@ Route::prefix('admin')
         Route::post('/products', [AdminController::class, 'storeProduct'])->name('admin.products.store');
         Route::get('/products/{id}/edit', [AdminController::class, 'editProduct'])->name('admin.products.edit');
         Route::post('/products/{id}', [AdminController::class, 'updateProduct'])->name('admin.products.update');
+        Route::get('/customers', [AdminController::class, 'customers'])->name('admin.customers');
         Route::delete('/products/{id}', [AdminController::class, 'deleteProduct'])->name('admin.products.delete');
 
         /*
@@ -174,7 +172,7 @@ Route::prefix('admin')
         Route::get('/categories/add', [AdminController::class, 'addCategory'])->name('admin.categories.add');
         Route::post('/categories', [AdminController::class, 'storeCategory'])->name('admin.categories.store');
         Route::get('/categories/{id}/edit', [AdminController::class, 'editCategory'])->name('admin.categories.edit');
-        Route::post('/categories/{id}', [AdminController::class, 'updateCategory'])->name('admin.categories.update');
+        Route::put('/categories/{id}', [AdminController::class, 'updateCategory'])->name('admin.categories.update');
         Route::delete('/categories/{id}', [AdminController::class, 'deleteCategory'])->name('admin.categories.delete');
 
         /*
@@ -194,4 +192,14 @@ Route::prefix('admin')
         */
         Route::get('/reviews', [AdminController::class, 'reviews'])->name('admin.reviews');
         Route::post('/reviews/{id}/status', [AdminController::class, 'updateReviewStatus'])->name('admin.reviews.status');
+        /*
+        |-------------------------
+        | PROMOTIONS
+        |-------------------------
+        */
+        Route::get('/promotions', [AdminController::class, 'promotions'])->name('admin.promotions');
+        Route::get('/promotions/add', [AdminController::class, 'addPromotion'])->name('admin.promotions.add');
+        Route::post('/promotions', [AdminController::class, 'storePromotion'])->name('admin.promotions.store');
+        Route::post('/promotions/{id}/status', [AdminController::class, 'updatePromotionStatus'])->name('admin.promotions.status');
+        Route::delete('/promotions/{id}', [AdminController::class, 'deletePromotion'])->name('admin.promotions.delete');
     });

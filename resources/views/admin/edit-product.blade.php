@@ -65,27 +65,27 @@
             </div>
 
             <div class="form-container">
-                <form id="editProductForm">
+                <form id="editProductForm" action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
                     <div class="row">
                         <div class="col-md-8">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="form-label">Product Name</label>
-                                        <input type="text" class="form-control" value="Choco Blouse" placeholder="Enter product name" required>
+                                        <input type="text" name="name" class="form-control" value="{{ old('name', $product->name) }}" placeholder="Enter product name" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="form-label">Category</label>
-                                        <select class="form-select" required>
+                                        <select name="category_id" class="form-select" required>
                                             <option value="">Select Category</option>
-                                            <option value="shirts-blouse" selected>Shirts and Blouse</option>
-                                            <option value="sweaters">Sweaters, Cardigan, and Fleece</option>
-                                            <option value="t-shirts-polo">T-Shirts and Polo</option>
-                                            <option value="pants">Pants</option>
-                                            <option value="skirt-dress">Skirt and Dress</option>
-                                            <option value="accessories">Accessories</option>
+                                            @foreach($categories as $category)
+                                                <option value="{{ $category->id }}" {{ $product->category_id == $category->id ? 'selected' : '' }}>
+                                                    {{ $category->name }}
+                                                </option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
@@ -95,87 +95,93 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="form-label">Price</label>
-                                        <input type="text" class="form-control" value="175.000" placeholder="Enter price (e.g., 150.000)" required>
+                                        <input type="number" name="price" class="form-control" value="{{ old('price', $product->price) }}" placeholder="Enter price" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="form-label">Stock Quantity</label>
-                                        <input type="number" class="form-control" value="76" placeholder="Enter stock quantity" min="0" required>
+                                        <input type="number" name="stock" class="form-control" value="{{ old('stock', $product->stock) }}" placeholder="Enter stock quantity" min="0" required>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">Description</label>
-                                <textarea class="form-control" rows="4" placeholder="Enter product description">Elegant chocolate-colored blouse made from high-quality cotton material. Perfect for casual and formal occasions.</textarea>
+                                <textarea name="description" class="form-control" rows="4" placeholder="Enter product description">{{ old('description', $product->description) }}</textarea>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="form-label">Size</label>
-                                        <select class="form-select">
-                                            <option value="">Select Size</option>
-                                            <option value="all-size" selected>All Size</option>
-                                        </select>
+                                        <label class="form-label d-block">Size</label>
+                                        <div class="d-flex gap-3 flex-wrap">
+                                            @php $sizes = explode(',', $product->size ?? ''); @endphp
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="size[]" value="all-size" id="sizeAll" {{ in_array('all-size', $sizes) || $product->size == 'all-size' ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="sizeAll">All Size</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="size[]" value="S" id="sizeS" {{ in_array('S', $sizes) || $product->size == 'S' ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="sizeS">S</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="size[]" value="M" id="sizeM" {{ in_array('M', $sizes) || $product->size == 'M' ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="sizeM">M</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="size[]" value="L" id="sizeL" {{ in_array('L', $sizes) || $product->size == 'L' ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="sizeL">L</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="size[]" value="XL" id="sizeXL" {{ in_array('XL', $sizes) || $product->size == 'XL' ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="sizeXL">XL</label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="form-label">Material</label>
-                                        <input type="text" class="form-control" value="100% Cotton" placeholder="Enter material">
+                                        <input type="text" name="material" class="form-control" value="{{ old('material', $product->material) }}" placeholder="Enter material">
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-md-4">
-                            <div class="current-image">
-                                <label class="form-label">Current Image</label>
-                                <img src="{{ asset('images/product1.png') }}" alt="Choco Blouse" class="img-fluid">
-                            </div>
-
                             <div class="form-group">
                                 <label class="form-label">Update Image</label>
                                 <div class="image-upload" onclick="document.getElementById('imageInput').click()">
                                     <i class="fas fa-cloud-upload-alt"></i>
                                     <p>Click to upload new image</p>
                                     <small>Recommended: 500x500px</small>
-                                    <img id="imagePreview" class="image-preview">
+                                    <img id="imagePreview" class="image-preview" src="{{ $product->image ? asset('storage/' . $product->image) : '' }}" style="{{ $product->image ? 'display:block' : '' }}">
                                 </div>
-                                <input type="file" id="imageInput" accept="image/*" class="file-input" onchange="previewImage(event)">
+                                <input type="file" name="image" id="imageInput" accept="image/*" class="file-input" onchange="previewImage(event)">
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">Status</label>
-                                <select class="form-select" required>
-                                    <option value="active" selected>Active</option>
-                                    <option value="inactive">Inactive</option>
+                                <select name="status" class="form-select" required>
+                                    <option value="active" {{ $product->status == 'active' ? 'selected' : '' }}>Active</option>
+                                    <option value="inactive" {{ $product->status == 'inactive' ? 'selected' : '' }}>Inactive</option>
                                 </select>
                             </div>
 
-                            <div class="form-group">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="featuredProduct" checked>
-                                    <label class="form-check-label" for="featuredProduct">
-                                        Featured Product
-                                    </label>
-                                </div>
-                            </div>
                         </div>
                     </div>
 
                     <div class="row mt-4">
                         <div class="col-12">
                             <div class="d-flex gap-3 justify-content-between">
-                                <button type="button" class="btn-delete" onclick="confirmDelete()">
+                                <button type="button" class="btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal">
                                     <i class="fas fa-trash"></i> Delete Product
                                 </button>
                                 <div class="d-flex gap-3">
-                                    <button type="button" class="btn-cancel" onclick="window.history.back()">
+                                    <a href="{{ route('admin.products') }}" class="btn-cancel text-decoration-none text-center pt-2">
                                         Cancel
-                                    </button>
+                                    </a>
                                     <button type="submit" class="btn-update">
                                         <i class="fas fa-save"></i> Update Product
                                     </button>
@@ -195,12 +201,16 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <p>Are you sure you want to delete <strong>"Choco Blouse"</strong>?</p>
+                        <p>Are you sure you want to delete <strong>"{{ $product->name }}"</strong>?</p>
                         <p class="text-danger">This action cannot be undone.</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" onclick="deleteProduct()">Delete Product</button>
+                        <form action="{{ route('admin.products.delete', $product->id) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger">Delete Product</button>
+                        </form>
                     </div>
                 </div>
             </div>

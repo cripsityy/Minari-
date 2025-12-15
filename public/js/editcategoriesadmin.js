@@ -1,10 +1,10 @@
 const categoryManager = {
-    init: function() {
+    init: function () {
         this.initializeEventListeners();
         this.setupRealTimeValidation();
     },
 
-    initializeEventListeners: function() {
+    initializeEventListeners: function () {
         const categoryImageInput = document.getElementById('categoryImage');
         if (categoryImageInput) {
             categoryImageInput.addEventListener('change', (e) => {
@@ -12,17 +12,19 @@ const categoryManager = {
             });
         }
 
-        const editCategoryForm = document.getElementById('editCategoryForm');
-        if (editCategoryForm) {
-            editCategoryForm.addEventListener('submit', (e) => {
-                this.handleFormSubmission(e);
-            });
-        }
+        /*
+                const editCategoryForm = document.getElementById('editCategoryForm');
+                if (editCategoryForm) {
+                    editCategoryForm.addEventListener('submit', (e) => {
+                        this.handleFormSubmission(e);
+                    });
+                }
+        */
 
         this.setupRealTimeValidation();
     },
 
-    handleImageUpload: function(e) {
+    handleImageUpload: function (e) {
         const file = e.target.files[0];
         if (!file) return;
 
@@ -41,10 +43,10 @@ const categoryManager = {
         reader.onload = (e) => {
             const preview = document.getElementById('imagePreview');
             const currentImage = document.getElementById('currentCategoryImage');
-            
+
             preview.src = e.target.result;
             preview.style.display = 'block';
-            
+
             if (currentImage) {
                 currentImage.style.display = 'none';
             }
@@ -52,9 +54,9 @@ const categoryManager = {
         reader.readAsDataURL(file);
     },
 
-    handleFormSubmission: function(e) {
+    handleFormSubmission: function (e) {
         e.preventDefault();
-        
+
         if (!this.validateForm()) {
             adminHelpers.showNotification('Please fill in all required fields correctly', 'error');
             return;
@@ -63,9 +65,9 @@ const categoryManager = {
         this.submitForm();
     },
 
-    validateForm: function() {
+    validateForm: function () {
         const categoryName = document.getElementById('categoryName').value.trim();
-        
+
         if (!categoryName) {
             this.highlightField('categoryName', false);
             return false;
@@ -75,7 +77,7 @@ const categoryManager = {
         return true;
     },
 
-    highlightField: function(fieldId, isValid) {
+    highlightField: function (fieldId, isValid) {
         const field = document.getElementById(fieldId);
         if (!field) return;
 
@@ -88,7 +90,7 @@ const categoryManager = {
         }
     },
 
-    setupRealTimeValidation: function() {
+    setupRealTimeValidation: function () {
         const categoryName = document.getElementById('categoryName');
         if (categoryName) {
             categoryName.addEventListener('input', () => {
@@ -97,7 +99,7 @@ const categoryManager = {
         }
     },
 
-    validateField: function(fieldId) {
+    validateField: function (fieldId) {
         const field = document.getElementById(fieldId);
         if (!field) return;
 
@@ -115,13 +117,13 @@ const categoryManager = {
         this.highlightField(fieldId, isValid);
     },
 
-    submitForm: function() {
+    submitForm: function () {
         const submitBtn = document.querySelector('.btn-update');
         adminHelpers.showLoading(submitBtn, 'Updating...');
 
         setTimeout(() => {
             adminHelpers.showNotification('Category updated successfully!', 'success');
-            
+
             adminHelpers.hideLoading(submitBtn);
 
             setTimeout(() => {
@@ -130,18 +132,18 @@ const categoryManager = {
         }, 1500);
     },
 
-    confirmDelete: function() {
+    confirmDelete: function () {
         const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
         deleteModal.show();
     },
 
-    deleteCategory: function() {
+    deleteCategory: function () {
         const deleteBtn = document.querySelector('#deleteModal .btn-delete');
         adminHelpers.showLoading(deleteBtn, 'Deleting...');
 
         setTimeout(() => {
             adminHelpers.showNotification('Category deleted successfully!', 'success');
-            
+
             const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
             deleteModal.hide();
 
@@ -154,6 +156,6 @@ const categoryManager = {
     }
 };
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     categoryManager.init();
 });

@@ -10,20 +10,7 @@
         <link rel="stylesheet" href="{{ asset('css/style1.css') }}">
     </head>
     <body>
-        <nav class="navbar-custom fixed-top">
-            <div class="container-fluid">
-                <div class="d-flex justify-content-between align-items-center w-100 px-5">
-                    <div class="logo">
-                        <img src="{{ asset('images/logofix.png') }}" alt="Logo MINARI" style="height: 40px; width: auto;">
-                    </div>
-                    <div class="navbar-icons">
-                        <img src="{{ asset('images/notification.png') }}" alt="Favorite" width="24" height="24"></a>
-                        <img src="{{ asset('images/searchnav.png') }}" alt="Search" width="24" height="24"></a>
-                        <img src="{{ asset('images/email.png') }}" alt="Cart" width="24" height="24"></a>
-                    </div>
-                </div>
-            </div>
-        </nav>
+        @include('admin.partials.navbar')
 
         <div class="sidebar">
             <a href="{{ route('admin.dashboard') }}" class="sidebar-item">
@@ -64,28 +51,36 @@
                 </a>
             </div>
 
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <div class="form-container">
-                <form id="addProductForm">
+                <form id="addProductForm" action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
                     <div class="row">
                         <div class="col-md-8">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="form-label">Product Name</label>
-                                        <input type="text" class="form-control" placeholder="Enter product name" required>
+                                        <input type="text" name="name" class="form-control" placeholder="Enter product name" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="form-label">Category</label>
-                                        <select class="form-select" required>
+                                        <select name="category_id" class="form-select" required>
                                             <option value="">Select Category</option>
-                                            <option value="shirt-blouse">Shirts and Blouse</option>
-                                            <option value="sweaters">Sweaters, Cardigan, and Fleece</option>
-                                            <option value="t-shirt-polo">T-Shirts and Polo</option>
-                                            <option value="pants">Pants</option>
-                                            <option value="skirt-dress">Skirt and Dress</option>
-                                            <option value="accessories">Accessories</option>
+                                            @foreach($categories as $category)
+                                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
@@ -95,42 +90,56 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="form-label">Price</label>
-                                        <input type="text" class="form-control" placeholder="Enter price (e.g., 150.000)" required>
+                                        <input type="text" name="price" class="form-control" placeholder="Enter price (e.g., 150.000)" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="form-label">Stock Quantity</label>
-                                        <input type="number" class="form-control" placeholder="Enter stock quantity" min="0" required>
+                                        <input type="number" name="stock" class="form-control" placeholder="Enter stock quantity" min="0" required>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">Description</label>
-                                <textarea class="form-control" rows="4" placeholder="Enter product description"></textarea>
+                                <textarea name="description" class="form-control" rows="4" placeholder="Enter product description"></textarea>
                             </div>
 
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <div class="form-group">
-                                        <label class="form-label">Size</label>
-                                        <select class="form-select">
-                                            <option value="">Select Size</option>
-                                            <option value="all-size">All Size</option>
-                                            <option value="XS">XS</option>
-                                            <option value="S">S</option>
-                                            <option value="M">M</option>
-                                            <option value="L">L</option>
-                                            <option value="XL">XL</option>
-                                            <option value="XXL">XXL</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-label">Material</label>
-                                        <input type="text" class="form-control" placeholder="Enter material">
+                                        <label class="form-label d-block">Size</label>
+                                        <div class="d-flex gap-3 flex-wrap">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="size[]" value="all-size" id="sizeAll">
+                                                <label class="form-check-label" for="sizeAll">All Size</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="size[]" value="XS" id="sizeXS">
+                                                <label class="form-check-label" for="sizeXS">XS</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="size[]" value="S" id="sizeS">
+                                                <label class="form-check-label" for="sizeS">S</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="size[]" value="M" id="sizeM">
+                                                <label class="form-check-label" for="sizeM">M</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="size[]" value="L" id="sizeL">
+                                                <label class="form-check-label" for="sizeL">L</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="size[]" value="XL" id="sizeXL">
+                                                <label class="form-check-label" for="sizeXL">XL</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="size[]" value="XXL" id="sizeXXL">
+                                                <label class="form-check-label" for="sizeXXL">XXL</label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -145,24 +154,15 @@
                                     <small>Recommended: 500x500px</small>
                                     <img id="imagePreview" class="image-preview">
                                 </div>
-                                <input type="file" id="imageInput" accept="image/*" class="file-input" onchange="previewImage(event)">
+                                <input type="file" name="image" id="imageInput" accept="image/*" class="file-input" onchange="previewImage(event)">
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">Status</label>
-                                <select class="form-select" required>
+                                <select name="status" class="form-select" required>
                                     <option value="active">Active</option>
                                     <option value="inactive">Inactive</option>
                                 </select>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="featuredProduct">
-                                    <label class="form-check-label" for="featuredProduct">
-                                        Featured Product
-                                    </label>
-                                </div>
                             </div>
                         </div>
                     </div>

@@ -10,20 +10,7 @@
         <link rel="stylesheet" href="{{ asset('css/style1.css') }}">
     </head>
     <body>
-        <nav class="navbar-custom fixed-top">
-            <div class="container-fluid">
-                <div class="d-flex justify-content-between align-items-center w-100 px-5">
-                    <div class="logo">
-                        <img src="{{ asset('images/logofix.png') }}" alt="Logo MINARI" style="height: 40px; width: auto;">
-                    </div>
-                    <div class="navbar-icons">
-                        <img src="{{ asset('images/notification.png') }}" alt="Favorite" width="24" height="24"></a>
-                        <img src="{{ asset('images/searchnav.png') }}" alt="Search" width="24" height="24"></a>
-                        <img src="{{ asset('images/email.png') }}" alt="Cart" width="24" height="24"></a>
-                    </div>
-                </div>
-            </div>
-        </nav>
+        @include('admin.partials.navbar')
 
         <div class="sidebar">
             <a href="{{ route('admin.dashboard') }}" class="sidebar-item">
@@ -78,104 +65,42 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>
-                                <div class="product-img">
-                                    <img src="{{ asset('images/shirt.png') }}" alt="shirt and blouse">
-                                </div>
-                            </td>
-                            <td>Shirt and Blouse</td>
-                            <td class="action-icons">
-                                <a href="{{ route('admin.categories.edit', 1) }}" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a href="#" title="Delete" onclick="confirmDelete(this)">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="product-img">
-                                    <img src="{{ asset('images/sweaters.png') }}" alt="Sweaters, Cardigan, and Fleece">
-                                </div>
-                            </td>
-                            <td>Sweaters, Cardigan, and Fleece</td>
-                            <td class="action-icons">
-                                <a href="{{ route('admin.categories.edit', 2) }}" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a href="#" title="Delete" onclick="confirmDelete(this)">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="product-img">
-                                    <img src="{{ asset('images/tshirt.png') }}" alt="T-Shirt and Polo">
-                                </div>
-                            </td>
-                            <td>T-Shirt and Polo</td>
-                            <td class="action-icons">
-                                <a href="{{ route('admin.categories.edit', 3) }}" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a href="#" title="Delete" onclick="confirmDelete(this)">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="product-img">
-                                    <img src="{{ asset('images/pants.png') }}" alt="Pants">
-                                </div>
-                            </td>
-                            <td>Pants</td>
-                            <td class="action-icons">
-                                <a href="{{ route('admin.categories.edit', 4) }}" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a href="#" title="Delete" onclick="confirmDelete(this)">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="product-img">
-                                    <img src="{{ asset('images/dress.png') }}" alt="Skirt and Dress">
-                                </div>
-                            </td>
-                            <td>Skirt and Dress</td>
-                            <td class="action-icons">
-                                <a href="{{ route('admin.categories.edit', 5) }}" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a href="#" title="Delete" onclick="confirmDelete(this)">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="product-img">
-                                    <img src="{{ asset('images/accessories.png') }}" alt="Accessories">
-                                </div>
-                            </td>
-                            <td>Accessories</td>
-                            <td class="action-icons">
-                                <a href="{{ route('admin.categories.edit', 6) }}" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a href="#" title="Delete" onclick="confirmDelete(this)">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-                            </td>
-                        </tr>
+                        @forelse($categories as $category)
+                            <tr>
+                                <td>
+                                    <div class="product-img">
+                                        @if($category->image)
+                                            <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" style="object-fit:cover; width:50px; height:50px;">
+                                        @else
+                                            <span class="text-muted small">No Image</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td>{{ $category->name }}</td>
+                                <td class="action-icons">
+                                    <a href="{{ route('admin.categories.edit', $category->id) }}" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('admin.categories.delete', $category->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this category?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-link p-0 text-danger" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="text-center">No categories found.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
+            </div>
+
+            <div class="d-flex justify-content-center mt-4">
+                {{ $categories->links() }}
             </div>
         </div>
 

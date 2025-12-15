@@ -57,6 +57,11 @@ class Product extends Model
         return $this->hasMany(Cart::class);
     }
 
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
     public function getFinalPriceAttribute()
     {
         return $this->discount_price ?: $this->price;
@@ -99,7 +104,7 @@ class Product extends Model
 
     public function scopeAvailable($query)
     {
-        return $query->where('status', 'available')->where('stock', '>', 0);
+        return $query->where('status', 'active')->where('stock', '>', 0);
     }
 
     public function scopeNewArrival($query)

@@ -427,7 +427,15 @@ class UserController extends Controller
             ]);
 
             // Decrease product stock
-            $cartItem->product->decrement('stock', $cartItem->quantity); // Consider checking < 0
+            // Decrease product stock and check status
+            $product = $cartItem->product;
+            $newStock = $product->stock - $cartItem->quantity;
+            $product->stock = max(0, $newStock);
+            
+            if ($product->stock <= 0) {
+                $product->status = 'inactive';
+            }
+            $product->save();
             
             // Delete this specific item from cart
             $cartItem->delete();

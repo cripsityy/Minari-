@@ -1,10 +1,10 @@
 const categoryManager = {
-    init: function() {
+    init: function () {
         this.initializeEventListeners();
         this.setupRealTimeValidation();
     },
 
-    initializeEventListeners: function() {
+    initializeEventListeners: function () {
         const categoryImageInput = document.getElementById('categoryImage');
         if (categoryImageInput) {
             categoryImageInput.addEventListener('change', (e) => {
@@ -12,12 +12,14 @@ const categoryManager = {
             });
         }
 
-        const addCategoryForm = document.getElementById('addCategoryForm');
-        if (addCategoryForm) {
-            addCategoryForm.addEventListener('submit', (e) => {
-                this.handleFormSubmission(e);
-            });
-        }
+        /*
+                const addCategoryForm = document.getElementById('addCategoryForm');
+                if (addCategoryForm) {
+                    addCategoryForm.addEventListener('submit', (e) => {
+                        this.handleFormSubmission(e);
+                    });
+                }
+        */
 
         this.setupRealTimeValidation();
 
@@ -29,10 +31,10 @@ const categoryManager = {
         }
     },
 
-    handleImageUpload: function(e) {
+    handleImageUpload: function (e) {
         const file = e.target.files[0];
         const errorDiv = document.getElementById('imageError');
-        
+
         if (!file) {
             this.showValidationMessage('imageError', 'Please upload a category image', 'error');
             return;
@@ -56,17 +58,17 @@ const categoryManager = {
             const preview = document.getElementById('imagePreview');
             preview.src = e.target.result;
             preview.style.display = 'block';
-            
+
             this.hideValidationMessage('imageError');
-            
+
             this.showValidationMessage('imageError', 'Image uploaded successfully!', 'success');
         };
         reader.readAsDataURL(file);
     },
 
-    handleFormSubmission: function(e) {
+    handleFormSubmission: function (e) {
         e.preventDefault();
-        
+
         if (!this.validateForm()) {
             adminHelpers.showNotification('Please fill in all required fields correctly', 'error');
             return;
@@ -75,7 +77,7 @@ const categoryManager = {
         this.submitForm();
     },
 
-    validateForm: function() {
+    validateForm: function () {
         let isValid = true;
 
         const categoryName = document.getElementById('categoryName').value.trim();
@@ -110,7 +112,7 @@ const categoryManager = {
         return isValid;
     },
 
-    highlightField: function(fieldId, isValid) {
+    highlightField: function (fieldId, isValid) {
         const field = document.getElementById(fieldId);
         if (!field) return;
 
@@ -123,7 +125,7 @@ const categoryManager = {
         }
     },
 
-    showValidationMessage: function(elementId, message, type) {
+    showValidationMessage: function (elementId, message, type) {
         const element = document.getElementById(elementId);
         if (!element) return;
 
@@ -132,20 +134,20 @@ const categoryManager = {
         element.style.display = 'block';
     },
 
-    hideValidationMessage: function(elementId) {
+    hideValidationMessage: function (elementId) {
         const element = document.getElementById(elementId);
         if (element) {
             element.style.display = 'none';
         }
     },
 
-    setupRealTimeValidation: function() {
+    setupRealTimeValidation: function () {
         const categoryName = document.getElementById('categoryName');
         if (categoryName) {
             categoryName.addEventListener('input', () => {
                 this.validateField('categoryName');
             });
-            
+
             categoryName.addEventListener('blur', () => {
                 this.validateField('categoryName');
             });
@@ -159,7 +161,7 @@ const categoryManager = {
         }
     },
 
-    validateField: function(fieldId) {
+    validateField: function (fieldId) {
         const field = document.getElementById(fieldId);
         if (!field) return;
 
@@ -201,7 +203,7 @@ const categoryManager = {
         this.highlightField(fieldId, isValid);
     },
 
-    submitForm: function() {
+    submitForm: function () {
         const submitBtn = document.querySelector('.btn-add');
         adminHelpers.showLoading(submitBtn, 'Adding...');
 
@@ -210,9 +212,9 @@ const categoryManager = {
         setTimeout(() => {
             try {
                 console.log('Form data to be submitted:', formData);
-                
+
                 adminHelpers.showNotification('Category added successfully!', 'success');
-                
+
                 adminHelpers.hideLoading(submitBtn);
 
                 setTimeout(() => {
@@ -225,7 +227,7 @@ const categoryManager = {
         }, 1500);
     },
 
-    collectFormData: function() {
+    collectFormData: function () {
         return {
             name: document.getElementById('categoryName').value.trim(),
             description: document.getElementById('categoryDescription').value.trim(),
@@ -234,7 +236,7 @@ const categoryManager = {
         };
     },
 
-    cancelForm: function() {
+    cancelForm: function () {
         if (this.isFormDirty()) {
             if (!confirm('You have unsaved changes. Are you sure you want to cancel?')) {
                 return;
@@ -243,7 +245,7 @@ const categoryManager = {
         window.location.href = '/admin/categories';
     },
 
-    isFormDirty: function() {
+    isFormDirty: function () {
         const categoryName = document.getElementById('categoryName').value.trim();
         const categoryDescription = document.getElementById('categoryDescription').value.trim();
         const categoryImage = document.getElementById('categoryImage').files[0];
@@ -251,32 +253,32 @@ const categoryManager = {
         return categoryName !== '' || categoryDescription !== '' || categoryImage !== undefined;
     },
 
-    resetForm: function() {
+    resetForm: function () {
         const form = document.getElementById('addCategoryForm');
         if (form) {
             form.reset();
         }
-        
+
         const preview = document.getElementById('imagePreview');
         if (preview) {
             preview.style.display = 'none';
         }
-        
+
         document.querySelectorAll('.is-valid, .is-invalid').forEach(el => {
             el.classList.remove('is-valid', 'is-invalid');
         });
-        
+
         document.querySelectorAll('.validation-message').forEach(msg => {
             msg.style.display = 'none';
         });
     }
 };
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     categoryManager.init();
 });
 
-window.addEventListener('beforeunload', function(e) {
+window.addEventListener('beforeunload', function (e) {
     if (categoryManager.isFormDirty()) {
         e.preventDefault();
         e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';

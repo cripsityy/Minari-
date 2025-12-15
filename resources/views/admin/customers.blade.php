@@ -10,20 +10,7 @@
         <link rel="stylesheet" href="{{ asset('css/style1.css') }}">
     </head>
     <body>
-        <nav class="navbar-custom fixed-top">
-            <div class="container-fluid">
-                <div class="d-flex justify-content-between align-items-center w-100 px-5">
-                    <div class="logo">
-                        <img src="{{ asset('images/logofix.png') }}" alt="Logo MINARI" style="height: 40px; width: auto;">
-                    </div>
-                    <div class="navbar-icons">
-                        <img src="{{ asset('images/notification.png') }}" alt="Favorite" width="24" height="24"></a>
-                        <img src="{{ asset('images/searchnav.png') }}" alt="Search" width="24" height="24"></a>
-                        <img src="{{ asset('images/email.png') }}" alt="Cart" width="24" height="24"></a>
-                    </div>
-                </div>
-            </div>
-        </nav>
+        @include('admin.partials.navbar')
 
         <div class="sidebar">
             <a href="{{ route('admin.dashboard') }}" class="sidebar-item">
@@ -75,60 +62,36 @@
                             <th>Phone</th>
                             <th>Orders</th>
                             <th>Total Spent</th>
-                            <th>Status</th>
+                            <th>Status Limit</th>
                         </tr>
                     </thead>
                     <tbody>
+                        @forelse($customers as $customer)
                         <tr>
-                            <td>Anneiza</td>
-                            <td>anneiza@email.com</td>
-                            <td>+62 812-3456-7890</td>
-                            <td>35</td>
-                            <td>Rp 780.000</td>
-                            <td><span class="badge-status badge-active">Active</span></td>
+                            <td>{{ $customer->name }}</td>
+                            <td>{{ $customer->email }}</td>
+                            <td>{{ $customer->phone ?? '-' }}</td>
+                            <td>{{ $customer->orders_count }}</td>
+                            <td>{{ 'Rp ' . number_format($customer->orders_sum_total ?? 0, 0, ',', '.') }}</td>
+                            <td>
+                                @if($customer->orders_count > 0)
+                                    <span class="badge-status badge-active">Active</span>
+                                @else
+                                    <span class="badge-status badge-pending">New</span>
+                                @endif
+                            </td>
                         </tr>
+                        @empty
                         <tr>
-                            <td>Lisa</td>
-                            <td>sasa@email.com</td>
-                            <td>+62 812-6987-7600</td>
-                            <td>29</td>
-                            <td>Rp 500.000</td>
-                            <td><span class="badge-status badge-inactive">Inactive</span></td>
+                            <td colspan="6" class="text-center py-4">No customers found.</td>
                         </tr>
-                        <tr>
-                            <td>Aliyah</td>
-                            <td>aliyah@email.com</td>
-                            <td>+62 813-4567-8901</td>
-                            <td>12</td>
-                            <td>Rp 800.000</td>
-                            <td><span class="badge-status badge-active">Active</span></td>
-                        </tr>
-                        <tr>
-                            <td>Karina</td>
-                            <td>karina@email.com</td>
-                            <td>+62 814-5678-9012</td>
-                            <td>18</td>
-                            <td>Rp 650.000</td>
-                            <td><span class="badge-status badge-active">Active</span></td>
-                        </tr>
-                        <tr>
-                            <td>Elsa</td>
-                            <td>elsa@email.com</td>
-                            <td>+62 815-6789-0123</td>
-                            <td>9</td>
-                            <td>Rp 370.000</td>
-                            <td><span class="badge-status badge-inactive">Inactive</span></td>
-                        </tr>
-                        <tr>
-                            <td>Cantika</td>
-                            <td>cacan@email.com</td>
-                            <td>+62 816-7890-1234</td>
-                            <td>21</td>
-                            <td>Rp 300.000</td>
-                            <td><span class="badge-status badge-inactive">Inactive</span></td>
-                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
+            </div>
+
+            <div class="d-flex justify-content-center mt-4">
+                {{ $customers->links() }}
             </div>
         </div>
 

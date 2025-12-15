@@ -65,29 +65,40 @@
             </div>
 
             <div class="form-container">
-                <form id="editCategoryForm">
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                <form id="editCategoryForm" action="{{ route('admin.categories.update', $category->id) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
                     <div class="row">
                         <div class="col-md-8">
                             <div class="form-group">
                                 <label for="categoryName" class="form-label">Category Name</label>
-                                <input type="text" class="form-control" id="categoryName" value="Shirt and Blouse" required>
+                                <input type="text" name="name" class="form-control" id="categoryName" value="{{ old('name', $category->name) }}" required>
                             </div>
                             
                             <div class="form-group">
                                 <label for="categoryDescription" class="form-label">Description</label>
-                                <textarea class="form-control" id="categoryDescription" rows="4" placeholder="Enter category description">A collection of stylish shirts and blouses for everyday wear</textarea>
+                                <textarea name="description" class="form-control" id="categoryDescription" rows="4" placeholder="Enter category description">{{ old('description', $category->description) }}</textarea>
                             </div>
                             
                             <div class="form-group">
                                 <label class="form-label">Status</label>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="status" id="activeStatus" checked>
+                                    <input class="form-check-input" type="radio" name="status" id="activeStatus" value="active" {{ old('status', $category->status) == 'active' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="activeStatus">
                                         Active
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="status" id="inactiveStatus">
+                                    <input class="form-check-input" type="radio" name="status" id="inactiveStatus" value="inactive" {{ old('status', $category->status) == 'inactive' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="inactiveStatus">
                                         Inactive
                                     </label>
@@ -99,17 +110,17 @@
                             <div class="form-group">
                                 <label class="form-label">Category Image</label>
                                 <div class="current-image mb-3">
-                                    <img src="{{ asset('images/shirt.jpg') }}" alt="Current category image" id="currentCategoryImage" class="img-fluid">
+                                    <img src="{{ asset('storage/' . $category->image) }}" alt="Current category image" id="currentCategoryImage" class="img-fluid">
                                 </div>
                                 
                                 <div class="image-upload" onclick="document.getElementById('categoryImage').click()">
                                     <i class="fas fa-cloud-upload-alt"></i>
                                     <p>Click to upload new image</p>
                                     <small>JPG, PNG, or GIF (Max 2MB)</small>
-                                    <input type="file" id="categoryImage" class="file-input" accept="image/*">
+                                    <input type="file" name="image" id="categoryImage" class="file-input" accept="image/*" onchange="previewImage(this)">
                                 </div>
                                 
-                                <img id="imagePreview" class="image-preview" src="#" alt="Preview">
+                                <img id="imagePreview" class="image-preview" src="#" alt="Preview" style="display:none; max-width: 100%; margin-top: 10px;">
                             </div>
                         </div>
                     </div>
@@ -142,7 +153,11 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn-cancel" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn-delete" onclick="categoryManager.deleteCategory()">Delete Category</button>
+                        <form action="{{ route('admin.categories.delete', $category->id) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn-delete">Delete Category</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -174,5 +189,17 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="{{ asset('js/editcategoriesadmin.js') }}"></script>
         <script src="{{ asset('js/navigation.js') }}"></script>
+        <script>
+            function previewImage(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('imagePreview').src = e.target.result;
+                        document.getElementById('imagePreview').style.display = 'block';
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+        </script>
     </body>
 </html>

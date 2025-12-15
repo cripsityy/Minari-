@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>MINARI - Promotions</title>
+        <title>MINARI - Product Management</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -17,7 +17,7 @@
                 <i class="fas fa-table-columns"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="{{ route('admin.products') }}" class="sidebar-item">
+            <a href="{{ route('admin.products') }}" class="sidebar-item active">
                 <i class="fas fa-box"></i>
                 <span>Product</span>
             </a>
@@ -37,7 +37,7 @@
                 <i class="fas fa-thumbs-up"></i>
                 <span>Review</span>
             </a>
-            <a href="{{ route('admin.promotions') }}" class="sidebar-item active">
+            <a href="{{ route('admin.promotions') }}" class="sidebar-item">
                 <i class="fas fa-ad"></i>
                 <span>Promotions</span>
             </a>
@@ -45,50 +45,74 @@
         
         <div class="main-content">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="page-title">Promotions</h2>
-                <a href="{{ route('admin.promotions.add') }}" class="btn-add">
-                    <i class="fas fa-plus"></i> Add Promotion
+                <h2 class="page-title">Products</h2>
+                <a href="{{ route('admin.products.add') }}" class="btn-add" style="text-decoration: none;">
+                    <i class="fas fa-plus"></i> Add New Product
                 </a>
             </div>
 
             <div class="filter-section">
-                <input type="text" class="search-box" placeholder="Search promotions...">
-                <button class="filter-btn active">All Promotions</button>
+                <input type="text" class="search-box" placeholder="Search products...">
+                <button class="filter-btn active">All Category</button>
             </div>
 
             <div class="table-custom">
                 <table class="table mb-0">
                     <thead>
                         <tr>
-                            <th>Promo Code</th>
-                            <th>Description</th>
-                            <th>Discount</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
+                            <th>Image</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
                             <th>Status</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($promotions as $promo)
+
+                        @forelse($products as $product)
                         <tr>
-                            <td><strong>{{ $promo->code }}</strong></td>
-                            <td>{{ $promo->description }}</td>
-                            <td>{{ $promo->formatted_value }}</td>
-                            <td>{{ $promo->start_date->format('d M Y') }}</td>
-                            <td>{{ $promo->end_date->format('d M Y') }}</td>
                             <td>
-                                <span class="badge-status {{ $promo->status_badge_class }}">
-                                    {{ $promo->status }}
-                                </span>
+                                <div class="product-img">
+                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" onerror="this.src='{{ asset('images/logofix.png') }}'">
+                                </div>
+                            </td>
+                            <td>{{ $product->name }}</td>
+                            <td>{{ $product->category->name ?? 'Uncategorized' }}</td>
+                            <td>Rp {{ number_format($product->price, 0, ',', '.') }}</td>
+                            <td>{{ $product->stock }}</td>
+                            <td>
+                                @if($product->status == 'active' && $product->stock > 0)
+                                    <span class="badge-status badge-active">Active</span>
+                                @else
+                                    <span class="badge-status badge-inactive">Inactive</span>
+                                @endif
+                            </td>
+                            <td class="action-icons">
+                                <a href="{{ route('admin.products.edit', $product->id) }}" class="text-decoration-none">
+                                    <i class="fas fa-edit" title="Edit"></i>
+                                </a>
+                                <form action="{{ route('admin.products.delete', $product->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn p-0 border-0 bg-transparent text-danger">
+                                        <i class="fas fa-trash" title="Delete"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center py-4">No promotions found.</td>
+                            <td colspan="7" class="text-center py-4">No products found.</td>
                         </tr>
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+            
+            <div class="mt-4 px-4">
+                {{ $products->links() }}
             </div>
         </div>
 
@@ -117,5 +141,12 @@
         </footer>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="{{ asset('js/navigation.js') }}"></script>
+        <script>
+            function confirmDelete(productName) {
+                if (confirm('Are you sure you want to delete "' + productName + '"?')) {
+                    alert(productName + ' deleted successfully!');
+                }
+            }
+        </script>
     </body>
 </html>

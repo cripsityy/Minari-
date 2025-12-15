@@ -8,11 +8,21 @@ class LandingController extends Controller
 {
     public function index()
     {
+        // Redirect admins to dashboard
+        if (\Illuminate\Support\Facades\Auth::guard('admin')->check()) {
+            return redirect()->route('admin.dashboard');
+        }
+
         // Fetch featured/popular products for landing page
         $featuredProducts = Product::available()->take(8)->get();
         $categories = Category::withCount('products')->get();
+        
+        $promotions = \App\Models\Promotion::where('is_active', true)
+            ->whereDate('start_date', '<=', now())
+            ->whereDate('end_date', '>=', now())
+            ->get();
 
-        return view('landing', compact('featuredProducts', 'categories'));
+        return view('landing', compact('featuredProducts', 'categories', 'promotions'));
     }
     
     public function shirtblouse()

@@ -15,10 +15,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(['auth:admin', \App\Http\Middleware\AdminGuard::class]);
-    }
+
     
     public function dashboard()
     {
@@ -35,10 +32,16 @@ class AdminController extends Controller
             'pending_reviews' => Review::where('status', 'pending')->count()
         ];
         
-        $recentOrders = Order::with('user')->latest()->take(10)->get();
-        $topProducts = Product::orderBy('sold_count', 'desc')->take(5)->get();
+        $recentOrders = Order::with('user')->latest()->take(5)->get();
+        // Dynamic Top Products based on actual sales quantity
+        $topProducts = Product::withSum('orderItems', 'quantity')
+                              ->orderByDesc('order_items_sum_quantity')
+                              ->take(5)
+                              ->get();
+                              
+        $recentReviews = Review::with('user')->latest()->take(3)->get();
         
-        return view('admin.dashboard', compact('stats', 'recentOrders', 'topProducts'));
+        return view('admin.dashboard', compact('stats', 'recentOrders', 'topProducts', 'recentReviews'));
     }
     
     public function account()
@@ -97,9 +100,8 @@ class AdminController extends Controller
         $product->discount_price = $request->discount_price;
         $product->stock = $request->stock;
         $product->description = $request->description;
-        $product->size = $request->size;
+        $product->size = is_array($request->size) ? implode(',', $request->size) : $request->size;
         $product->color = $request->color;
-        $product->material = $request->material;
         $product->status = $request->status;
         
         if ($request->hasFile('image')) {
@@ -150,7 +152,7 @@ class AdminController extends Controller
         $product->discount_price = $request->discount_price;
         $product->stock = $request->stock;
         $product->description = $request->description;
-        $product->size = $request->size;
+        $product->size = is_array($request->size) ? implode(',', $request->size) : $request->size;
         $product->color = $request->color;
         $product->material = $request->material;
         $product->status = $request->status;
@@ -294,7 +296,7 @@ class AdminController extends Controller
     // Orders Management
     public function orders(Request $request)
     {
-        $query = Order::with('user');
+        $query = Order::with(['user', 'items']);
         
         if ($request->has('search')) {
             $query->where('order_number', 'like', '%' . $request->search . '%')
@@ -354,11 +356,16 @@ class AdminController extends Controller
         });
         
         if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%')
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
                   ->orWhere('email', 'like', '%' . $request->search . '%');
+            });
         }
         
-        $customers = $query->withCount('orders')->latest()->paginate(20);
+        $customers = $query->withCount('orders')
+                           ->withSum('orders', 'total')
+                           ->latest()
+                           ->paginate(20);
         
         return view('admin.customers', compact('customers'));
     }
@@ -397,49 +404,44 @@ class AdminController extends Controller
         $promotions = Promotion::latest()->paginate(15);
         return view('admin.promotions', compact('promotions'));
     }
-    
+
     public function addPromotion()
     {
-        $categories = Category::all();
-        $products = Product::all();
-        
-        return view('admin.add-promotion', compact('categories', 'products'));
+        return view('admin.add-promotion');
     }
-    
+
     public function storePromotion(Request $request)
     {
         $request->validate([
-            'code' => 'required|string|unique:promotions,code',
-            'name' => 'required|string|max:255',
-            'type' => 'required|in:percentage,fixed,free_shipping',
-            'value' => 'required_if:type,percentage,fixed|nullable|numeric|min:0',
-            'min_purchase' => 'nullable|numeric|min:0',
-            'usage_limit' => 'nullable|integer|min:1',
+            'code' => 'required|unique:promotions,code',
+            'type' => 'required|in:percentage,fixed',
+            'value' => 'required|numeric',
             'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date'
+            'end_date' => 'required|date|after_or_equal:start_date',
         ]);
-        
-        $promotion = new Promotion();
-        $promotion->code = strtoupper($request->code);
-        $promotion->name = $request->name;
-        $promotion->description = $request->description;
-        $promotion->type = $request->type;
-        $promotion->value = $request->value;
-        $promotion->min_purchase = $request->min_purchase;
-        $promotion->usage_limit = $request->usage_limit;
-        $promotion->start_date = $request->start_date;
-        $promotion->end_date = $request->end_date;
-        $promotion->is_active = $request->has('is_active');
-        
-        if ($request->has('applicable_to') && $request->applicable_to == 'selected') {
-            $promotion->applicable_categories = $request->applicable_categories;
-            $promotion->applicable_products = $request->applicable_products;
-        }
-        
-        $promotion->save();
-        
-        return redirect()->route('admin.promotions')->with('success', 'Promosi berhasil ditambahkan');
+
+        $status = $request->input('status', 'active');
+        $isActive = $status !== 'inactive';
+
+        Promotion::create([
+            'code' => strtoupper($request->code),
+            'name' => $request->code, // Fallback name to code
+            'description' => $request->description,
+            'type' => $request->type,
+            'value' => $request->value,
+            'min_purchase' => $request->min_purchase,
+            'usage_limit' => $request->usage_limit,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'is_active' => $isActive,
+            // 'applicable_products' etc if needed
+        ]);
+
+        return redirect()->route('admin.promotions')->with('success', 'Promotion created successfully');
     }
+    
+    // Duplicates removed
+
     
     public function updatePromotionStatus(Request $request, $id)
     {

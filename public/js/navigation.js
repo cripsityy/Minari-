@@ -1,12 +1,12 @@
 
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     function initializeSidebar() {
         const sidebarItems = document.querySelectorAll('.sidebar-item');
         if (sidebarItems.length > 0) {
             const currentPath = window.location.pathname;
             let foundActive = false;
-            
+
             sidebarItems.forEach(item => {
                 const href = item.getAttribute('href');
                 if (href && currentPath.includes(href)) {
@@ -16,13 +16,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     item.classList.remove('active');
                 }
             });
-            
+
             if (!foundActive && sidebarItems.length > 0) {
                 sidebarItems[0].classList.add('active');
             }
-            
+
             sidebarItems.forEach(item => {
-                item.addEventListener('click', function(e) {
+                item.addEventListener('click', function (e) {
                     if (this.getAttribute('href') === '#') {
                         e.preventDefault();
                     }
@@ -30,65 +30,65 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
-    
+
     function initializeSearch() {
         const searchBoxes = document.querySelectorAll('.search-box');
         searchBoxes.forEach(box => {
-            box.addEventListener('keypress', function(e) {
+            box.addEventListener('keypress', function (e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     performSearch(this.value);
                 }
             });
-            
-            box.addEventListener('input', function() {
+
+            box.addEventListener('input', function () {
                 if (this.value.length > 0) {
                     console.log('Searching for:', this.value);
                 }
             });
         });
     }
-    
+
     function performSearch(query) {
         if (query.trim() !== '') {
             alert('Search functionality would search for: ' + query);
         }
     }
-    
+
     function initializeFilters() {
         const filterButtons = document.querySelectorAll('.filter-btn');
         filterButtons.forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 const container = this.closest('.filter-section') || this.closest('.d-flex');
                 if (container) {
                     const allButtons = container.querySelectorAll('.filter-btn');
                     allButtons.forEach(btn => btn.classList.remove('active'));
                 }
-                
+
                 this.classList.add('active');
-                
+
                 const filterValue = this.textContent || this.getAttribute('data-filter');
                 console.log('Filter applied:', filterValue);
             });
         });
     }
-    
+
     function initializeActionIcons() {
         const actionIcons = document.querySelectorAll('.action-icons i, .action-icons a');
         actionIcons.forEach(icon => {
-            icon.addEventListener('click', function(e) {
-                const action = this.getAttribute('title') || 
-                               this.classList.contains('fa-edit') ? 'Edit' : 
-                               this.classList.contains('fa-trash') ? 'Delete' : 
-                               this.classList.contains('fa-eye') ? 'View' : 'Action';
-                
+            icon.addEventListener('click', function (e) {
+                const action = this.getAttribute('title') ||
+                    this.classList.contains('fa-edit') ? 'Edit' :
+                    this.classList.contains('fa-trash') ? 'Delete' :
+                        this.classList.contains('fa-eye') ? 'View' : 'Action';
+
                 console.log(`${action} action triggered`);
-                
+
                 if (action === 'Delete' || this.classList.contains('fa-trash')) {
                     e.preventDefault();
                     const row = this.closest('tr');
                     const itemName = row ? row.querySelector('td:nth-child(2)').textContent : 'item';
-                    
+
                     if (confirm(`Are you sure you want to delete "${itemName}"?`)) {
                         alert(`"${itemName}" deleted successfully!`);
                         if (row) {
@@ -104,15 +104,15 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-    
+
     function initializeForms() {
         const forms = document.querySelectorAll('form');
         forms.forEach(form => {
-            form.addEventListener('submit', function(e) {
+            form.addEventListener('submit', function (e) {
                 if (!this.checkValidity()) {
                     e.preventDefault();
                     e.stopPropagation();
-                    
+
                     const invalidFields = this.querySelectorAll(':invalid');
                     if (invalidFields.length > 0) {
                         invalidFields[0].focus();
@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         const originalText = submitBtn.innerHTML;
                         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
                         submitBtn.disabled = true;
-                        
+
                         setTimeout(() => {
                             submitBtn.innerHTML = originalText;
                             submitBtn.disabled = false;
@@ -133,14 +133,14 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-    
+
     function initializeNotifications() {
         const messageIcons = document.querySelectorAll('.fa-envelope');
         messageIcons.forEach(icon => {
-            icon.addEventListener('click', function() {
-                const badge = this.querySelector('.notification-badge') || 
-                              document.querySelector('.notification-count');
-                
+            icon.addEventListener('click', function () {
+                const badge = this.querySelector('.notification-badge') ||
+                    document.querySelector('.notification-count');
+
                 if (badge) {
                     const count = parseInt(badge.textContent) || 0;
                     if (count > 0) {
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-    
+
     function initializeResponsive() {
         const sidebar = document.querySelector('.sidebar');
         if (sidebar && window.innerWidth <= 768) {
@@ -165,10 +165,10 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
             toggleBtn.className = 'sidebar-toggle btn btn-light position-fixed';
             toggleBtn.style.cssText = 'top: 70px; left: 15px; z-index: 1001; border-radius: 50%; width: 40px; height: 40px;';
-            
+
             document.body.appendChild(toggleBtn);
-            
-            toggleBtn.addEventListener('click', function() {
+
+            toggleBtn.addEventListener('click', function () {
                 if (sidebar.style.display === 'none') {
                     sidebar.style.display = 'block';
                     sidebar.style.position = 'fixed';
@@ -183,22 +183,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     sidebar.style.display = 'none';
                 }
             });
-            
-            document.addEventListener('click', function(e) {
-                if (window.innerWidth <= 768 && 
-                    !sidebar.contains(e.target) && 
-                    !toggleBtn.contains(e.target) && 
+
+            document.addEventListener('click', function (e) {
+                if (window.innerWidth <= 768 &&
+                    !sidebar.contains(e.target) &&
+                    !toggleBtn.contains(e.target) &&
                     sidebar.style.display === 'block') {
                     sidebar.style.display = 'none';
                 }
             });
         }
     }
-    
+
     function initializePrint() {
         const printButtons = document.querySelectorAll('.btn-cancel[onclick*="print"], .btn-cancel:contains("Print")');
         printButtons.forEach(btn => {
-            btn.addEventListener('click', function(e) {
+            btn.addEventListener('click', function (e) {
                 if (this.getAttribute('onclick') && this.getAttribute('onclick').includes('print')) {
                     return;
                 }
@@ -207,7 +207,22 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-    
+
+    function initializeScroll() {
+        const navbar = document.querySelector('.navbar-custom');
+        if (navbar) {
+            window.addEventListener('scroll', function () {
+                if (window.scrollY > 50) {
+                    navbar.style.background = 'transparent';
+                    navbar.style.boxShadow = 'none';
+                } else {
+                    navbar.style.background = '#FFF6F0';
+                    navbar.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+                }
+            });
+        }
+    }
+
     function initializeAll() {
         initializeSidebar();
         initializeSearch();
@@ -217,21 +232,22 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeNotifications();
         initializeResponsive();
         initializePrint();
+        initializeScroll();
     }
-    
+
     initializeAll();
-    
+
     let resizeTimer;
-    window.addEventListener('resize', function() {
+    window.addEventListener('resize', function () {
         clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(function() {
+        resizeTimer = setTimeout(function () {
             initializeResponsive();
         }, 250);
     });
 });
 
 window.adminHelpers = {
-    showNotification: function(message, type = 'success') {
+    showNotification: function (message, type = 'success') {
         const existingNotifications = document.querySelectorAll('.custom-notification');
         existingNotifications.forEach(notification => notification.remove());
 
@@ -247,14 +263,14 @@ window.adminHelpers = {
             border: none;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         `;
-        
+
         const icons = {
             success: 'fa-check-circle',
             error: 'fa-exclamation-circle',
             warning: 'fa-exclamation-triangle',
             info: 'fa-info-circle'
         };
-        
+
         notification.innerHTML = `
             <div class="d-flex align-items-center">
                 <i class="fas ${icons[type] || icons.info} me-2"></i>
@@ -262,17 +278,17 @@ window.adminHelpers = {
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
-        
+
         document.body.appendChild(notification);
-        
+
         setTimeout(() => {
             if (notification.parentNode) {
                 notification.parentNode.removeChild(notification);
             }
         }, 4000);
     },
-    
-    confirmAction: function(message, callback) {
+
+    confirmAction: function (message, callback) {
         if (confirm(message)) {
             if (typeof callback === 'function') {
                 callback();
@@ -281,22 +297,22 @@ window.adminHelpers = {
         }
         return false;
     },
-    
-    showLoading: function(selector, text = 'Loading...') {
-        const element = typeof selector === 'string' ? 
+
+    showLoading: function (selector, text = 'Loading...') {
+        const element = typeof selector === 'string' ?
             document.querySelector(selector) : selector;
-        
+
         if (element) {
             element.dataset.originalHTML = element.innerHTML;
             element.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${text}`;
             element.disabled = true;
         }
     },
-    
-    hideLoading: function(selector) {
-        const element = typeof selector === 'string' ? 
+
+    hideLoading: function (selector) {
+        const element = typeof selector === 'string' ?
             document.querySelector(selector) : selector;
-        
+
         if (element && element.dataset.originalHTML) {
             element.innerHTML = element.dataset.originalHTML;
             element.disabled = false;

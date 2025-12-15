@@ -10,20 +10,7 @@
         <link rel="stylesheet" href="{{ asset('css/style1.css') }}">
     </head>
     <body>
-        <nav class="navbar-custom fixed-top">
-            <div class="container-fluid">
-                <div class="d-flex justify-content-between align-items-center w-100 px-5">
-                    <div class="logo">
-                        <img src="{{ asset('images/logofix.png') }}" alt="Logo MINARI" style="height: 40px; width: auto;">
-                    </div>
-                    <div class="navbar-icons">
-                        <img src="{{ asset('images/notification.png') }}" alt="Favorite" width="24" height="24"></a>
-                        <img src="{{ asset('images/searchnav.png') }}" alt="Search" width="24" height="24"></a>
-                        <img src="{{ asset('images/email.png') }}" alt="Cart" width="24" height="24"></a>
-                    </div>
-                </div>
-            </div>
-        </nav>
+        @include('admin.partials.navbar')
 
         <div class="sidebar">
             <a href="{{ route('admin.dashboard') }}" class="sidebar-item">
@@ -65,19 +52,27 @@
             </div>
 
             <div class="form-container">
-                <form id="addCategoryForm">
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                <form id="addCategoryForm" action="{{ route('admin.categories.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
                     <div class="row">
                         <div class="col-md-8">
                             <div class="form-group">
                                 <label for="categoryName" class="form-label">Category Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="categoryName" placeholder="Enter category name" required>
-                                <div class="validation-message error" id="nameError"></div>
+                                <input type="text" name="name" class="form-control" id="categoryName" placeholder="Enter category name" required>
                             </div>
                             
                             <div class="form-group">
                                 <label for="categoryDescription" class="form-label">Description</label>
-                                <textarea class="form-control" id="categoryDescription" rows="4" placeholder="Enter category description"></textarea>
-                                <div class="validation-message" id="descriptionError"></div>
+                                <textarea name="description" class="form-control" id="categoryDescription" rows="4" placeholder="Enter category description"></textarea>
                             </div>
                             
                             <div class="form-group">
@@ -105,11 +100,10 @@
                                     <i class="fas fa-cloud-upload-alt"></i>
                                     <p>Click to upload category image</p>
                                     <small>JPG, PNG, or GIF (Max 2MB)</small>
-                                    <input type="file" id="categoryImage" class="file-input" accept="image/*" required>
+                                    <input type="file" name="image" id="categoryImage" class="file-input" accept="image/*" required onchange="previewImage(this)">
                                 </div>
                                 
-                                <img id="imagePreview" class="image-preview" src="#" alt="Preview">
-                                <div class="validation-message error" id="imageError"></div>
+                                <img id="imagePreview" class="image-preview" src="#" alt="Preview" style="display:none; max-width: 100%; margin-top: 10px;">
                             </div>
                         </div>
                     </div>
@@ -150,5 +144,17 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="{{ asset('js/addcategoriadmin.js') }}"></script>
         <script src="{{ asset('js/navigation.js') }}"></script>
+        <script>
+            function previewImage(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('imagePreview').src = e.target.result;
+                        document.getElementById('imagePreview').style.display = 'block';
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+        </script>
     </body>
 </html>

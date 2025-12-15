@@ -8,10 +8,10 @@ const Role = {
 // ====== Templates ======
 function tplGuest() {
   return `
-  <nav class="navbar navbar-expand-lg fixed-top py-3" style="background-color: #FFF6F0 !important; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
+  <nav class="navbar navbar-expand-lg fixed-top py-2" id="mainNavbar" style="background-color: #FFF6F0; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); transition: all 0.3s ease;">
     <div class="container">
       <a class="navbar-brand" href="/">
-        <img src="/images/logofix.png" alt="MINARI Logo" width="100" height="auto" class="me-2">
+        <img src="/images/logofix.png" alt="MINARI Logo" height="40" width="auto" class="me-2">
       </a>
 
       <div class="d-flex align-items-center ms-auto gap-3">
@@ -37,10 +37,10 @@ function tplGuest() {
 
 function tplUser() {
   return `
-  <nav class="navbar navbar-expand-lg fixed-top py-3" style="background-color: #FFF6F0 !important; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
+  <nav class="navbar navbar-expand-lg fixed-top py-2" id="mainNavbar" style="background-color: #FFF6F0; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); transition: all 0.3s ease;">
     <div class="container">
       <a class="navbar-brand" href="/">
-        <img src="/images/logofix.png" alt="MINARI Logo" width="100" height="auto" class="me-2">
+        <img src="/images/logofix.png" alt="MINARI Logo" height="40" width="auto" class="me-2">
       </a>
 
       <div class="d-flex align-items-center ms-auto gap-3">
@@ -68,37 +68,23 @@ function tplUser() {
   </div>`;
 }
 
-function tplAdmin() {
-  return `
-  <nav class="navbar navbar-expand-lg fixed-top py-3" style="background-color: #FFF6F0 !important; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
-    <div class="container">
-      <a class="navbar-brand" href="/">
-        <img src="/images/logofix.png" alt="MINARI Logo" width="100" height="auto" class="me-2">
-      </a>
-
-      <div class="d-flex align-items-center ms-auto gap-3">
-        <button id="accBtn" class="btn p-0 border-0" style="background: transparent !important; cursor: pointer;">
-          <img src="/images/akun.png" alt="Admin" width="24" height="24">
-        </button>
-        <a href="/menu"><img src="/images/searchnav.png" alt="Search" width="24" height="24"></a>
-        <a href="/admin/dashboard"><img src="/images/add.png" alt="dashboard" width="24" height="24"></a>
-        <a href="/menu"><img src="/images/menu.png" alt="Menu" width="24" height="24"></a>
-      </div>
-    </div>
-  </nav>
-
-  <div id="accMini" class="accmini" style="display: none; position: fixed; z-index: 9999; background: #FFF6F0; border: 1px solid #ead9d2; border-radius: 12px; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15); padding: 14px 12px 12px; width: 220px;">
-    <div class="accmini__row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-      <img src="/images/akun.png" width="16" height="16" class="accmini__icon" alt="">
-      <a class="accmini__link" href="/admin/account" style="font-weight: 500; color: #1f1f1f; text-decoration: none;">Admin</a>
-    </div>
-    <div class="accmini__row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-      <img src="/images/add.png" width="16" height="16" class="accmini__icon" alt="">
-      <a class="accmini__link" href="/admin/dashboard" style="font-weight: 500; color: #1f1f1f; text-decoration: none;">Dashboard</a>
-    </div>
-    <button id="logoutBtn" class="accmini__btn" style="display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 36px; background-color: #ffffff; border: 1.5px solid #d9c8c1; border-radius: 10px; color: #1e1e1e; font-weight: 600; text-decoration: none; font-size: 14px; cursor: pointer; transition: all 0.25s ease; margin-top: 8px;">Log out</button>
-  </div>`;
+// Scroll Effect
+function initializeScrollEffect() {
+  const navbar = document.getElementById('mainNavbar');
+  if (navbar) {
+    window.addEventListener('scroll', function () {
+      if (window.scrollY > 50) {
+        navbar.style.backgroundColor = 'transparent';
+        navbar.style.boxShadow = 'none';
+      } else {
+        navbar.style.backgroundColor = '#FFF6F0';
+        navbar.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.15)';
+      }
+    });
+  }
 }
+
+
 
 // ====== Main Render Function ======
 function renderNavbar() {
@@ -115,13 +101,14 @@ function renderNavbar() {
 
   // Clear and render template based on role
   mount.innerHTML = '';
-  if (role === Role.ADMIN) {
-    mount.innerHTML = tplAdmin();
-  } else if (role === Role.USER) {
+  if (role === Role.USER) {
     mount.innerHTML = tplUser();
   } else {
     mount.innerHTML = tplGuest();
   }
+
+  // Initialize scroll effect
+  initializeScrollEffect();
 
   // Setup event listeners
   setTimeout(attachEventListeners, 100);
