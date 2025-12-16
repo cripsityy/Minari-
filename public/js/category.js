@@ -46,9 +46,9 @@ function addToWishlist(productId, buttonElement) {
     buttonElement.classList.toggle('active');
     const img = buttonElement.querySelector('img');
     if (img && buttonElement.classList.contains('active')) {
-      img.src = "{{ asset('images/whislist-active.png') }}";
+      img.src = "/images/whislist-active.png";
     } else if (img) {
-      img.src = "{{ asset('images/whislist.png') }}";
+      img.src = "/images/whislist.png";
     }
   }
 
@@ -77,7 +77,7 @@ function addToWishlist(productId, buttonElement) {
           if (buttonElement) {
             buttonElement.classList.toggle('active');
             const img = buttonElement.querySelector('img');
-            if (img) img.src = "{{ asset('images/whislist.png') }}";
+            if (img) img.src = "/images/whislist.png";
           }
         }
       }
@@ -89,7 +89,7 @@ function addToWishlist(productId, buttonElement) {
       if (buttonElement) {
         buttonElement.classList.toggle('active');
         const img = buttonElement.querySelector('img');
-        if (img) img.src = "{{ asset('images/whislist.png') }}";
+        if (img) img.src = "/images/whislist.png";
       }
     });
 }
@@ -109,7 +109,7 @@ function removeFromWishlist(productId, buttonElement, productName) {
         if (buttonElement) {
           buttonElement.classList.remove('active');
           const img = buttonElement.querySelector('img');
-          if (img) img.src = "{{ asset('images/whislist.png') }}";
+          if (img) img.src = "/images/whislist.png";
         }
       }
     })
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!this.classList.contains('active')) {
         const img = this.querySelector('img');
         if (img) {
-          img.src = "{{ asset('images/whislist-hover.png') }}";
+          img.src = "/images/whislist-hover.png";
         }
       }
     });
@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!this.classList.contains('active')) {
         const img = this.querySelector('img');
         if (img) {
-          img.src = "{{ asset('images/whislist.png') }}";
+          img.src = "/images/whislist.png";
         }
       }
     });

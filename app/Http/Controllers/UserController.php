@@ -450,6 +450,16 @@ class UserController extends Controller
         $tax = 0; // No tax for now
         $total = $subtotal + $shippingCost + $tax - $discount;
 
+        // Determine payment status with explicit logic
+        $paymentMethod = trim($request->payment_method);
+        $paymentStatus = ($paymentMethod === 'cash_on_delivery') ? 'pending' : 'paid';
+
+        \Illuminate\Support\Facades\Log::info('Order Creation', [
+            'method_raw' => $request->payment_method,
+            'method_processed' => $paymentMethod,
+            'status_assigned' => $paymentStatus
+        ]);
+
         // Create order
         $order = Order::create([
             'order_number' => Order::generateOrderNumber(),
@@ -467,18 +477,8 @@ class UserController extends Controller
             'tax' => $tax,
             'total' => max(0, $total),
             'payment_method' => $request->payment_method,
-        // Determine payment status with explicit logic
-        $paymentMethod = trim($request->payment_method);
-        $paymentStatus = ($paymentMethod === 'cash_on_delivery') ? 'pending' : 'paid';
-
-        \Illuminate\Support\Facades\Log::info('Order Creation', [
-            'method_raw' => $request->payment_method,
-            'method_processed' => $paymentMethod,
-            'status_assigned' => $paymentStatus
-        ]);
-
-        'payment_status' => $paymentStatus,
-        'order_status' => 'pending'
+            'payment_status' => $paymentStatus,
+            'order_status' => 'pending'
         ]);
 
         // Create order items
