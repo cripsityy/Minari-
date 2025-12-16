@@ -205,29 +205,7 @@ class UserController extends Controller
     {
         $orders = auth()->user()->orders()->latest()->get();
     
-        // Jika belum ada database, buat data dummy
-        if ($orders->isEmpty()) {
-            $orders = collect([
-                (object)[
-                    'id' => '0103',
-                    'order_number' => '#0103',
-                    'date' => '31 Oct 2025',
-                    'status' => 'Sent',
-                    'items' => [
-                        (object)[
-                            'product_name' => 'Soft green cardigan',
-                            'quantity' => 1,
-                            'size' => 'M',
-                            'price' => 'Rp. 250.000,00'
-                        ]
-                    ],
-                    'delivery' => 'Home',
-                    'payment_method' => 'Cash on Delivery',
-                    'total' => 'Rp. 250.000,00'
-                ],
-                // ... tambahkan order lainnya
-            ]);
-        }
+        // Dummy data removed as per request
         
         return view('user.orderhistory', compact('orders'));
     }
@@ -489,8 +467,18 @@ class UserController extends Controller
             'tax' => $tax,
             'total' => max(0, $total),
             'payment_method' => $request->payment_method,
-            'payment_status' => 'pending',
-            'order_status' => 'pending'
+        // Determine payment status with explicit logic
+        $paymentMethod = trim($request->payment_method);
+        $paymentStatus = ($paymentMethod === 'cash_on_delivery') ? 'pending' : 'paid';
+
+        \Illuminate\Support\Facades\Log::info('Order Creation', [
+            'method_raw' => $request->payment_method,
+            'method_processed' => $paymentMethod,
+            'status_assigned' => $paymentStatus
+        ]);
+
+        'payment_status' => $paymentStatus,
+        'order_status' => 'pending'
         ]);
 
         // Create order items
@@ -621,28 +609,28 @@ class UserController extends Controller
             ], 400);
         }
         
-        // Normalize size and color to empty string if null
-        $size = $request->size ?? '';
-        $color = $request->color ?? '';
-        
-        // Check if item already in cart (handle both null and empty string)
-        $cartItem = $user->carts()
-            ->where('product_id', $request->product_id)
-            ->where(function($query) use ($size) {
-                if ($size === '') {
-                    $query->whereNull('size')->orWhere('size', '');
-                } else {
-                    $query->where('size', $size);
-                }
-            })
-            ->where(function($query) use ($color) {
-                if ($color === '') {
-                    $query->whereNull('color')->orWhere('color', '');
-                } else {
-                    $query->where('color', $color);
-                }
-            })
-            ->first();
+        // Normalize size and color to empty string if null, and trim whitespace
+    $size = trim($request->size ?? '');
+    $color = trim($request->color ?? '');
+    
+    // Check if item already in cart (handle both null and empty string)
+    $cartItem = $user->carts()
+        ->where('product_id', $request->product_id)
+        ->where(function($query) use ($size) {
+            if ($size === '') {
+                $query->whereNull('size')->orWhere('size', '');
+            } else {
+                $query->where('size', $size);
+            }
+        })
+        ->where(function($query) use ($color) {
+            if ($color === '') {
+                $query->whereNull('color')->orWhere('color', '');
+            } else {
+                $query->where('color', $color);
+            }
+        })
+        ->first();
         
         if ($cartItem) {
             $cartItem->quantity += $request->quantity;

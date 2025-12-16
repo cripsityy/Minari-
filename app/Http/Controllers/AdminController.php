@@ -107,13 +107,9 @@ class AdminController extends Controller
         $product->discount_price = $request->discount_price;
         $product->stock = $request->stock;
         $product->description = $request->description;
-        // Determine size based on category
-        $category = Category::find($request->category_id);
-        if ($category && stripos($category->name, 'Accessories') !== false) {
-            $product->size = '';
-        } else {
-            $product->size = 'All Size';
-        }
+        // Determine size logic removed as column is dropped
+        // $category = Category::find($request->category_id);
+        // ...
         $product->color = $request->color;
         $product->status = $request->status;
         
@@ -172,13 +168,9 @@ class AdminController extends Controller
         $product->discount_price = $request->discount_price;
         $product->stock = $request->stock;
         $product->description = $request->description;
-        // Determine size based on category
-        $category = Category::find($request->category_id);
-        if ($category && stripos($category->name, 'Accessories') !== false) {
-            $product->size = '';
-        } else {
-            $product->size = 'All Size';
-        }
+        // Determine size logic removed as column is dropped
+        // $category = Category::find($request->category_id);
+        // ...
         $product->color = $request->color;
         $product->material = $request->material;
         $product->status = $request->status;

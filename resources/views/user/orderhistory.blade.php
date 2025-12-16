@@ -53,7 +53,7 @@
                             @foreach($order->items as $item)
                                 <div class="product-info mb-3 border-bottom pb-3">
                                     <div class="product-image">
-                                        <img src="{{ $item->product_image ?? ($item->product->image ? asset('storage/'.$item->product->image) : asset('images/default-product.jpg')) }}" alt="{{ $item->product_name }}">
+                                        <img src="{{ $item->product_image ?? (optional($item->product ?? null)->image ? asset('storage/'.optional($item->product)->image) : asset('images/default-product.jpg')) }}" alt="{{ $item->product_name }}">
                                     </div>
                                     <div class="product-details w-100">
                                         <div class="d-flex justify-content-between align-items-start">
@@ -108,49 +108,14 @@
                     </div>
                 @endforeach
             @else
-                {{-- Data statis jika tidak ada data dari controller --}}
-                <!-- ORDER 1 STATIS -->
-                <div class="order-card fade-in">
-                    <div class="order-header">
-                        <div class="order-info">
-                            <h3>Order #0103</h3>
-                            <span class="order-date">31 Oct 2025</span>
-                        </div>
-                        <div class="order-status status-sent">
-                            <span class="material-icons">local_shipping</span> Sent
-                        </div>
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <span class="material-icons" style="font-size: 64px; color: #ccc;">shopping_bag</span>
                     </div>
-
-                    <div class="order-content">
-                        <div class="product-info">
-                            <div class="product-image">
-                                <img src="{{ asset('images/cardigangreen.png') }}" alt="Soft green cardigan">
-                            </div>
-                            <div class="product-details">
-                                <h4>Soft green cardigan</h4>
-                                <p class="product-specs">Qty: 1 • Size: M</p>
-                                <p class="product-price">Rp. 250.000,00</p>
-                            </div>
-                        </div>
-
-                        <div class="order-summary">
-                            <div class="delivery-info">
-                                <span class="material-icons">location_on</span> Delivered to: Home
-                            </div>
-                            <div class="payment-info">
-                                <span class="material-icons">payments</span> Cash on Delivery
-                            </div>
-                            <div class="total-price">
-                                Total: Rp. 250.000,00
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="order-actions">
-                        <a href="#" class="btn-view-details">View Details</a>
-                    </div>
+                    <h3>No orders yet</h3>
+                    <p class="text-muted">You haven't placed any orders yet.</p>
+                    <a href="{{ route('home') }}" class="btn btn-dark mt-3">Start Shopping</a>
                 </div>
-                <!-- ... tambahkan order statis lainnya ... -->
             @endif
         </div>
     </div>

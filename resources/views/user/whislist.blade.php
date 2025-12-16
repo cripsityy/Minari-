@@ -35,16 +35,6 @@
                 <div>
                     <span id="resultCount">Results: 0 product</span>
                 </div>
-                <div class="wish-sort">
-                    <span>Sort by</span>
-                    <select id="sortSelect" class="form-select form-select-sm wish-select">
-                        <option value="recent">Most recent</option>
-                        <option value="price-asc">Price ↑</option>
-                        <option value="price-desc">Price ↓</option>
-                        <option value="name-asc">Name A–Z</option>
-                        <option value="name-desc">Name Z–A</option>
-                    </select>
-                </div>
             </div>
             
             <hr class="wish-sep">

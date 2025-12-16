@@ -20,7 +20,6 @@ class Product extends Model
         'discount_price',
         'stock',
         'sku',
-        'size',
         'color',
         'material',
         'image',

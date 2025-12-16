@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // === Update quantity via API
     async function updateQuantity(itemId, quantity, isGuest) {
-        const endpoint = isGuest ? `/api/guest-cart/${itemId}` : `/api/cart/${itemId}`;
+        const endpoint = isGuest ? `/api/guest/cart/${itemId}` : `/api/cart/${itemId}`;
         try {
             const response = await fetch(endpoint, {
                 method: 'PATCH',
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function removeItem(itemId, isGuest, rowElement) {
         if (!confirm('Are you sure you want to remove this item?')) return;
 
-        const endpoint = isGuest ? `/api/guest-cart/${itemId}` : `/api/cart/${itemId}`;
+        const endpoint = isGuest ? `/api/guest/cart/${itemId}` : `/api/cart/${itemId}`;
         try {
             const response = await fetch(endpoint, {
                 method: 'DELETE',

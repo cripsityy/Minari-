@@ -24,41 +24,49 @@ body {
     transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
-.navbar-custom.transparent {
+.navbar-custom.transparent,
+.navbar-custom.scrolled {
     background: transparent !important;
     box-shadow: none !important;
-    backdrop-filter: blur(2px);
 }
 
 /* Floating / Transparent Mode Refinements */
 .navbar-custom.transparent .logo a,
 .navbar-custom.transparent .navbar-icons i,
 .navbar-custom.transparent .navbar-icons img,
-.navbar-custom.transparent .navbar-icons button i {
+.navbar-custom.transparent .navbar-icons button i,
+.navbar-custom.scrolled .logo a,
+.navbar-custom.scrolled .navbar-icons i,
+.navbar-custom.scrolled .navbar-icons img,
+.navbar-custom.scrolled .navbar-icons button i {
     color: black !important;
     text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
     filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
 }
 
-.navbar-custom.transparent .input-group {
+.navbar-custom.transparent .input-group,
+.navbar-custom.scrolled .input-group {
     background: transparent;
     box-shadow: none;
 }
 
-.navbar-custom.transparent .input-group .form-control {
+.navbar-custom.transparent .input-group .form-control,
+.navbar-custom.scrolled .input-group .form-control {
     width: 0;
     padding: 0;
     border: none;
     background: transparent;
 }
 
-.navbar-custom.transparent .input-group-text {
+.navbar-custom.transparent .input-group-text,
+.navbar-custom.scrolled .input-group-text {
     background: transparent !important;
     border: none !important;
 }
 
-.navbar-custom.transparent .input-group-text img {
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
+.navbar-custom.transparent .input-group-text img,
+.navbar-custom.scrolled .input-group-text img {
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0));
 }
 
 .logo {

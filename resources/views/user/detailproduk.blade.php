@@ -107,7 +107,7 @@
                     }
                     
                     // Auto-assign size from product data
-                    const selectedSize = "{{ $product->size }}";
+                    const selectedSize = "";
                     
                     const productId = {{ $product->id }};
                     const productName = "{{ $product->name }}";
