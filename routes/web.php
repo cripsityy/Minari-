@@ -45,6 +45,7 @@ Route::get('/logout', [AuthController::class, 'logoutGet'])->name('logout.get');
 Route::get('/wishlist', [UserController::class, 'wishlist'])->name('wishlist');
 Route::get('/cart', [UserController::class, 'cart'])->name('cart');
 Route::get('/menu', [UserController::class, 'menu'])->name('menu');
+Route::get('/search', [UserController::class, 'search'])->name('search');
 
 /*
 |--------------------------------------------------------------------------
@@ -67,12 +68,14 @@ Route::middleware(['auth', 'checkRole:user'])->group(function () {
 
     Route::get('/account', [UserController::class, 'account'])->name('user.account');
 
+    // Shipping Address
+    Route::get('/shipping-address', [UserController::class, 'shippingAddress'])->name('user.shipping.address');
+    Route::post('/shipping-address', [UserController::class, 'storeShippingAddress'])->name('shipping.address.store');
+
     Route::get('/payment', [UserController::class, 'payment'])->name('payment');
     Route::get('/payment-method', [UserController::class, 'paymentMethod'])->name('payment.method');
     
-    // Shipping Address
-    Route::get('/shipping-address', [UserController::class, 'shippingAddress'])->name('shipping.address');
-    Route::post('/shipping-address', [UserController::class, 'storeShippingAddress'])->name('shipping.address.store');
+
 
     Route::post('/place-order', [UserController::class, 'placeOrder'])->name('place.order');
     Route::get('/order-confirm', [UserController::class, 'orderConfirm'])->name('order.confirm');
@@ -227,7 +230,7 @@ Route::prefix('admin')
         */
         Route::get('/orders', [AdminController::class, 'orders'])->name('admin.orders');
         Route::get('/orders/{id}', [AdminController::class, 'orderDetail'])->name('admin.orders.detail');
-        Route::get('/orders/{id}', [AdminController::class, 'orderDetail'])->name('admin.orders.detail');
+
         Route::post('/orders/{id}/status', [AdminController::class, 'updateOrderStatus'])->name('admin.orders.status');
 
         /*
@@ -245,6 +248,8 @@ Route::prefix('admin')
         Route::get('/promotions', [AdminController::class, 'promotions'])->name('admin.promotions');
         Route::get('/promotions/add', [AdminController::class, 'addPromotion'])->name('admin.promotions.add');
         Route::post('/promotions', [AdminController::class, 'storePromotion'])->name('admin.promotions.store');
+        Route::get('/promotions/{id}/edit', [AdminController::class, 'editPromotion'])->name('admin.promotions.edit');
+        Route::put('/promotions/{id}', [AdminController::class, 'updatePromotion'])->name('admin.promotions.update');
         Route::post('/promotions/{id}/status', [AdminController::class, 'updatePromotionStatus'])->name('admin.promotions.status');
         Route::delete('/promotions/{id}', [AdminController::class, 'deletePromotion'])->name('admin.promotions.delete');
     });

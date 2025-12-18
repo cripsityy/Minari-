@@ -20,7 +20,7 @@
         </a>
         <a href="{{ route('admin.products') }}" class="sidebar-item {{ request()->routeIs('admin.products*') ? 'active' : '' }}">
             <i class="fas fa-box"></i>
-            <span>Product</span>
+            <span>Products</span>
         </a>
         <a href="{{ route('admin.categories') }}" class="sidebar-item {{ request()->routeIs('admin.categories*') ? 'active' : '' }}">
             <i class="fas fa-layer-group"></i>
@@ -32,7 +32,7 @@
         </a>
         <a href="{{ route('admin.reviews') }}" class="sidebar-item {{ request()->routeIs('admin.reviews*') ? 'active' : '' }}">
             <i class="fas fa-thumbs-up"></i>
-            <span>Review</span>
+            <span>Reviews</span>
         </a>
         <a href="{{ route('admin.promotions') }}" class="sidebar-item {{ request()->routeIs('admin.promotions*') ? 'active' : '' }}">
             <i class="fas fa-ad"></i>
@@ -41,19 +41,7 @@
     </div>
 
     <div class="main-content">
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+        @include('partials.toast-notifications')
 
         @yield('content')
     </div>

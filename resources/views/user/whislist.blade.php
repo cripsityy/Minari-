@@ -7,10 +7,12 @@
     <title>MINARI | Wishlist</title>
     @include('partials.navbar-scripts')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/whislist.css') }}">
     <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
 </head>
 <body>
+    @include('partials.toast-notifications')
     <header id="navMount"></header>
     
     <main id="gate" class="gate-wrap" style="display: none;">

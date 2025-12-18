@@ -68,11 +68,13 @@ body {
 .card-item img {
   width: 140px;
   height: 140px;
-  object-fit: contain; /* biar semua gambar proporsional */
+  object-fit: cover;
+  /* biar semua gambar proporsional */
 }
 
 .card-item h6 {
-  font-size: 18px; /* lebih besar dari sebelumnya */
+  font-size: 18px;
+  /* lebih besar dari sebelumnya */
   font-weight: 600;
   color: #3a2b21;
   max-width: 150px;

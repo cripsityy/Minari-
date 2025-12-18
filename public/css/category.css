@@ -20,36 +20,31 @@ body {
   position: relative;
   overflow: hidden;
   background-color: #fff;
-  /* biar transisi antar bagian rapi */
+  height: 60vh;
+  /* Tinggi hero yang pas */
+  min-height: 400px;
+  background-attachment: fixed;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.hero__img {
-  display: block;
-  /* hilangkan whitespace default inline-img */
-  width: 100%;
-  height: 1000px;
-  /* <- kunci: biar tidak terpotong */
-  /* optional: batasi supaya tidak terlalu tinggi di layar besar */
-  object-fit: contain;
-  /* aman dipakai, walau height:auto sudah cukup */
-  background: #fff;
-
-}
+/* .hero__img removed as we use background-image now */
 
 .hero__title {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  /* benar-benar di tengah */
+  /* position absolute not needed if using flex on parent, but let's keep it robust */
+  z-index: 2;
   text-align: center;
   font-weight: 800;
   font-size: clamp(32px, 6vw, 64px);
-  /* gedein, responsif */
   letter-spacing: .5px;
   color: #FBAF99;
   text-shadow: 0 3px 12px rgba(0, 0, 0, .45);
   padding: 0 .5rem;
+  margin: 0;
 }
 
 .p-card {
@@ -162,26 +157,28 @@ body {
 }
 
 .p-mini-actions button {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
-  border: 0px solid #e6e6e6;
+  border: 1px solid #eee;
   background: #fff;
-  border-radius: 0;
-  /* kotak */
+  border-radius: 50%;
+  /* Circle shape looks better */
   padding: 0;
+  color: #333;
+  transition: all 0.2s ease;
 }
 
 .p-mini-actions button:hover {
-  background: #fafafa;
+  background: #FBAF99;
+  color: #fff;
+  border-color: #FBAF99;
+  transform: scale(1.05);
 }
 
-.p-mini-actions img {
-  width: 16px;
-  height: 16px;
-  object-fit: contain;
-  display: block;
+.p-mini-actions i {
+  font-size: 14px;
 }
 
 /* (opsional) state aktif wishlist */

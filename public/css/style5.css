@@ -18,7 +18,7 @@ body {
 .navbar-custom {
     background: #FFF6F0;
     padding: 0.8rem 0;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     height: 50px;
     position: fixed;
@@ -35,7 +35,7 @@ body {
 .navbar-custom.transparent .logo,
 .navbar-custom.transparent .navbar-icons i {
     color: black;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .logo {
@@ -116,7 +116,7 @@ body {
     padding: 20px;
     background: #FFFFFF;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .product-image {
@@ -275,7 +275,7 @@ body {
     display: flex;
     align-items: center;
     z-index: 1000;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .checkout-content {
@@ -283,9 +283,8 @@ body {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0;
 }
 
 .total-price {
@@ -296,9 +295,9 @@ body {
 .total-amount {
     font-family: 'Poppins';
     font-weight: 500;
-    font-size: 18px;
+    font-size: 24px;
     line-height: 1.3;
-    color: #FFF6F0;
+    color: #000000;
 }
 
 .checkout-btn {
@@ -320,7 +319,7 @@ body {
 .checkout-btn:hover {
     background: #FFE5DD;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .checkout-btn:disabled {
@@ -382,7 +381,7 @@ body {
 .payment-method-item:hover {
     border-color: #DCA594;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .address-item.selected,
@@ -522,7 +521,7 @@ body {
 .back-to-collection-btn:hover {
     background: #FFE5DD;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 @keyframes bounceIn {
@@ -530,13 +529,16 @@ body {
         opacity: 0;
         transform: scale(0.3);
     }
+
     50% {
         opacity: 1;
         transform: scale(1.05);
     }
+
     70% {
         transform: scale(0.9);
     }
+
     100% {
         opacity: 1;
         transform: scale(1);
@@ -562,7 +564,7 @@ body {
     justify-content: space-between;
     margin-bottom: 10px;
     padding-bottom: 10px;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .order-info-label {
@@ -582,142 +584,142 @@ body {
         padding-top: 50px;
         padding-bottom: 60px;
     }
-    
+
     .main-content {
         padding: 0 15px 15px;
     }
-    
+
     .order-title {
         font-size: 28px;
     }
-    
+
     .order-number {
         font-size: 16px;
     }
-    
+
     .product-item {
         flex-direction: column;
         align-items: flex-start;
         gap: 15px;
         padding: 15px;
     }
-    
+
     .product-image {
         width: 70px;
         height: 90px;
     }
-    
+
     .product-name {
         font-size: 18px;
     }
-    
+
     .product-price {
         font-size: 18px;
     }
-    
+
     .section-header {
         padding: 12px 15px;
     }
-    
+
     .section-title {
         font-size: 18px;
     }
-    
+
     .address-name,
     .payment-method {
         font-size: 16px;
     }
-    
+
     .summary-details {
         padding: 15px;
     }
-    
+
     .summary-label,
     .summary-value {
         font-size: 14px;
     }
-    
+
     .total-row .summary-label,
     .total-row .summary-value {
         font-size: 16px;
     }
-    
+
     .checkout-footer {
         height: 60px;
     }
-    
+
     .checkout-content {
         flex-direction: column;
         gap: 8px;
         padding: 10px 15px;
     }
-    
+
     .total-amount {
         font-size: 16px;
     }
-    
+
     .checkout-btn {
         width: 100%;
         padding: 10px 20px;
         font-size: 14px;
         min-width: auto;
     }
-    
+
     .back-link {
         font-size: 16px;
     }
-    
+
     .address-item,
     .payment-method-item {
         padding: 15px;
     }
-    
+
     .address-checkbox,
     .payment-checkbox {
         width: 30px;
         height: 30px;
     }
-    
+
     .address-name,
     .payment-name {
         font-size: 16px;
     }
-    
+
     .address-contact,
     .address-details {
         font-size: 12px;
     }
-    
+
     .add-icon i {
         font-size: 18px;
     }
-    
+
     .confirmation-content {
         padding: 40px 0;
         min-height: 60vh;
     }
-    
+
     .confirmation-icon {
         font-size: 60px;
         margin-bottom: 20px;
     }
-    
+
     .confirmation-title {
         font-size: 28px;
         margin-bottom: 15px;
     }
-    
+
     .confirmation-message {
         font-size: 16px;
         margin-bottom: 30px;
         padding: 0 20px;
     }
-    
+
     .back-to-collection-btn {
         padding: 10px 25px;
         font-size: 14px;
     }
-    
+
     .order-details {
         padding: 20px;
         margin-top: 20px;
@@ -728,97 +730,97 @@ body {
     body {
         padding-bottom: 60px;
     }
-    
+
     .order-title {
         font-size: 24px;
     }
-    
+
     .order-number {
         font-size: 14px;
     }
-    
+
     .product-name {
         font-size: 16px;
     }
-    
+
     .product-price {
         font-size: 16px;
     }
-    
+
     .section-title {
         font-size: 16px;
     }
-    
+
     .address-name,
     .payment-method {
         font-size: 14px;
     }
-    
+
     .summary-label,
     .summary-value {
         font-size: 12px;
     }
-    
+
     .total-row .summary-label,
     .total-row .summary-value {
         font-size: 14px;
     }
-    
+
     .checkout-footer {
         height: 55px;
     }
-    
+
     .total-amount {
         font-size: 14px;
     }
-    
+
     .checkout-btn {
         font-size: 12px;
         padding: 8px 15px;
     }
-    
+
     .back-link {
         font-size: 14px;
     }
-    
+
     .address-item,
     .payment-method-item {
         padding: 12px;
     }
-    
+
     .address-checkbox,
     .payment-checkbox {
         width: 25px;
         height: 25px;
     }
-    
+
     .checkmark {
         width: 12px;
         height: 12px;
     }
-    
+
     .address-name,
     .payment-name {
         font-size: 14px;
     }
-    
+
     .address-contact,
     .address-details {
         font-size: 11px;
     }
-    
+
     .confirmation-icon {
         font-size: 50px;
     }
-    
+
     .confirmation-title {
         font-size: 24px;
     }
-    
+
     .confirmation-message {
         font-size: 14px;
     }
-    
+
     .order-details {
         padding: 15px;
     }
@@ -827,42 +829,41 @@ body {
 /* === Buttons Style === */
 .back-to-collection-btn,
 #reviewBtn {
-  display: inline-block;
-  background-color: #fceee8;
-  border: 1px solid #000;
-  border-radius: 15px;
-  padding: 14px 36px;
-  font-size: 18px;
-  font-family: 'Playfair Display', serif;
-  font-weight: 500;
-  color: #2b1d1a;
-  text-transform: none;
-  transition: all 0.25s ease;
-  cursor: pointer;
-  text-align: center;
+    display: inline-block;
+    background-color: #fceee8;
+    border: 1px solid #000;
+    border-radius: 15px;
+    padding: 14px 36px;
+    font-size: 18px;
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    color: #2b1d1a;
+    text-transform: none;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    text-align: center;
 }
 
 /* Hover effect */
 .back-to-collection-btn:hover,
 #reviewBtn:hover {
-  background-color: #f9e4db;
-  transform: translateY(-2px);
+    background-color: #f9e4db;
+    transform: translateY(-2px);
 }
 
 /* Container layout */
 .confirmation-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 18px;
-  margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 18px;
+    margin-top: 40px;
 }
 
 /* Icon */
 .confirmation-icon {
-  color: #58c172;
-  font-size: 72px;
-  margin-bottom: 16px;
+    color: #58c172;
+    font-size: 72px;
+    margin-bottom: 16px;
 }
-

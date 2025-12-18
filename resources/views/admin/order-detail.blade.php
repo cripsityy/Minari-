@@ -3,21 +3,114 @@
 @section('title', 'Order Details')
 
 @section('content')
-    <div class="order-detail-header">
-        <div>
-            <a href="{{ route('admin.orders') }}" class="back-btn">
-                <i class="fas fa-arrow-left"></i> Back to Orders
-            </a>
-            <h2 class="page-title mt-3">Order #{{ $order->order_number }}</h2>
+    <!-- Print Styles -->
+    <style>
+        .print-only { display: none; }
+        @media print {
+        @media print {
+            /* Hide UI elements */
+            .sidebar, .navbar, .back-btn, .btn, .btn-cancel, .alert, form, .no-print {
+                display: none !important;
+            }
+            /* Layout adjustments for single page */
+            body, .main-content {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                color: black !important;
+                font-size: 12px !important; /* Smaller font for compact fit */
+            }
+            .order-detail-grid {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 15px !important;
+                margin-bottom: 20px !important;
+            }
+            /* Items section formatting */
+            .product-item {
+                border-bottom: 1px solid #ddd;
+                padding: 8px 0;
+                page-break-inside: avoid;
+            }
+            /* Images visible but small */
+            .product-img {
+                display: block !important; /* Ensure visible */
+                width: 40px !important;
+                height: 40px !important;
+            }
+            .product-img img {
+                width: 100% !important;
+                height: 100% !important;
+                object-fit: cover !important;
+            }
+            
+            /* Hide Delivery Info as requested */
+            .order-detail-card:has(h5:contains("Delivery Information")),
+            .delivery-info-card {
+                display: none !important;
+            }
+            
+            .order-detail-card {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+                padding: 10px !important;
+                break-inside: avoid;
+            }
+            .page-title {
+                font-size: 18px !important;
+                margin-bottom: 5px !important;
+            }
+            /* Branding Header Compact */
+            .print-only {
+                display: block !important;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #000;
+                padding-bottom: 5px;
+            }
+            .invoice-brand {
+                font-size: 24px;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+            }
+            
+            /* Compact margins generally */
+            h5 { font-size: 14px !important; margin-bottom: 8px !important; font-weight: bold; }
+            .detail-row { margin-bottom: 4px !important; }
+        }
+    </style>
+
+    <!-- Print Header (Visible only in print) -->
+    <div class="print-only">
+        <div class="d-flex justify-content-between align-items-end">
+            <div>
+                <div class="invoice-brand">MINARI</div>
+                <div class="invoice-subtitle">Official Invoice & Receipt</div>
+            </div>
+            <div class="text-end">
+                <div>Date: {{ now()->format('d M Y') }}</div>
+                <div>Order #: {{ $order->order_number }}</div>
+            </div>
         </div>
-        <div class="d-flex align-items-center gap-3">
-            <span class="order-status-badge {{ $order->payment_badge_class }}">
-                {{ ucfirst($order->payment_status) }}
-            </span>
-            <span class="order-status-badge {{ $order->status_badge_class }}">
-                {{ ucfirst($order->order_status) }}
-            </span>
-            <span class="detail-value">{{ $order->created_at->format('d.m.Y H:i') }}</span>
+    </div>
+
+    <div class="order-detail-header">
+        <div class="no-print"> <!-- Hide header logic in print, use Print Header instead -->
+            <div>
+                <a href="{{ route('admin.orders') }}" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Orders
+                </a>
+                <h2 class="page-title mt-3">Order #{{ $order->order_number }}</h2>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="order-status-badge {{ $order->payment_badge_class }}">
+                    {{ ucfirst($order->payment_status) }}
+                </span>
+                <span class="order-status-badge {{ $order->status_badge_class }}">
+                    {{ ucfirst($order->order_status) }}
+                </span>
+                <span class="detail-value">{{ $order->created_at->format('d.m.Y H:i') }}</span>
+            </div>
         </div>
     </div>
 
@@ -56,7 +149,7 @@
         @foreach($order->items as $item)
         <div class="product-item">
             <div class="product-info">
-                <div class="product-img">
+                <div class="product-img"> <!-- Images visible in print -->
                     @if($item->product && $item->product->image)
                         <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}">
                     @else
@@ -75,7 +168,8 @@
     </div>
 
     <div class="order-detail-grid">
-        <div class="order-detail-card">
+        <!-- Delivery Info Card (Class added for Print targeting) -->
+        <div class="order-detail-card delivery-info-card"> 
             <h5>Delivery Information</h5>
             <div class="detail-row">
                 <span class="detail-label">Tracking Number</span>
@@ -87,7 +181,7 @@
             </div>
             
             @if($order->payment_status == 'paid')
-                <div class="mt-4 pt-3 border-top">
+                <div class="mt-4 pt-3 border-top no-print"> <!-- Hide forms in print -->
                     <h6>Update Shipping Status</h6>
                     <form action="{{ route('admin.orders.status', $order->id) }}" method="POST" class="mt-2">
                         @csrf
@@ -109,7 +203,7 @@
                     </form>
                 </div>
             @else
-                <div class="alert alert-warning mt-3">
+                <div class="alert alert-warning mt-3 no-print">
                     <i class="fas fa-exclamation-triangle"></i> Payment Status is <strong>{{ ucfirst($order->payment_status) }}</strong>. Order processing is locked until payment is confirmed (Paid).
                 </div>
             @endif
@@ -131,12 +225,19 @@
             </div>
         </div>
     </div>
+    
+    <!-- Hide Delivery Info via CSS class logic update -->
+    <style>
+        @media print {
+            .delivery-info-card { display: none !important; }
+        }
+    </style>
 
-    <div class="d-flex justify-content-end gap-3 mt-4">
+    <div class="d-flex justify-content-end gap-3 mt-4 no-print">
         <button class="btn-cancel" onclick="window.print()">Print Invoice</button>
     </div>
 @endsection
 
 @push('scripts')
-<script src="{{ asset('js/orderdetailadmin.js') }}"></script>
+{{-- <script src="{{ asset('js/orderdetailadmin.js') }}"></script> --}}
 @endpush

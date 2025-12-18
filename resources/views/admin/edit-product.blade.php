@@ -94,46 +94,17 @@
 
             <div class="row mt-4">
                 <div class="col-12">
-                    <div class="d-flex gap-3 justify-content-between">
-                        <button type="button" class="btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                            <i class="fas fa-trash"></i> Delete Product
+                    <div class="d-flex gap-3 justify-content-end">
+                        <a href="{{ route('admin.products') }}" class="btn-cancel text-decoration-none text-center pt-2">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn-update">
+                            <i class="fas fa-save"></i> Update Product
                         </button>
-                        <div class="d-flex gap-3">
-                            <a href="{{ route('admin.products') }}" class="btn-cancel text-decoration-none text-center pt-2">
-                                Cancel
-                            </a>
-                            <button type="submit" class="btn-update">
-                                <i class="fas fa-save"></i> Update Product
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
         </form>
-    </div>
-
-    <!-- Delete Modal -->
-    <div class="modal fade" id="deleteModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirm Delete</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to delete <strong>"{{ $product->name }}"</strong>?</p>
-                    <p class="text-danger">This action cannot be undone.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <form action="{{ route('admin.products.delete', $product->id) }}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Delete Product</button>
-                    </form>
-                </div>
-            </div>
-        </div>
     </div>
 @endsection
 

@@ -12,12 +12,13 @@ use App\Models\Promotion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
 
     
-    public function dashboard()
+    public function dashboard(Request $request)
     {
         $admin = Auth::guard('admin')->user();
         
@@ -32,14 +33,34 @@ class AdminController extends Controller
             'pending_reviews' => Review::where('status', 'pending')->count()
         ];
         
-        $recentOrders = Order::with('user')->latest()->take(5)->get();
-        // Dynamic Top Products based on actual sales quantity
-        $topProducts = Product::withSum('orderItems', 'quantity')
-                              ->orderByDesc('order_items_sum_quantity')
-                              ->take(5)
-                              ->get();
-                              
-        $recentReviews = Review::with('user')->latest()->take(3)->get();
+        $recentOrdersQuery = Order::with('user')->latest();
+        $topProductsQuery = Product::withSum('orderItems', 'quantity')->orderByDesc('order_items_sum_quantity');
+        $recentReviewsQuery = Review::with('user')->latest();
+
+        if ($request->has('search')) {
+            $searchTerm = $request->search;
+            
+            // Filter Orders
+            $recentOrdersQuery->where(function($q) use ($searchTerm) {
+                $q->where('order_number', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('customer_name', 'like', '%' . $searchTerm . '%');
+            });
+
+            // Filter Products
+            $topProductsQuery->where('name', 'like', '%' . $searchTerm . '%');
+
+            // Filter Reviews
+            $recentReviewsQuery->where(function($q) use ($searchTerm) {
+                $q->where('comment', 'like', '%' . $searchTerm . '%')
+                  ->orWhereHas('user', function($u) use ($searchTerm) {
+                      $u->where('name', 'like', '%' . $searchTerm . '%');
+                  });
+            });
+        }
+
+        $recentOrders = $recentOrdersQuery->take(5)->get();
+        $topProducts = $topProductsQuery->take(5)->get();
+        $recentReviews = $recentReviewsQuery->take(3)->get();
         
         return view('admin.dashboard', compact('stats', 'recentOrders', 'topProducts', 'recentReviews'));
     }
@@ -206,27 +227,73 @@ class AdminController extends Controller
     
     public function deleteProduct($id)
     {
-        $product = Product::findOrFail($id);
-        
-        if ($product->image) {
-            Storage::disk('public')->delete($product->image);
-        }
-        
-        if ($product->images) {
-            foreach ($product->images as $image) {
-                Storage::disk('public')->delete($image);
+        try {
+            // Get data for image deletion before we wipe the record
+            $product = DB::table('products')->where('id', $id)->first();
+            
+            if (!$product) {
+                 return redirect()->route('admin.products')->with('error', 'Produk tidak ditemukan');
             }
+
+            if (!$product) {
+                 return redirect()->route('admin.products')->with('error', 'Produk tidak ditemukan');
+            }
+
+            DB::beginTransaction();
+
+            // 1. Disable Foreign Key Checks temporarily (Nuclear Option)
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+            // 2. Delete Related Data (Direct SQL)
+            DB::table('order_items')->where('product_id', $id)->delete();
+            DB::table('carts')->where('product_id', $id)->delete();
+            DB::table('wishlists')->where('product_id', $id)->delete();
+            DB::table('reviews')->where('product_id', $id)->delete();
+
+            // 3. Delete Product (Direct SQL - Hard Delete)
+            DB::table('products')->where('id', $id)->delete();
+
+            // 4. Re-enable Foreign Key Checks
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+            DB::commit();
+
+            // 5. Cleanup Files (After database success)
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
+            
+            // Handle JSON images manually since we used query builder
+            if ($product->images) {
+                $images = json_decode($product->images, true);
+                if (is_array($images)) {
+                    foreach ($images as $image) {
+                        Storage::disk('public')->delete($image);
+                    }
+                }
+            }
+
+            return redirect()->route('admin.products')->with('success', 'Produk berhasil dihapus permanen (Force)');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            // Re-enable in case of crash
+            try { DB::statement('SET FOREIGN_KEY_CHECKS=1;'); } catch (\Exception $x) {}
+            
+            return redirect()->route('admin.products')->with('error', 'Gagal menghapus produk: ' . $e->getMessage());
         }
-        
-        $product->delete();
-        
-        return redirect()->route('admin.products')->with('success', 'Produk berhasil dihapus');
     }
     
     // Categories Management
-    public function categories()
+    public function categories(Request $request)
     {
-        $categories = Category::withCount('products')->paginate(15);
+        $query = Category::withCount('products');
+
+        if ($request->has('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%');
+        }
+
+        $categories = $query->paginate(15);
         return view('admin.categories', compact('categories'));
     }
     
@@ -312,23 +379,69 @@ class AdminController extends Controller
     
     public function deleteCategory($id)
     {
-        $category = Category::findOrFail($id);
-        
-        if ($category->products()->count() > 0) {
-            return redirect()->route('admin.categories')->with('error', 'Tidak dapat menghapus kategori yang memiliki produk');
-        }
-        
-        if ($category->image) {
-            Storage::disk('public')->delete($category->image);
-        }
+        try {
+            $category = DB::table('categories')->where('id', $id)->first();
+            if (!$category) {
+                 return redirect()->route('admin.categories')->with('error', 'Kategori tidak ditemukan');
+            }
 
-        if ($category->background_image) {
-            Storage::disk('public')->delete($category->background_image);
+            DB::beginTransaction();
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+            // 1. Get all products in category
+            $products = DB::table('products')->where('category_id', $id)->get();
+            $productCount = $products->count();
+
+            // 2. Cascade Delete Products & Relations
+            foreach ($products as $product) {
+                // Delete relations
+                DB::table('order_items')->where('product_id', $product->id)->delete();
+                DB::table('carts')->where('product_id', $product->id)->delete();
+                DB::table('wishlists')->where('product_id', $product->id)->delete();
+                DB::table('reviews')->where('product_id', $product->id)->delete();
+
+                // Delete product images physically
+                if ($product->image) {
+                    Storage::disk('public')->delete($product->image);
+                }
+                if ($product->images) {
+                    $images = json_decode($product->images, true);
+                    if (is_array($images)) {
+                        foreach ($images as $img) {
+                            Storage::disk('public')->delete($img);
+                        }
+                    }
+                }
+
+                // Delete Product Record
+                DB::table('products')->where('id', $product->id)->delete();
+            }
+            
+            // 3. Delete Category Images
+            if ($category->image) {
+                Storage::disk('public')->delete($category->image);
+            }
+            if ($category->background_image) {
+                Storage::disk('public')->delete($category->background_image);
+            }
+            
+            // 4. Delete Category Record
+            DB::table('categories')->where('id', $id)->delete();
+            
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+            DB::commit();
+            
+            $msg = $productCount > 0 
+                ? "Kategori dan $productCount produk di dalamnya berhasil dihapus permanen (Force)" 
+                : 'Kategori berhasil dihapus permanen (Force)';
+
+            return redirect()->route('admin.categories')->with('success', $msg);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            try { DB::statement('SET FOREIGN_KEY_CHECKS=1;'); } catch (\Exception $x) {}
+            return redirect()->route('admin.categories')->with('error', 'Gagal menghapus kategori: ' . $e->getMessage());
         }
-        
-        $category->delete();
-        
-        return redirect()->route('admin.categories')->with('success', 'Kategori berhasil dihapus');
     }
     
     // Orders Management
@@ -339,7 +452,11 @@ class AdminController extends Controller
         if ($request->has('search')) {
             $query->where('order_number', 'like', '%' . $request->search . '%')
                   ->orWhere('customer_name', 'like', '%' . $request->search . '%')
-                  ->orWhere('customer_email', 'like', '%' . $request->search . '%');
+                  ->orWhere('customer_email', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('user', function($q) use ($request) {
+                      $q->where('name', 'like', '%' . $request->search . '%')
+                        ->orWhere('email', 'like', '%' . $request->search . '%');
+                  });
         }
         
         if ($request->has('status')) {
@@ -393,6 +510,18 @@ class AdminController extends Controller
     public function reviews(Request $request)
     {
         $query = Review::with(['user', 'product']);
+        
+        if ($request->has('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('comment', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('user', function($u) use ($request) {
+                      $u->where('name', 'like', '%' . $request->search . '%');
+                  })
+                  ->orWhereHas('product', function($p) use ($request) {
+                      $p->where('name', 'like', '%' . $request->search . '%');
+                  });
+            });
+        }
         
         if ($request->has('status')) {
             $query->where('status', $request->status);
@@ -475,6 +604,51 @@ class AdminController extends Controller
     // Duplicates removed
 
     
+    public function editPromotion($id)
+    {
+        $promotion = Promotion::findOrFail($id);
+        $products = Product::where('status', 'active')->get();
+        return view('admin.edit-promotion', compact('promotion', 'products'));
+    }
+
+    public function updatePromotion(Request $request, $id)
+    {
+        $promotion = Promotion::findOrFail($id);
+        
+        $request->validate([
+            'code' => 'required|unique:promotions,code,' . $id,
+            'type' => 'required|in:percentage,fixed',
+            'value' => 'required|numeric',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
+
+        try {
+            $status = $request->input('status', 'active');
+            $isActive = $status !== 'inactive';
+
+            $promotion->update([
+                'code' => strtoupper($request->code),
+                'name' => $request->code,
+                'description' => $request->description,
+                'type' => $request->type,
+                'value' => $request->value,
+                'min_purchase' => $request->min_purchase,
+                'usage_limit' => $request->usage_limit,
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+                'is_active' => $isActive,
+                'applicable_products' => $request->applicable_products,
+            ]);
+
+            return redirect()->route('admin.promotions')->with('success', 'Promotion updated successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Failed to update promotion: ' . $e->getMessage()]);
+        }
+    }
+
     public function updatePromotionStatus(Request $request, $id)
     {
         $promotion = Promotion::findOrFail($id);

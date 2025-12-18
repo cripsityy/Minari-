@@ -43,17 +43,15 @@
                             <span class="badge-status badge-inactive">Inactive</span>
                         @endif
                     </td>
-                    <td class="action-icons">
-                        <a href="{{ route('admin.products.edit', $product->id) }}" class="text-decoration-none">
-                            <i class="fas fa-edit" title="Edit"></i>
-                        </a>
-                        <form action="{{ route('admin.products.delete', $product->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this product?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn p-0 border-0 bg-transparent text-danger">
-                                <i class="fas fa-trash" title="Delete"></i>
+                    <td>
+                        <div class="action-icons">
+                            <a href="{{ route('admin.products.edit', $product->id) }}" class="text-decoration-none">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn p-0 border-0 bg-transparent" onclick="confirmDelete('{{ $product->id }}', '{{ addslashes($product->name) }}')">
+                                <i class="fas fa-trash"></i>
                             </button>
-                        </form>
+                        </div>
                     </td>
                 </tr>
                 @empty
@@ -64,16 +62,21 @@
             </tbody>
         </table>
     </div>
-    
+
+    {{-- Single hidden delete form --}}
+    <form id="deleteForm" method="POST" class="d-none">
+        @csrf
+        @method('DELETE')
+    </form>
 
 @endsection
 
 @push('scripts')
 <script>
-    function confirmDelete(productName) {
-        if (confirm('Are you sure you want to delete "' + productName + '"?')) {
-            alert(productName + ' deleted successfully!');
-        }
+    function confirmDelete(id, name) {
+        let form = document.getElementById('deleteForm');
+        form.action = '/admin/products/' + id; // Construct route manually to avoid JS parsing issues
+        form.submit();
     }
 </script>
 @endpush

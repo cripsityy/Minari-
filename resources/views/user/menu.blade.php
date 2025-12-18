@@ -27,19 +27,44 @@
             </a>
 
             {{-- CLOSE BUTTON --}}
-            <a class="close-btn" href="{{ route('home') }}" style="text-decoration: none;">&times;</a>
+            {{-- CLOSE BUTTON --}}
+            <a class="close-btn" href="#" onclick="history.back(); return false;" style="text-decoration: none;">&times;</a>
         </div>
 
         {{-- SEARCH BAR --}}
         <div class="mb-5">
-            <div class="search-wrapper">
-                <i class="bi bi-search search-icon"></i>
-                <input type="text" class="search-bar" placeholder="keywords">
+            <div class="search-wrapper d-flex align-items-center">
+                <i class="bi bi-arrow-left me-2" id="searchBackBtn" style="display: none; cursor: pointer; font-size: 1.5rem;"></i>
+                <i class="bi bi-search search-icon" id="searchIcon"></i>
+                <form action="{{ route('search') }}" method="GET" style="width: 100%;">
+                    <input type="text" name="q" class="search-bar" placeholder="keywords" value="{{ request('q') }}">
+                </form>
+            </div>
+        </div>
+
+        {{-- SEARCH RECOMMENDATIONS (Hidden by default) --}}
+        <div id="searchRecommendations" style="display: none;">
+            <div class="mb-4">
+                <h6 class="fw-bold mb-3">Trending</h6>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ route('search', ['q' => 'Celana Barrel']) }}" class="search-tag">Celana Barrel</a>
+                    <a href="{{ route('search', ['q' => 'Koleksi Jeans']) }}" class="search-tag">Koleksi Jeans</a>
+                    <a href="{{ route('search', ['q' => 'Koleksi Flannel']) }}" class="search-tag">Koleksi Flannel</a>
+                    <a href="{{ route('search', ['q' => 'Winter Travel']) }}" class="search-tag">Winter Travel</a>
+                    <a href="{{ route('search', ['q' => 'Kaos Kaki HEATTECH']) }}" class="search-tag">Kaos Kaki HEATTECH</a>
+                    <a href="{{ route('search', ['q' => 'Limited Offer']) }}" class="search-tag">Limited Offer</a>
+                    <a href="{{ route('search', ['q' => 'Sale']) }}" class="search-tag">Sale</a>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <h6 class="fw-bold mb-3">Riwayat pencarian</h6>
+                <p class="text-muted small">Anda dapat melihat riwayat pencarian Anda di sini.</p>
             </div>
         </div>
 
         {{-- CATEGORY SECTION --}}
-        <div class="section row row-cols-1 row-cols-md-3 g-5 pb-5">
+        <div id="categorySection" class="section row row-cols-1 row-cols-md-3 g-5 pb-5">
             @foreach($categories as $category)
             <div class="col">
                 <a href="{{ route('user.category', ['cat' => $category->slug]) }}" class="card-item text-decoration-none">

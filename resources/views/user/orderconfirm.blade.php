@@ -20,38 +20,45 @@
 
 <header id="navMount"></header>
 
-<div class="order-header-section">
-    <div class="container">
-            <div class="order-header-content">
-                <h1 class="order-title" id="orderTitle">Order {{ $latestOrder->order_number ?? '#----' }}</h1>
-            </div>
-        </div>
-    </div>
-</div>
+<div class="header-spacer" style="height: 60px;"></div> {{-- Spacer for fixed navbar --}}
 
 <div class="main-content">
     <div class="container">
-        <div class="confirmation-content">
+        <div class="confirmation-content" style="min-height: 50vh; justify-content: flex-start; padding-top: 40px;">
 
-            <div class="confirmation-icon">
-                <i class="fas fa-check-circle"></i>
+            {{-- Custom Success Icon (Inline SVG for reliability) --}}
+            <div class="confirmation-icon-container mb-4">
+                 <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="40" cy="40" r="40" fill="#F3E5DC"/>
+                    <path d="M24 40L34.6667 50.6667L56 29.3333" stroke="#8B7E74" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
             </div>
 
-            <h1 class="confirmation-title">Payment successful!</h1>
-            <p class="confirmation-message">Your order will be processed shortly</p>
+            <h1 class="confirmation-title mb-3" style="font-size: 32px; color: #1D1B20;">Payment successful!</h1>
+            <p class="confirmation-message mb-5" style="color: #625B71;">Your order will be processed shortly</p>
+            
+            @if($latestOrder)
+                <div class="order-number-badge mb-5" style="background: #FFF6F0; padding: 10px 20px; border-radius: 50px; display: inline-block;">
+                    <p class="m-0" style="font-family: 'Playfair Display'; font-size: 18px; color: #5a4b45;">
+                        Order #{{ $latestOrder->order_number }}
+                    </p>
+                </div>
+            @endif
 
-            <div class="d-flex gap-2 justify-content-center">
-                <button class="back-to-collection-btn" id="backToHomeBtn">
+            <div class="d-flex gap-3 justify-content-center flex-wrap mb-4">
+                <a href="{{ url('/') }}" class="back-to-collection-btn text-decoration-none" style="background: #1D1B20; color: #fff; border: 1px solid #1D1B20;">
                     Continue Shopping
-                </button>
-                <a href="{{ route('order.history') }}" class="back-to-collection-btn" style="text-decoration: none; display: inline-block;">
+                </a>
+                <a href="{{ route('order.history') }}" class="back-to-collection-btn text-decoration-none" style="background: transparent; border: 1px solid #1D1B20; color: #1D1B20;">
                     View My Orders
                 </a>
             </div>
-
-            <button class="button" id="reviewBtn">
-                rate our product
-            </button>
+            
+            <div class="mt-3">
+                 <a href="{{ route('rating.page', ['order_id' => $latestOrder->id ?? '']) }}" class="text-decoration-none" style="font-family: 'Poppins'; font-size: 18px; color: #8B7E74; border-bottom: 1px solid #8B7E74; padding-bottom: 2px;">
+                    Rate our product
+                 </a>
+            </div>
 
         </div>
     </div>

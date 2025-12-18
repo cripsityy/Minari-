@@ -19,7 +19,7 @@ function tplGuest() {
           <img src="/images/akun.png" alt="User" width="24" height="24">
         </button>
         <a href="/wishlist"><img src="/images/whislist.png" alt="Favorite" width="24" height="24"></a>
-        <a href="/menu"><img src="/images/searchnav.png" alt="Search" width="24" height="24"></a>
+        <a href="/search"><img src="/images/searchnav.png" alt="Search" width="24" height="24"></a>
         <a href="/cart"><img src="/images/chart.png" alt="Cart" width="24" height="24"></a>
         <a href="/menu"><img src="/images/menu.png" alt="Menu" width="24" height="24"></a>
       </div>
@@ -32,6 +32,37 @@ function tplGuest() {
       <a class="accmini__name" href="/login" style="font-weight: 500; color: #1f1f1f; text-decoration: none;">Guest</a>
     </div>
     <a id="loginLink" class="accmini__btn" href="/login" onclick="window.location.href='/login'; return false;" style="display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 36px; background-color: #ffffff; border: 1.5px solid #d9c8c1; border-radius: 10px; color: #1e1e1e; font-weight: 600; text-decoration: none; font-size: 14px; cursor: pointer !important; transition: all 0.25s ease; margin-top: 8px; position: relative; z-index: 10000; pointer-events: auto;">Log in</a>
+  </div>
+
+  <div id="searchOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #FFF6F0; z-index: 20000; overflow-y: auto;">
+    <div class="container pt-4">
+        <div class="d-flex align-items-center mb-4">
+            <button id="closeSearchBtn" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #5a4b45;" class="me-3">
+                <i class="bi bi-arrow-left"></i>
+            </button>
+            <form action="/search" method="GET" style="flex-grow: 1;">
+                <input type="text" name="q" placeholder="keywords" style="width: 100%; border: none; border-bottom: 1px solid #ccc; padding: 10px; font-size: 18px; background: transparent; outline: none;">
+            </form>
+        </div>
+        
+        <div class="mt-4">
+            <h6 class="fw-bold mb-3" style="color: #5a4b45;">Trending</h6>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="/search?q=Celana Barrel" class="btn btn-sm btn-outline-secondary rounded-pill" style="border-color: #ddd;">Celana Barrel</a>
+                <a href="/search?q=Koleksi Jeans" class="btn btn-sm btn-outline-secondary rounded-pill" style="border-color: #ddd;">Koleksi Jeans</a>
+                <a href="/search?q=Koleksi Flannel" class="btn btn-sm btn-outline-secondary rounded-pill" style="border-color: #ddd;">Koleksi Flannel</a>
+                <a href="/search?q=Winter Travel" class="btn btn-sm btn-outline-secondary rounded-pill" style="border-color: #ddd;">Winter Travel</a>
+                <a href="/search?q=Kaos Kaki HEATTECH" class="btn btn-sm btn-outline-secondary rounded-pill" style="border-color: #ddd;">Kaos Kaki HEATTECH</a>
+                <a href="/search?q=Limited Offer" class="btn btn-sm btn-outline-secondary rounded-pill" style="border-color: #ddd;">Limited Offer</a>
+                <a href="/search?q=Sale" class="btn btn-sm btn-outline-secondary rounded-pill" style="border-color: #ddd;">Sale</a>
+            </div>
+        </div>
+
+        <div class="mt-5">
+            <h6 class="fw-bold mb-3" style="color: #5a4b45;">Riwayat pencarian</h6>
+            <p class="text-muted small">Anda dapat melihat riwayat pencarian Anda di sini.</p>
+        </div>
+    </div>
   </div>`;
 }
 
@@ -48,7 +79,7 @@ function tplUser() {
           <img src="/images/akun.png" alt="User" width="24" height="24">
         </button>
         <a href="/wishlist"><img src="/images/whislist.png" alt="Favorite" width="24" height="24"></a>
-        <a href="/menu"><img src="/images/searchnav.png" alt="Search" width="24" height="24"></a>
+        <a href="/search"><img src="/images/searchnav.png" alt="Search" width="24" height="24"></a>
         <a href="/cart"><img src="/images/chart.png" alt="Cart" width="24" height="24"></a>
         <a href="/menu"><img src="/images/menu.png" alt="Menu" width="24" height="24"></a>
       </div>
@@ -65,6 +96,37 @@ function tplUser() {
       <a class="accmini__link" href="/order-history" style="font-weight: 500; color: #1f1f1f; text-decoration: none;">Order history</a>
     </div>
     <button id="logoutBtn" class="accmini__btn" style="display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 36px; background-color: #ffffff; border: 1.5px solid #d9c8c1; border-radius: 10px; color: #1e1e1e; font-weight: 600; text-decoration: none; font-size: 14px; cursor: pointer; transition: all 0.25s ease; margin-top: 8px;">Log out</button>
+  </div>
+
+  <div id="searchOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #FFF6F0; z-index: 20000; overflow-y: auto;">
+    <div class="container pt-4">
+        <div class="d-flex align-items-center mb-4">
+            <button id="closeSearchBtn" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #5a4b45;" class="me-3">
+                <i class="bi bi-arrow-left"></i>
+            </button>
+            <form action="/search" method="GET" style="flex-grow: 1;">
+                <input type="text" name="q" placeholder="keywords" style="width: 100%; border: none; border-bottom: 1px solid #ccc; padding: 10px; font-size: 18px; background: transparent; outline: none;">
+            </form>
+        </div>
+        
+        <div class="mt-4">
+            <h6 class="fw-bold mb-3" style="color: #5a4b45;">Trending</h6>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="/search?q=Celana Barrel" class="btn btn-sm btn-outline-secondary rounded-pill" style="border-color: #ddd;">Celana Barrel</a>
+                <a href="/search?q=Koleksi Jeans" class="btn btn-sm btn-outline-secondary rounded-pill" style="border-color: #ddd;">Koleksi Jeans</a>
+                <a href="/search?q=Koleksi Flannel" class="btn btn-sm btn-outline-secondary rounded-pill" style="border-color: #ddd;">Koleksi Flannel</a>
+                <a href="/search?q=Winter Travel" class="btn btn-sm btn-outline-secondary rounded-pill" style="border-color: #ddd;">Winter Travel</a>
+                <a href="/search?q=Kaos Kaki HEATTECH" class="btn btn-sm btn-outline-secondary rounded-pill" style="border-color: #ddd;">Kaos Kaki HEATTECH</a>
+                <a href="/search?q=Limited Offer" class="btn btn-sm btn-outline-secondary rounded-pill" style="border-color: #ddd;">Limited Offer</a>
+                <a href="/search?q=Sale" class="btn btn-sm btn-outline-secondary rounded-pill" style="border-color: #ddd;">Sale</a>
+            </div>
+        </div>
+
+        <div class="mt-5">
+            <h6 class="fw-bold mb-3" style="color: #5a4b45;">Riwayat pencarian</h6>
+            <p class="text-muted small">Anda dapat melihat riwayat pencarian Anda di sini.</p>
+        </div>
+    </div>
   </div>`;
 }
 
@@ -148,10 +210,17 @@ function attachEventListeners() {
         currentAccMini.style.display = 'none';
         currentAccMini.style.pointerEvents = 'none';
       } else {
-        // Position dropdown below button
+        // Position dropdown below button (Centered)
         currentAccMini.style.position = 'fixed';
         currentAccMini.style.top = (rect.bottom + 10) + 'px';
-        currentAccMini.style.right = (window.innerWidth - rect.right) + 'px'; // Fix alignment
+
+        // Center alignment
+        const popupWidth = 220;
+        const buttonCenter = rect.left + (rect.width / 2);
+        const leftPos = buttonCenter - (popupWidth / 2);
+
+        currentAccMini.style.left = leftPos + 'px';
+        currentAccMini.style.right = 'auto';
         currentAccMini.style.display = 'block';
         currentAccMini.style.opacity = '1';
         currentAccMini.style.pointerEvents = 'auto'; // Enable clicks
@@ -168,14 +237,14 @@ function attachEventListeners() {
       }
     });
 
+
+
     // Handle logout button
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
       logoutBtn.addEventListener('click', function (e) {
         e.preventDefault();
-        if (confirm('Apakah Anda yakin ingin logout?')) {
-          window.location.href = '/logout';
-        }
+        window.location.href = '/logout';
       });
     }
 

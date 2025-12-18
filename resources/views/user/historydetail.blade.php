@@ -6,13 +6,14 @@
     <title>MINARI - Order Details</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     @include('partials.navbar-scripts')
     {{-- CSS --}}
-    <link rel="stylesheet" href="{{ asset('css/style4.css') }}">
     <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/orderdetail.css') }}">
 </head>
 
 <body>
@@ -20,131 +21,98 @@
 <header id="navMount"></header>
 
 <div class="main-content">
-    <div class="container">
-
-        {{-- BACK BUTTON --}}
-        <div class="d-flex align-items-center mb-4">
-            <a href="{{ route('order.history') }}" class="back-btn me-3">
-                <span class="material-icons">arrow_back</span>
-            </a>
-            <h1 class="page-title mb-0">Order Details {{ $order->order_number ?? '#'.$order->id }}</h1>
-        </div>
-
-        {{-- DELIVERY BADGE --}}
-        <div class="delivery-badge">
-            <div class="check-icon">
-                <span class="material-icons">check</span>
-            </div>
-            <span>Delivered to {{ $order->shipping_address ?? 'Home' }}</span>
-        </div>
-
-        {{-- ORDER INFO --}}
-        <div class="info-section">
-            <div class="section-header">
-                <span class="material-icons">📦</span>
-                <h2>Order Information</h2>
-            </div>
-
-            <div class="info-row">
-                <div class="info-label">Order Number</div>
-                <div class="info-value">{{ $order->order_number ?? '#'.$order->id }}</div>
-            </div>
-
-            <div class="info-row">
-                <div class="info-label">Order Date</div>
-                <div class="info-value">{{ $order->created_at->format('d M Y') }}</div>
-            </div>
-
-            <div class="info-row">
-                <div class="info-label">Status</div>
-                <div class="info-value status-value">{{ $order->status }}</div>
-            </div>
-        </div>
-
-        {{-- SHIPPING --}}
-        @if($order->shipping)
-        <div class="info-section">
-            <div class="section-header">
-                <span class="material-icons">📍</span>
-                <h2>Shipping Address</h2>
-            </div>
-
-            <div class="info-row">
-                <div class="info-label">Recipient</div>
-                <div class="info-value">{{ $order->shipping->name }}</div>
-            </div>
-
-            <div class="info-row">
-                <div class="info-label">Address</div>
-                <div class="info-value">{{ $order->shipping->address }}</div>
-            </div>
-
-            <div class="info-row">
-                <div class="info-label">Telephone</div>
-                <div class="info-value">{{ $order->shipping->phone }}</div>
-            </div>
-        </div>
-        @endif
-
-        {{-- ORDERED PRODUCTS --}}
-        <div class="info-section">
-            <div class="section-header">
-                <span class="material-icons">shopping_bag</span>
-                <h2>Ordered Products</h2>
-            </div>
-
-            @foreach($order->items as $item)
-            <div class="product-info mb-3 border-bottom pb-3">
-                <div class="product-image">
-                    <img src="{{ $item->product_image ?? ($item->product->image ? asset('storage/'.$item->product->image) : asset('images/default-product.jpg')) }}" alt="{{ $item->product_name }}">
-                </div>
-                <div class="product-details w-100">
-                    <h4>{{ $item->product_name }}</h4>
-                    <p class="product-specs">Qty: {{ $item->quantity }} • Size: {{ $item->size ?? '-' }}</p>
-                    <p class="product-price">{{ $item->price }}</p>
-                </div>
-            </div>
-            @endforeach
-        </div>
-
-        {{-- PAYMENT SUMMARY --}}
-        <div class="info-section">
-            <div class="section-header">
-                <span class="material-icons">payments</span>
-                <h2>Payment Summary</h2>
-            </div>
-
-            <div class="info-row">
-                <div class="info-label">Payment Method</div>
-                <div class="info-value">{{ $order->payment_method ?? 'Cash on Delivery' }}</div>
-            </div>
-
-            <div class="info-row">
-                <div class="info-label payment-total">Total</div>
-                <div class="info-value payment-total">{{ $order->total_amount ? 'Rp ' . number_format($order->total_amount, 0, ',', '.') : $order->total }}</div>
-            </div>
-        </div>
-
-        {{-- ACTION BUTTONS --}}
-        <div class="action-buttons">
-            <button class="btn btn-secondary">
-                <span class="material-icons">help</span>
-                Need Help?
-            </button>
-        </div>
-
+    
+    {{-- Header --}}
+    <div class="detail-header">
+        <a href="{{ route('order.history') }}" class="back-btn">
+            <span class="material-icons" style="font-size: 20px;">arrow_back</span>
+        </a>
+        <h1 class="page-title">Order Details {{ $order->order_number ?? 'MIN'.str_pad($order->id, 8, '0', STR_PAD_LEFT) }}</h1>
     </div>
+
+    {{-- Delivery Status --}}
+    <div class="delivery-status-card">
+        <div class="status-icon">
+            <span class="material-icons">check</span>
+        </div>
+        <div class="delivery-text">
+            Delivered to <span style="font-weight: 600;">{{ $order->delivery ?? ($order->shipping_address ?? 'Home') }}</span>
+        </div>
+    </div>
+
+    {{-- Card 1: Order Information --}}
+    <div class="detail-card">
+        <h3 class="card-title">
+            Order Information
+        </h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <label>Order Number</label>
+                <span>{{ $order->order_number ?? 'MIN'.str_pad($order->id, 8, '0', STR_PAD_LEFT) }}</span>
+            </div>
+            <div class="info-item">
+                <label>Order Date</label>
+                <span>{{ $order->created_at->format('d M Y') }}</span>
+            </div>
+            <div class="info-item">
+                <label>Status</label>
+                <span style="color: #317331;">{{ $order->status }}</span>
+            </div>
+        </div>
+    </div>
+
+    {{-- Card 2: Ordered Products --}}
+    <div class="detail-card">
+        <h3 class="card-title">
+            Ordered Products
+        </h3>
+        
+        @foreach($order->items as $item)
+            <div class="product-item">
+                <div class="product-thumb">
+                     <img src="{{ $item->product_image ?? (optional($item->product ?? null)->image ? asset('storage/'.optional($item->product)->image) : asset('images/default-product.jpg')) }}" 
+                          alt="{{ $item->product_name }}">
+                </div>
+                <div class="product-meta" style="flex:1;">
+                    <h4>{{ $item->product_name }}</h4>
+                    <p>Qty: {{ $item->quantity }}</p>
+                    <div class="product-price">Rp {{ number_format($item->price, 0, ',', '.') }}</div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+
+    {{-- Card 3: Payment Summary --}}
+    <div class="detail-card">
+        <h3 class="card-title">
+            Payment Summary
+        </h3>
+        
+        <div class="info-row">
+            <span class="info-label">Payment Method</span>
+            <span class="info-value">{{ ucwords(str_replace(['_', '-'], ' ', $order->payment_method ?? 'Bank Transfer')) }}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Total</span>
+            <span class="info-value" style="font-size: 16px; font-weight: 700;">Rp {{ number_format($order->total_amount ?? $order->total ?? 0, 0, ',', '.') }}</span>
+        </div>
+    </div>
+
+    {{-- Footer --}}
+    <div class="detail-footer">
+        <a href="#" class="btn-help">
+            <span class="material-icons" style="font-size: 16px;">help_outline</span>
+            Need Help?
+        </a>
+    </div>
+
 </div>
 
-{{-- JS --}}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
     window.APP_ROLE = "{{ session('role') ?? 'guest' }}";
 </script>
-
 <script src="{{ asset('js/navbar.js') }}"></script>
-<script src="{{ asset('js/orderdetailcust.js') }}"></script>
 
 </body>
 </html>

@@ -24,10 +24,10 @@
 <header id="navMount"></header>
 
 {{-- ORDER HEADER --}}
-<div class="order-header-section">
+<div class="order-header-section" style="background: none;">
     <div class="container">
         <div class="order-header-content">
-            <h1 class="order-title" id="orderTitle">Order #0103</h1>
+            <h1 class="order-title" id="orderTitle">Checkout</h1>
         </div>
     </div>
 </div>
@@ -64,12 +64,18 @@
             </div>
 
             {{-- SHIPPING --}}
+            {{-- SHIPPING --}}
             <div class="info-section">
-                <div class="section-header clickable" onclick="window.location.href='{{ route('shipping.address') }}' + window.location.search">
+                <div class="section-header clickable" onclick="window.location.href='{{ route('user.shipping.address') }}' + window.location.search">
                     <h3 class="section-title">Shipping to</h3>
                     <div class="section-action">
                         @php
-                            $primaryAddress = $addresses->firstWhere('is_primary', true) ?? $addresses->first();
+                            $selectedId = request('address_id');
+                            if ($selectedId) {
+                                $primaryAddress = $addresses->firstWhere('id', $selectedId);
+                            } else {
+                                $primaryAddress = null; // Default to empty as requested
+                            }
                         @endphp
                         
                         @if($primaryAddress)
@@ -87,7 +93,7 @@
                                 </script>
                             </div>
                         @else
-                            <span class="address-name text-danger">Select Address</span>
+                            <span class="address-name text-muted">Shipping Address</span>
                         @endif
                         <i class="fas fa-chevron-right ms-2"></i>
                     </div>
@@ -135,10 +141,10 @@
 
     {{-- FOOTER CHECKOUT --}}
     <div class="checkout-footer">
-        <div class="container">
+        <div class="container-fluid px-5">
             <div class="checkout-content">
                 <div class="total-price">
-                    <span class="total-amount">Rp {{ number_format($total, 0, ',', '.') }}</span>
+                    <span class="total-amount">Total: Rp {{ number_format($total, 0, ',', '.') }}</span>
                 </div>
                 <button type="button" class="checkout-btn" id="realCheckoutBtn">Check Out</button>
             </div>
@@ -156,7 +162,7 @@
 {{-- SYNC ROLE DARI BACKEND --}}
 <script>
     window.APP_ROLE = "{{ session('role') ?? 'guest' }}";
-    window.ROUTE_SHIPPING = "{{ route('shipping.address') }}";
+    window.ROUTE_SHIPPING = "{{ route('user.shipping.address') }}";
     window.ROUTE_PAYMENT_METHOD = "{{ route('payment.method') }}";
 </script>
 

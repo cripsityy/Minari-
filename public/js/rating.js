@@ -21,7 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const stars = container.querySelectorAll('.star');
         stars.forEach(star => {
             const starValue = parseInt(star.dataset.value);
-            star.style.color = starValue <= value ? '#e5a391' : '#ddd';
+            if (starValue <= value) {
+                star.classList.add('active');
+                star.style.color = ''; // clear inline style if any
+            } else {
+                star.classList.remove('active');
+                star.style.color = ''; // clear inline style if any
+            }
         });
     }
 
@@ -36,12 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const isAnonymous = hideInput.checked;
 
         if (rating === 0) {
-            alert('Please select a star rating first.');
+            showToast('Please select a star rating first.', 'error');
             return;
         }
 
         if (comment === '') {
-            alert('Please write a comment.');
+            showToast('Please write a comment.', 'error');
             return;
         }
 
@@ -70,17 +76,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
 
             if (result.success) {
-                alert('Review submitted successfully!');
+                showToast('Review submitted successfully!', 'success');
                 // Reload or update UI to show "Reviewed"
-                location.reload();
+                setTimeout(() => location.reload(), 1000); // Delay refresh to see toast
             } else {
-                alert(result.message || 'Failed to submit review.');
+                showToast(result.message || 'Failed to submit review.', 'error');
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred. Please try again.');
+            showToast('An error occurred. Please try again.', 'error');
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
         }

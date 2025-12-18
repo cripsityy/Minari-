@@ -106,7 +106,7 @@
               </div>
 
               @auth
-                <a href="#" id="addAddressLink" class="acc-add-address">ADD NEW SHIPPING ADDRESS</a>
+                <a href="{{ route('user.shipping.address') }}" id="addAddressLink" class="acc-add-address">ADD NEW SHIPPING ADDRESS</a>
               @endauth
             </div>
           </div>
@@ -130,11 +130,11 @@
 
   <!-- Footer -->
   <footer>
-    <div class="container">
+    <div class="container-fluid px-5">
       <div class="row align-items-center">
         <div class="col-md-6">
           <div class="logo">
-            <img src="{{ asset('images/logofix.png') }}" alt="Logo MINARI" class="logo-img">
+             <img src="{{ asset('images/logofix.png') }}" alt="Logo MINARI" style="height: 40px; width: auto;">
           </div>
           <p>Your everyday fashion boutique</p>
         </div>

@@ -147,8 +147,8 @@ function renderWishlistItems(items) {
                     <button class="w-btn js-addcart" data-id="${product.id}">
                         Add to cart
                     </button>
-                    <button class="w-heart js-remove" data-id="${item.id}">
-                        Remove
+                    <button class="w-remove js-remove" data-id="${item.id}" title="Remove from wishlist">
+                        <i class="fas fa-trash"></i>
                     </button>
                 </div>
             </article>

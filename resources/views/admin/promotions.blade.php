@@ -20,6 +20,7 @@
                     <th>Start Date</th>
                     <th>End Date</th>
                     <th>Status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -35,13 +36,36 @@
                             {{ $promo->status }}
                         </span>
                     </td>
+                    <td class="action-icons">
+                        <a href="{{ route('admin.promotions.edit', $promo->id) }}" class="text-decoration-none text-primary me-2">
+                            <i class="fas fa-edit" title="Edit"></i>
+                        </a>
+                        <button type="button" class="btn btn-link p-0 text-danger" onclick="confirmDelete('{{ $promo->id }}', '{{ $promo->code }}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="text-center py-4">No promotions found.</td>
+                    <td colspan="7" class="text-center py-4">No promotions found.</td>
                 </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
+
+    <form id="deleteForm" method="POST" class="d-none">
+        @csrf
+        @method('DELETE')
+    </form>
 @endsection
+
+@push('scripts')
+<script>
+    function confirmDelete(id, code) {
+        let form = document.getElementById('deleteForm');
+        form.action = '/admin/promotions/' + id;
+        form.submit();
+    }
+</script>
+@endpush

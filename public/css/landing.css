@@ -140,18 +140,51 @@ body {
     margin-bottom: 40px;
 }
 
-.style-scroll,
 .category-scroll {
     display: flex;
     gap: 50px;
-    overflow-x: auto;
+    overflow-x: hidden;
+    /* Disable manual scrolling */
     scroll-behavior: smooth;
     padding-bottom: 10px;
 }
 
-.style-scroll::-webkit-scrollbar,
+.style-scroll-container {
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+    padding: 20px 0;
+}
+
+.style-scroll-track {
+    display: flex;
+    width: max-content;
+    animation: scroll 10s linear infinite;
+}
+
+.style-scroll-track:hover {
+    animation-play-state: paused;
+}
+
+@keyframes scroll {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+        /* Move half the width (one full set of items) */
+    }
+}
+
 .category-scroll::-webkit-scrollbar {
     display: none;
+}
+
+.style-item {
+    margin-right: 50px;
+    /* Use margin instead of gap for consistent spacing calculation */
+    flex-shrink: 0;
 }
 
 .style-item img {
@@ -159,10 +192,10 @@ body {
     height: auto;
     border-radius: 10px;
     transition: transform 0.3s ease;
-}
-
-.style-item img:hover {
-    transform: scale(1.05);
+    user-select: none;
+    /* Prevent selection */
+    pointer-events: none;
+    /* Prevent interaction as requested */
 }
 
 .category-section {
@@ -202,6 +235,48 @@ body {
     font-size: 18px;
     overflow: hidden;
     position: relative;
+}
+
+.category-scroll-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    background: #FFFFFF;
+    border: 1px solid #ead9d2;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    color: #4A3B34;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+    opacity: 0.8;
+}
+
+.scroll-btn:hover {
+    background: #FFF6F0;
+    transform: translateY(-50%) scale(1.1);
+    opacity: 1;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.scroll-btn.scroll-left {
+    left: 20px;
+}
+
+.scroll-btn.scroll-right {
+    right: 20px;
 }
 
 .category-image img {
@@ -341,8 +416,9 @@ footer {
     /* Reduced from 15px */
 }
 
-footer .container {
-    padding: 0 15px;
+footer .container-fluid {
+    padding: 0 8% !important;
+    /* Ensure the padding is applied */
 }
 
 footer .logo {

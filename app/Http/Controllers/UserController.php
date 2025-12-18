@@ -23,6 +23,52 @@ class UserController extends Controller
         $user = Auth::user();
         return view('user.akun', compact('user'));
     }
+
+    public function shippingAddress()
+    {
+        $user = Auth::user();
+        $addresses = $user->addresses()->orderBy('is_primary', 'desc')->get();
+        return view('user.shipping_address', compact('addresses'));
+    }
+
+    public function storeShippingAddress(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:50',
+            'recipient_name' => 'required|string|max:100',
+            'phone' => 'required|string|max:20',
+            'address_line1' => 'required|string',
+            'city' => 'required|string|max:50',
+            'postal_code' => 'required|string|max:10',
+        ]);
+
+        $user = Auth::user();
+
+        // If this is the first address, make it primary
+        $isPrimary = $user->addresses()->count() === 0;
+
+        // Create address
+        $newAddress = $user->addresses()->create([
+            'title' => $request->title,
+            'recipient_name' => $request->recipient_name,
+            'phone' => $request->phone,
+            'address_line1' => $request->address_line1,
+            'city' => $request->city,
+            'postal_code' => $request->postal_code,
+            'is_primary' => $isPrimary
+        ]);
+
+        // If context 'items' matches, redirect back to checkout with this new address selected
+        if ($request->has('items') && !empty($request->items)) {
+            return redirect()->route('payment', [
+                'items' => $request->items,
+                'address_id' => $newAddress->id
+            ])->with('success', 'Address added and selected');
+        }
+
+        // Redirect back to ACCOUNT page as normal
+        return redirect()->route('user.account')->with('success', 'Address added successfully');
+    }
     
     public function wishlist()
     {
@@ -195,6 +241,40 @@ class UserController extends Controller
         ]);
     }
     
+    public function search(Request $request)
+    {
+        $query = $request->input('q');
+
+        if (empty($query)) {
+            $history = session()->get('search_history', []);
+            // Fetch trending products (Popular + High Views)
+            $trending = Product::available()
+                        ->popular()
+                        ->orderBy('view_count', 'desc')
+                        ->inRandomOrder() // Mix it up slightly if all counts are 0
+                        ->take(7)
+                        ->get();
+                        
+            return view('user.search-start', compact('history', 'trending'));
+        }
+        
+        // Save to history
+        $history = session()->get('search_history', []);
+        array_unshift($history, $query);
+        $history = array_unique($history);
+        $history = array_slice($history, 0, 10); // Keep last 10
+        session()->put('search_history', $history);
+
+        $products = Product::where(function($q) use ($query) {
+                            $q->where('name', 'like', "%{$query}%")
+                              ->orWhere('description', 'like', "%{$query}%");
+                        })
+                        ->available()
+                        ->get();
+        
+        return view('user.search', compact('products', 'query'));
+    }
+
     public function menu()
     {
         $categories = Category::withCount('products')->get();
@@ -342,43 +422,7 @@ class UserController extends Controller
         return view('user.paymentmeth');
     }
 
-    public function shippingAddress()
-    {
-        $user = Auth::user();
-        $addresses = $user->addresses()->latest()->get();
-        return view('user.shipping_address', compact('addresses'));
-    }
 
-    public function storeShippingAddress(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string|max:50',
-            'recipient_name' => 'required|string|max:100',
-            'phone' => 'required|string|max:20',
-            'address_line1' => 'required|string|max:255',
-            'city' => 'required|string|max:100',
-            'postal_code' => 'required|string|max:20',
-        ]);
-
-        $user = Auth::user();
-        
-        // If this is the first address, make it primary
-        $isPrimary = $user->addresses()->count() === 0;
-
-        $user->addresses()->create([
-            'title' => $request->title,
-            'recipient_name' => $request->recipient_name,
-            'phone' => $request->phone,
-            'address_line1' => $request->address_line1,
-            'city' => $request->city,
-            'postal_code' => $request->postal_code,
-            'is_primary' => $isPrimary
-        ]);
-
-        // Redirect back to payment or shipping list
-        // If "from" param exists, could redirect there
-        return redirect()->back()->with('success', 'Address added successfully');
-    }
     
     public function placeOrder(Request $request)
     {
@@ -508,9 +552,11 @@ class UserController extends Controller
             
             // Delete this specific item from cart
             $cartItem->delete();
+            dump($paymentMethod);
         }
 
         return redirect()->route('order.confirm')->with('success', 'Pesanan berhasil dibuat');
+        
     }
 
     public function orderConfirm()

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ $category->name }} - MINARI</title>
+  <title>Search: {{ $query }} - MINARI</title>
 
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -16,12 +16,14 @@
   <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
 </head>
 <body>
+  @include('partials.toast-notifications')
   <!-- Navbar mount -->
   <header id="navMount"></header>
 
   <!-- Hero -->
-  <section class="hero" style="background-image: url('{{ $category->background_image_url }}');">
-    <div id="heroTitle" class="hero__title">{{ $category->name }}</div>
+  <!-- Hero -->
+  <section class="hero" style="min-height: 150px; display: flex; align-items: center; justify-content: center; background-image: url('{{ asset('images/aesthetic_search_bg.png') }}'); background-size: cover; background-position: center; padding: 0 5%; text-align: center;">
+    <div id="heroTitle" style="color: #5a4b45; font-size: 28px; font-weight: 700; font-family: 'Playfair Display', serif; text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);">Search Results: "{{ $query }}"</div>
   </section>
 
   <!-- Grid produk -->

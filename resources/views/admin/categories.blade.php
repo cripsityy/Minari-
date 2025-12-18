@@ -33,17 +33,15 @@
                             </div>
                         </td>
                         <td>{{ $category->name }}</td>
-                        <td class="action-icons">
-                            <a href="{{ route('admin.categories.edit', $category->id) }}" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form action="{{ route('admin.categories.delete', $category->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this category?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-link p-0 text-danger" title="Delete">
+                        <td>
+                            <div class="action-icons">
+                                <a href="{{ route('admin.categories.edit', $category->id) }}" class="text-decoration-none">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn p-0 border-0 bg-transparent" onclick="confirmDelete('{{ $category->id }}', '{{ addslashes($category->name) }}')">
                                     <i class="fas fa-trash"></i>
                                 </button>
-                            </form>
+                            </div>
                         </td>
                     </tr>
                 @empty
@@ -58,4 +56,20 @@
     <div class="d-flex justify-content-center mt-4">
         {{ $categories->links() }}
     </div>
+
+    {{-- Single hidden delete form --}}
+    <form id="deleteForm" method="POST" class="d-none">
+        @csrf
+        @method('DELETE')
+    </form>
 @endsection
+
+@push('scripts')
+<script>
+    function confirmDelete(id, name) {
+        let form = document.getElementById('deleteForm');
+        form.action = '/admin/categories/' + id;
+        form.submit();
+    }
+</script>
+@endpush

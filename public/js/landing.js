@@ -88,4 +88,62 @@ document.addEventListener("DOMContentLoaded", function () {
     if (window.location.pathname.includes('/admin/')) {
         checkLoginStatus();
     }
+
+    // Category Manual Scroll Buttons
+    const scrollContainer = document.getElementById('categoryScroll');
+    const scrollLeftBtn = document.getElementById('scrollLeftBtn');
+    const scrollRightBtn = document.getElementById('scrollRightBtn');
+
+    if (scrollContainer && scrollLeftBtn && scrollRightBtn) {
+        // Function to check and update button visibility
+        const updateScrollButtons = () => {
+            // Threshold to account for float precision
+            const threshold = 5;
+
+            // Hide Left Button if at start
+            if (scrollContainer.scrollLeft <= threshold) {
+                scrollLeftBtn.style.opacity = '0';
+                scrollLeftBtn.style.pointerEvents = 'none';
+            } else {
+                scrollLeftBtn.style.opacity = '1';
+                scrollLeftBtn.style.pointerEvents = 'auto';
+            }
+
+            // Hide Right Button if at end
+            // scrollWidth - scrollLeft should equal clientWidth at the end
+            if (scrollContainer.scrollWidth - scrollContainer.scrollLeft - scrollContainer.clientWidth <= threshold) {
+                scrollRightBtn.style.opacity = '0';
+                scrollRightBtn.style.pointerEvents = 'none';
+            } else {
+                scrollRightBtn.style.opacity = '1';
+                scrollRightBtn.style.pointerEvents = 'auto';
+            }
+        };
+
+        // Initial check
+        updateScrollButtons();
+
+        // Update on scroll (programmatic scroll triggers this)
+        scrollContainer.addEventListener('scroll', updateScrollButtons);
+
+        // Also update after window resize
+        window.addEventListener('resize', updateScrollButtons);
+
+        scrollLeftBtn.addEventListener('click', () => {
+            scrollContainer.scrollBy({
+                left: -400,
+                behavior: 'smooth'
+            });
+            // Fallback check after delay to ensure animation finished
+            setTimeout(updateScrollButtons, 500);
+        });
+
+        scrollRightBtn.addEventListener('click', () => {
+            scrollContainer.scrollBy({
+                left: 400,
+                behavior: 'smooth'
+            });
+            setTimeout(updateScrollButtons, 500);
+        });
+    }
 });

@@ -12,6 +12,7 @@
         <link rel="stylesheet" href="{{ asset('css/landing.css') }}">
     </head>
     <body class="landing-page">
+        @include('partials.toast-notifications')
         <header id="navMount"></header>
         <section class="hero-section">
             <div class="container">
@@ -43,14 +44,14 @@
         </section>
 
         @if(isset($promotions) && $promotions->count() > 0)
-        <section class="promotion-section py-5 bg-light">
+        <section class="promotion-section py-5 bg-white">
             <div class="container">
                 <h2 class="section-title text-center mb-5" style="font-family: 'Playfair Display', serif;">Special Offers</h2>
                 <div class="row g-4 justify-content-center">
                     @foreach($promotions as $promo)
                     <div class="col-md-4">
                         <div class="card border-0 shadow-sm h-100 promo-card" style="border-radius: 15px; overflow: hidden; transition: transform 0.3s;">
-                            <div class="card-body text-center p-4" style="background: #fff;">
+                            <div class="card-body text-center p-4" style="background: #FFF6F0;">
                                 <div class="badge bg-dark mb-3 px-3 py-2" style="font-weight: 500; letter-spacing: 1px;">
                                     {{ $promo->type == 'percentage' ? $promo->value . '% OFF' : 'Rp ' . number_format($promo->value, 0, ',', '.') . ' OFF' }}
                                 </div>
@@ -71,34 +72,48 @@
         <section class="style-section">
             <div class="container-fluid">
                 <h2 class="section-title">MINARI's Style</h2>
-                <div class="style-scroll px-5">
-                    @for($i = 1; $i <= 8; $i++)
-                    <div class="style-item">
-                        <img src="{{ asset('images/g' . $i . '.png') }}" alt="Style {{ $i }}">
+                <div class="style-scroll-container">
+                    <div class="style-scroll-track">
+                        {{-- First set of items --}}
+                        @for($i = 1; $i <= 8; $i++)
+                        <div class="style-item">
+                            <img src="{{ asset('images/g' . $i . '.png') }}" alt="Style {{ $i }}">
+                        </div>
+                        @endfor
+                        
+                        {{-- Duplicate set for seamless looping --}}
+                        @for($i = 1; $i <= 8; $i++)
+                        <div class="style-item">
+                            <img src="{{ asset('images/g' . $i . '.png') }}" alt="Style {{ $i }}">
+                        </div>
+                        @endfor
                     </div>
-                    @endfor
                 </div>
             </div>
         </section>
         <section class="category-section" id="categories">
             <div class="container-fluid">
                 <h2 class="section-title">Product Category</h2>
-                <div class="category-scroll px-5">
-                    @foreach($categories as $category)
-                    <a href="{{ route('user.category', ['cat' => $category->slug]) }}" class="category-card text-decoration-none d-block">
-                        <div class="category-image">
-                            <!-- Use image_url accessor which handles default -->
-                            <img src="{{ $category->image_url }}" alt="{{ $category->name }}">
-                        </div>
-                        <h3>{{ $category->name }}</h3>
-                    </a>
-                    @endforeach
-                    
-                    @if($categories->isEmpty())
-                        <div class="text-center w-100 p-5">
-                            <p class="text-muted">No categories available at the moment.</p>
-                        </div>
-                    @endif
+                <div class="category-scroll-wrapper position-relative">
+                    <button class="scroll-btn scroll-left" id="scrollLeftBtn"><i class="fas fa-chevron-left"></i></button>
+                    <div class="category-scroll px-5" id="categoryScroll">
+                        @foreach($categories as $category)
+                        <a href="{{ route('user.category', ['cat' => $category->slug]) }}" class="category-card text-decoration-none d-block">
+                            <div class="category-image">
+                                <!-- Use image_url accessor which handles default -->
+                                <img src="{{ $category->image_url }}" alt="{{ $category->name }}">
+                            </div>
+                            <h3>{{ $category->name }}</h3>
+                        </a>
+                        @endforeach
+                        
+                        @if($categories->isEmpty())
+                            <div class="text-center w-100 p-5">
+                                <p class="text-muted">No categories available at the moment.</p>
+                            </div>
+                        @endif
+                    </div>
+                    <button class="scroll-btn scroll-right" id="scrollRightBtn"><i class="fas fa-chevron-right"></i></button>
                 </div>
             </div>
         </section>
@@ -149,7 +164,7 @@
             </div>
         </section>
         <footer>
-            <div class="container">
+            <div class="container-fluid px-5">
                 <div class="row align-items-center">
                     <div class="col-md-6">
                         <div class="logo">

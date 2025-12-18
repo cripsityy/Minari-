@@ -151,6 +151,16 @@
     @endif
   </section>
 
+  <!-- Toast: added to cart -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="miniToast" class="toast align-items-center" data-bs-delay="1600" role="status" aria-live="polite">
+      <div class="d-flex">
+        <div class="toast-body" id="toastMessage">Item has been added to your cart.</div>
+        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   {{-- kirim role Laravel ke JS/navbar --}}

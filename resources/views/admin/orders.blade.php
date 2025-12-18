@@ -22,8 +22,8 @@
             </thead>
             <tbody>
                 @forelse($orders as $order)
-                <tr>
-                    <td><a href="{{ route('admin.orders.detail', $order->id) }}" style="color: #000; text-decoration: none;">#{{ $order->order_number }}</a></td>
+                <tr onclick="window.location='{{ route('admin.orders.detail', $order->id) }}'" style="cursor: pointer;">
+                    <td><strong>#{{ $order->order_number }}</strong></td>
                     <td>{{ $order->customer_name }}</td>
                     <td>
                         @if($order->items->count() > 0)

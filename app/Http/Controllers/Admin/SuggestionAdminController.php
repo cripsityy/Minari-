@@ -7,11 +7,17 @@ use App\Models\Suggestion;
 
 class SuggestionAdminController extends Controller
 {
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
-        $suggestions = Suggestion::query()
-            ->latest()
-            ->paginate(20);
+        $query = Suggestion::query();
+
+        if ($request->has('search')) {
+            $query->where('message', 'like', '%' . $request->search . '%')
+                  ->orWhere('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('email', 'like', '%' . $request->search . '%');
+        }
+
+        $suggestions = $query->latest()->paginate(20);
 
         return view('admin.suggestions.index', compact('suggestions'));
     }

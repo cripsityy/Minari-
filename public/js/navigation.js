@@ -70,23 +70,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 console.log(`${action} action triggered`);
 
+                // Global delete handler removed to allow specific page logic
+                /*
                 if (action === 'Delete' || this.classList.contains('fa-trash')) {
                     e.preventDefault();
-                    const row = this.closest('tr');
-                    const itemName = row ? row.querySelector('td:nth-child(2)').textContent : 'item';
-
-                    if (confirm(`Are you sure you want to delete "${itemName}"?`)) {
-                        alert(`"${itemName}" deleted successfully!`);
-                        if (row) {
-                            row.style.opacity = '0.5';
-                            setTimeout(() => {
-                                if (row.parentNode) {
-                                    row.parentNode.removeChild(row);
-                                }
-                            }, 500);
-                        }
-                    }
+                    // ... (rest of the removed logic)
                 }
+                */
             });
         });
     }

@@ -67,32 +67,9 @@ document.addEventListener('DOMContentLoaded', function () {
             paymentInput.value = backendValues[savedPayment] || savedPayment;
         }
 
-        // 2. Shipping Address
-        const savedAddressData = localStorage.getItem('selectedAddressData');
-        const addressDisplay = document.getElementById('selectedAddressDisplay');
-        const addressDetails = document.getElementById('selectedAddressDetails');
-
-        // Hidden inputs
-        const inputAddr = document.getElementById('inputShippingAddress');
-        const inputCity = document.getElementById('inputShippingCity');
-        const inputZip = document.getElementById('inputShippingPostalCode');
-
-        if (savedAddressData) {
-            try {
-                const data = JSON.parse(savedAddressData);
-
-                // Update Visuals
-                if (addressDisplay) addressDisplay.textContent = data.display_name;
-                if (addressDetails) addressDetails.textContent = data.details;
-
-                // Update Hidden Inputs (CRITICAL for backend)
-                if (inputAddr && data.address_line1) inputAddr.value = data.address_line1;
-                if (inputCity && data.city) inputCity.value = data.city;
-                if (inputZip && data.postal_code) inputZip.value = data.postal_code;
-
-            } catch (e) {
-                console.error("Error parsing saved address", e);
-            }
-        }
+        // 2. Shipping Address - REMOVED
+        // We now rely on URL parameters and server-side rendering for the address.
+        // Restoring from localStorage caused conflicting states (e.g. showing old address despite new selection).
+        // if (savedAddressData) { ... }
     }
 });

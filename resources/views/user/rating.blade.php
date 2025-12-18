@@ -7,12 +7,17 @@
 
     {{-- Bootstrap --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    {{-- Fonts --}}
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     {{-- CSS --}}
     <link rel="stylesheet" href="{{ asset('css/rating.css') }}">
     <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @include('partials.navbar-scripts')
+    @include('partials.toast-notifications')
     {{-- Role Sync --}}
     <script>
         window.APP_ROLE = "{{ session('role') ?? 'guest' }}";
@@ -33,7 +38,7 @@
                 $existingReview = $item->product ? $item->product->reviews()->where('order_id', $order->id)->where('user_id', auth()->id())->first() : null;
             @endphp
             
-            <div class="product-box mb-5" id="review-box-{{ $item->product_id }}" style="border-bottom: 2px solid #eee; padding-bottom: 20px;">
+            <div class="product-box mb-5" id="review-box-{{ $item->product_id }}">
                 {{-- Product Info --}}
                 <div class="d-flex align-items-center mb-3">
                     <img src="{{ $item->product->image ? asset('storage/'.$item->product->image) : asset('images/default-product.jpg') }}" 
@@ -46,12 +51,16 @@
                 </div>
 
                 @if($existingReview)
-                    <div class="alert alert-success">
-                        <i class="fas fa-check-circle"></i> You have reviewed this product.
-                        <div class="mt-2 text-warning">
+                    <div class="reviewed-state text-center py-4">
+                        <div class="mb-2" style="color: #625B71; font-weight: 500;">
+                            <i class="fas fa-check-circle" style="color: #D9AF9C;"></i> Reviewed
+                        </div>
+                        <div class="mb-3" style="color: #e5a391; font-size: 24px; letter-spacing: 5px;">
                             @for($i=0; $i<$existingReview->rating; $i++) ★ @endfor
                         </div>
-                        <div class="fst-italic text-muted">"{{ $existingReview->comment }}"</div>
+                        <div class="fst-italic" style="color: #8B7E74; font-family: 'Playfair Display', serif; font-size: 16px;">
+                            "{{ $existingReview->comment }}"
+                        </div>
                     </div>
                 @else
                     {{-- Rating Form --}}
@@ -92,7 +101,7 @@
 </main>
 
 <footer>
-            <div class="container">
+            <div class="container-fluid px-5">
                 <div class="row align-items-center">
                     <div class="col-md-6">
                         <div class="logo">

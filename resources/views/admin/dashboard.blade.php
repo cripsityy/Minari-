@@ -82,9 +82,7 @@
                                     <td>#{{ $order->order_number }}</td>
                                     <td>{{ $order->customer_name }}</td>
                                     <td>
-                                        <span class="badge bg-{{ $order->status_color }}">
-                                            {{ ucfirst($order->order_status) }}
-                                        </span>
+                                        {{ ucfirst($order->order_status) }}
                                     </td>
                                     <td>Rp {{ number_format($order->total, 0, ',', '.') }}</td>
                                 </tr>

@@ -6,6 +6,7 @@
   <title>MINARI | Cart</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   @include('partials.navbar-scripts')
 
   {{-- CSS --}}
@@ -14,7 +15,7 @@
 </head>
 
 <body>
-
+    @include('partials.toast-notifications')
 <header id="navMount"></header>
 
 <div class="container mb-5">
@@ -77,14 +78,14 @@
                             </div>
                             @endif
                         </div>
-                        <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-2">
                             <div class="qty-wrap">
                                 <button class="qty-btn btnMinus">−</button>
                                 <input type="number" class="qty-input item-qty" min="1" value="{{ $itemQuantity }}"/>
                                 <button class="qty-btn btnPlus">+</button>
                             </div>
-                            <button class="btn btn-outline-danger btn-sm remove-item">
-                                <i class="bi bi-trash"></i>
+                            <button class="btn btn-link text-danger remove-item p-0 border-0" style="text-decoration:none;" title="Remove Item">
+                                <i class="fas fa-trash-alt fa-lg"></i>
                             </button>
                         </div>
                     </div>
@@ -97,7 +98,7 @@
 {{-- STICKY TOTAL BAR --}}
 @if(!$cartItems->isEmpty())
 <div class="sticky-total">
-    <div class="container d-flex align-items-center justify-content-between">
+    <div class="container-fluid px-5 d-flex align-items-center justify-content-between">
         <div>
             <span class="text-muted">Total:</span>
             <span class="ms-2 fw-bold price" id="totalPrice">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
