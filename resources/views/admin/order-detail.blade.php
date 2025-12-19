@@ -197,7 +197,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label small">Tracking Number (Required for Shipped)</label>
-                            <input type="text" name="tracking_number" class="form-control form-control-sm" value="{{ $order->tracking_number }}" placeholder="Enter receipt number">
+                            <input type="text" name="tracking_number" class="form-control form-control-sm" value="{{ $order->tracking_number }}" placeholder="Enter receipt number" {{ $order->tracking_number ? 'readonly' : '' }}>
                         </div>
                         <button type="submit" class="btn btn-dark btn-sm w-100">Update Status</button>
                     </form>
@@ -239,5 +239,16 @@
 @endsection
 
 @push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const trackingInput = document.querySelector('input[name="tracking_number"]');
+        if (trackingInput && !trackingInput.value) {
+            // Generate random tracking number: TRK + Timestamp + Random 3 chars
+            const timestamp = Date.now().toString().substr(-6);
+            const random = Math.random().toString(36).substring(2, 5).toUpperCase();
+            trackingInput.value = 'TRK' + timestamp + random;
+        }
+    });
+</script>
 {{-- <script src="{{ asset('js/orderdetailadmin.js') }}"></script> --}}
 @endpush

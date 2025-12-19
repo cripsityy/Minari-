@@ -489,18 +489,26 @@ class AdminController extends Controller
         
         $order->order_status = $request->order_status;
         
-        if ($request->order_status == 'shipped' && $request->tracking_number) {
-            $order->tracking_number = $request->tracking_number;
-            $order->shipped_at = now();
+        // Update tracking number if provided and not already set (or if we want to allow updates until it's "locked" - user said "gak boleh berubah-ubah lagi", implying lock)
+        // However, if the field is readonly in generic view, controller should also respect that or just save what comes in. 
+        // If the view handles it as readonly, the request might not send it or send the same value.
+        // Let's just save it if provided.
+        if ($request->has('tracking_number') && $request->tracking_number) {
+             $order->tracking_number = $request->tracking_number;
+        }
+
+        if ($request->order_status == 'shipped' && !$order->shipped_at) {
+             $order->shipped_at = now();
         }
         
-        if ($request->order_status == 'delivered') {
+        if ($request->order_status == 'delivered' && !$order->delivered_at) {
             $order->delivered_at = now();
         }
         
         $order->save();
         
-        return redirect()->back()->with('success', 'Status pesanan berhasil diperbarui');
+        // User requested redirect to order list
+        return redirect()->route('admin.orders')->with('success', 'Status pesanan berhasil diperbarui');
     }
     
     // Customers Management

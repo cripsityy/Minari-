@@ -241,6 +241,35 @@ body {
     }
 }
 
+@media (max-width: 576px) {
+    .w-item {
+        grid-template-columns: 80px 1fr;
+        gap: 12px;
+    }
+
+    .w-img {
+        width: 80px;
+        height: 80px;
+    }
+
+    .w-name {
+        font-size: 15px;
+    }
+
+    .w-meta {
+        font-size: 13px;
+    }
+
+    .w-actions {
+        flex-wrap: wrap;
+    }
+
+    .w-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 13px;
+    }
+}
+
 /* Guest message styling */
 .guest-message,
 .empty-wishlist {

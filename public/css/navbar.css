@@ -152,3 +152,57 @@ body {
     height: 40px;
     width: auto;
 }
+
+/* RESPONSIVE NAVBAR */
+@media (max-width: 991.98px) {
+    #navMount .navbar {
+        padding: 10px 15px;
+    }
+
+    .navbar-collapse {
+        background: #FFF6F0;
+        margin-top: 15px;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-nav .nav-item {
+        margin-bottom: 10px;
+    }
+
+    .navbar-nav .nav-link {
+        padding: 8px 0;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .navbar-brand img {
+        height: 32px;
+    }
+
+    #navMount .navbar {
+        padding: 8px 12px;
+    }
+
+    .navbar-toggler {
+        padding: 4px 8px;
+        font-size: 1.1rem;
+    }
+
+    /* Adjust account dropdown for mobile */
+    .accmini {
+        position: fixed;
+        top: 60px !important;
+        right: 15px;
+        left: auto;
+        width: 200px;
+        transform: none !important;
+    }
+
+    .accmini::before {
+        right: 15px;
+        left: auto;
+        transform: rotate(45deg);
+    }
+}

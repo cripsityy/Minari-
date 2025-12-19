@@ -241,14 +241,37 @@ body {
 
 /* Responsive tweak */
 @media (max-width: 768px) {
-  .hero__img {
-    width: 100%;
-    height: auto;
+  .hero {
+    height: 40vh;
+    min-height: 250px;
+  }
+
+  .hero__title {
+    font-size: 32px;
   }
 
   .navbar-custom {
     padding: 0.6rem 0;
     height: 60px;
+  }
+}
+
+@media (max-width: 576px) {
+  .p-card .p-name {
+    font-size: 13px;
+  }
+
+  .p-card .p-price {
+    font-size: 12px;
+  }
+
+  .p-mini-actions button {
+    width: 28px;
+    height: 28px;
+  }
+
+  .p-info {
+    padding: 8px;
   }
 }
 

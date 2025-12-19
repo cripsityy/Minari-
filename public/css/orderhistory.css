@@ -244,3 +244,43 @@ body {
         padding-top: 20px;
     }
 }
+
+@media (max-width: 576px) {
+    .products-grid {
+        grid-template-columns: 1fr;
+        /* Stack products on mobile */
+    }
+
+    .order-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .order-status {
+        align-self: flex-start;
+    }
+
+    .product-item {
+        gap: 10px;
+    }
+
+    .product-image {
+        width: 60px;
+        height: 60px;
+    }
+
+    .order-footer {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn-detail,
+    .btn-rate {
+        width: 100%;
+        text-align: center;
+    }
+
+    .page-title {
+        font-size: 28px;
+    }
+}

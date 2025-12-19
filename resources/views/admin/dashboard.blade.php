@@ -60,7 +60,7 @@
 
     <div class="row">
         <!-- Recent Orders -->
-        <div class="col-md-8">
+        <div class="col-lg-8">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white py-3">
                     <h5 class="mb-0">Recent Orders</h5>
@@ -72,7 +72,7 @@
                                 <tr>
                                     <th>Order ID</th>
                                     <th>Customer</th>
-                                    <th>Status</th>
+                                    <th>Shipping Status</th>
                                     <th>Amount</th>
                                 </tr>
                             </thead>
@@ -95,7 +95,7 @@
         </div>
 
         <!-- Top Products -->
-        <div class="col-md-4">
+        <div class="col-lg-4">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white py-3">
                     <h5 class="mb-0">Top Products</h5>

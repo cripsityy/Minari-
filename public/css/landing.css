@@ -344,7 +344,7 @@ body {
     background: #F7F7F2;
     border-radius: 20px;
     padding: 25px;
-    height: 240px;
+    height: 100%;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     transition: all 0.3s;
     display: flex;
@@ -528,6 +528,65 @@ footer .text-end .footer-form button:hover {
     display: none;
 }
 
+@media (max-width: 991.98px) {
+    .hero-section {
+        padding-top: 120px;
+        min-height: auto;
+        padding-bottom: 60px;
+        text-align: center;
+        flex-direction: column;
+    }
+
+    .hero-content {
+        margin-bottom: 50px;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .hero-content h1 {
+        font-size: 56px;
+    }
+
+    .hero-images {
+        height: 400px;
+        margin-top: 20px;
+    }
+
+    .hero-obj-main {
+        width: 300px;
+        top: 80px;
+        right: 25%;
+        transform: translateX(50%);
+        margin-right: -90px;
+        /* Center alignment trick */
+    }
+
+    .hero-obj-1,
+    .hero-obj-2,
+    .hero-obj-3 {
+        transform: scale(0.8);
+    }
+
+    .hero-obj-1 {
+        width: 120px;
+        top: -10px;
+        right: 60%;
+    }
+
+    .hero-obj-2 {
+        width: 120px;
+        top: -60px;
+        right: 25%;
+    }
+
+    .hero-obj-3 {
+        width: 120px;
+        top: 20px;
+        right: -10%;
+    }
+}
+
 @media (max-width: 768px) {
     .hero-content h1 {
         font-size: 42px;
@@ -535,6 +594,7 @@ footer .text-end .footer-form button:hover {
 
     .hero-content p {
         font-size: 16px;
+        padding: 0 20px;
     }
 
     .section-title {
@@ -574,11 +634,92 @@ footer .text-end .footer-form button:hover {
     .navbar-icons i {
         font-size: 18px;
     }
+}
 
+@media (max-width: 575.98px) {
     .hero-section {
-        padding-top: 80px;
-        min-height: 80vh;
-        margin-top: 60px;
+        padding-top: 100px;
+    }
+
+    .hero-content h1 {
+        font-size: 36px;
+    }
+
+    .hero-images {
+        height: 300px;
+    }
+
+    .hero-obj-main {
+        width: 150px;
+        margin-right: -65px;
+        top: 20px;
+    }
+
+    /* Hide floating elements on small mobile to reduce clutter */
+    .hero-obj-1,
+    .hero-obj-2,
+    .hero-obj-3 {
+        display: none;
+    }
+
+    .category-scroll {
+        gap: 20px;
+        padding: 0 20px 20px;
+    }
+
+    .scroll-btn {
+        display: none;
+        /* Hide scroll buttons on mobile, use touch */
+    }
+
+    .category-card {
+        min-width: 240px;
+        height: 340px;
+    }
+
+    .category-image {
+        height: 220px;
+    }
+
+    .slogan-section {
+        padding: 80px 0;
+    }
+
+    .slogan-section h2 {
+        font-size: 36px;
+    }
+
+    .slogan-section .subtitle {
+        font-size: 48px;
+    }
+
+    /* Footer adjustments */
+    footer .container-fluid {
+        padding: 0 20px !important;
+    }
+
+    footer .row {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+
+    footer .col-md-6 {
+        width: 100%;
+        text-align: center !important;
+        align-items: center !important;
+    }
+
+    footer .logo {
+        justify-content: center;
+    }
+
+    footer .text-end.input-end {
+        align-items: center;
+    }
+
+    footer .text-end .footer-form {
+        justify-content: center;
     }
 }
 
