@@ -33,30 +33,10 @@ class AdminController extends Controller
             'pending_reviews' => Review::where('status', 'pending')->count()
         ];
         
+        
         $recentOrdersQuery = Order::with('user')->latest();
         $topProductsQuery = Product::withSum('orderItems', 'quantity')->orderByDesc('order_items_sum_quantity');
         $recentReviewsQuery = Review::with('user')->latest();
-
-        if ($request->has('search')) {
-            $searchTerm = $request->search;
-            
-            // Filter Orders
-            $recentOrdersQuery->where(function($q) use ($searchTerm) {
-                $q->where('order_number', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('customer_name', 'like', '%' . $searchTerm . '%');
-            });
-
-            // Filter Products
-            $topProductsQuery->where('name', 'like', '%' . $searchTerm . '%');
-
-            // Filter Reviews
-            $recentReviewsQuery->where(function($q) use ($searchTerm) {
-                $q->where('comment', 'like', '%' . $searchTerm . '%')
-                  ->orWhereHas('user', function($u) use ($searchTerm) {
-                      $u->where('name', 'like', '%' . $searchTerm . '%');
-                  });
-            });
-        }
 
         $recentOrders = $recentOrdersQuery->take(5)->get();
         $topProducts = $topProductsQuery->take(5)->get();
@@ -484,10 +464,16 @@ class AdminController extends Controller
         
         $request->validate([
             'order_status' => 'required|in:pending,processing,shipped,delivered,cancelled',
+            'payment_status' => 'nullable|in:pending,paid,cancelled,returned',
             'tracking_number' => 'nullable|string'
         ]);
         
         $order->order_status = $request->order_status;
+
+        // Update Payment Status if provided
+        if ($request->has('payment_status')) {
+            $order->payment_status = $request->payment_status;
+        }
         
         // Update tracking number if provided and not already set (or if we want to allow updates until it's "locked" - user said "gak boleh berubah-ubah lagi", implying lock)
         // However, if the field is readonly in generic view, controller should also respect that or just save what comes in. 
@@ -555,10 +541,19 @@ class AdminController extends Controller
     }
     
     // Promotions Management
-    public function promotions()
+    public function promotions(Request $request)
     {
-        $promotions = Promotion::latest()->get();
-        \Illuminate\Support\Facades\Log::info('Admin Promotions View', ['count' => $promotions->count(), 'data' => $promotions->toArray()]);
+        $query = Promotion::latest();
+
+        if ($request->has('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('code', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $promotions = $query->get();
+        \Illuminate\Support\Facades\Log::info('Admin Promotions View', ['count' => $promotions->count()]);
         return view('admin.promotions', compact('promotions'));
     }
 

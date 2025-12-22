@@ -180,13 +180,15 @@
                 <span class="detail-value">{{ $order->formatted_shipping_cost }}</span>
             </div>
             
-            @if($order->payment_status == 'paid')
+            @if($order->payment_status == 'paid' || $order->payment_method == 'cash_on_delivery')
                 <div class="mt-4 pt-3 border-top no-print"> <!-- Hide forms in print -->
-                    <h6>Update Shipping Status</h6>
+                    <h6>Update Status</h6>
                     <form action="{{ route('admin.orders.status', $order->id) }}" method="POST" class="mt-2">
                         @csrf
+                        
+                        <!-- Order Status -->
                         <div class="mb-3">
-                            <label class="form-label small">Status</label>
+                            <label class="form-label small">Order Status</label>
                             <select name="order_status" class="form-select form-select-sm">
                                 <option value="pending" {{ $order->order_status == 'pending' ? 'selected' : '' }}>Pending</option>
                                 <option value="processing" {{ $order->order_status == 'processing' ? 'selected' : '' }}>Processing</option>
@@ -195,6 +197,21 @@
                                 <option value="cancelled" {{ $order->order_status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                             </select>
                         </div>
+
+                        <!-- Payment Status (For COD or Admin Override) -->
+                        <div class="mb-3">
+                            <label class="form-label small">Payment Status</label>
+                            <select name="payment_status" class="form-select form-select-sm">
+                                <option value="pending" {{ $order->payment_status == 'pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="paid" {{ $order->payment_status == 'paid' ? 'selected' : '' }}>Paid</option>
+                                <option value="cancelled" {{ $order->payment_status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                <option value="returned" {{ $order->payment_status == 'returned' ? 'selected' : '' }}>Returned</option>
+                            </select>
+                            @if($order->payment_method == 'cash_on_delivery')
+                                <small class="text-muted d-block mt-1"><i class="fas fa-info-circle"></i> COD Order: Update to "Paid" when money is received.</small>
+                            @endif
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label small">Tracking Number (Required for Shipped)</label>
                             <input type="text" name="tracking_number" class="form-control form-control-sm" value="{{ $order->tracking_number }}" placeholder="Enter receipt number" {{ $order->tracking_number ? 'readonly' : '' }}>

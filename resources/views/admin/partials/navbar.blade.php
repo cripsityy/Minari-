@@ -30,11 +30,20 @@
                          $searchAction = route('admin.reviews');
                          $searchPlaceholder = 'Search Reviews...';
                     } elseif ($currentRoute == 'admin.dashboard') {
-                        // User specifically requested 'Search Dashboard'.
-                        $searchAction = route('admin.dashboard'); 
-                        $searchPlaceholder = 'Search Dashboard...';
+                        // Explicitly disable for dashboard
+                        $searchAction = null;
+                        $searchPlaceholder = '';
+                    } else {
+                        // Default fallback (usually products or whatever is set initially)
+                        // Do not clear it here unless we want to hide it for ALL unspecified pages.
+                        // Since line 14 sets default to Admin Products, we keep it.
+                        // Or we can say if it's not one of specific pages, hide it?
+                        // User said "di product tetep ada tap di dashboard aja yang diilangin"
+                        // So we should respect the default, or explicitly set Products if not set.
+                        // Because line 14 sets it, we just do nothing here.
                     }
                 @endphp
+                @if($searchAction)
                 <form class="d-flex align-items-center" role="search" action="{{ $searchAction }}" method="GET">
                     <div class="input-group input-group-sm" style="width: 220px;">
                         <span class="input-group-text bg-white border-end-0" style="border-radius: 20px 0 0 20px; border-color: #eee; padding-left: 12px;">
@@ -43,6 +52,9 @@
                         <input class="form-control border-start-0 ps-2 text-muted" type="search" name="search" placeholder="{{ $searchPlaceholder }}" aria-label="Search" style="border-radius: 0 20px 20px 0; border-color: #eee; font-size: 13px; height: 32px;" value="{{ request('search') }}">
                     </div>
                 </form>
+                @else
+                <div style="width: 220px;"></div> {{-- Spacer to keep layout balanced if needed, or just nothing --}}
+                @endif
 
                 <!-- Notifications Dropdown -->
                 @php

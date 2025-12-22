@@ -20,7 +20,7 @@
                     <th>Start Date</th>
                     <th>End Date</th>
                     <th>Status</th>
-                    <th>Actions</th>
+                    <th class="text-center">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -35,14 +35,15 @@
                         <span class="badge-status {{ $promo->status_badge_class }}">
                             {{ $promo->status }}
                         </span>
-                    </td>
-                    <td class="action-icons">
-                        <a href="{{ route('admin.promotions.edit', $promo->id) }}" class="text-decoration-none text-primary me-2">
-                            <i class="fas fa-edit" title="Edit"></i>
-                        </a>
-                        <button type="button" class="btn btn-link p-0 text-danger" onclick="confirmDelete('{{ $promo->id }}', '{{ $promo->code }}')">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                    <td class="text-center">
+                        <div class="action-icons justify-content-center">
+                            <a href="{{ route('admin.promotions.edit', $promo->id) }}" class="text-decoration-none text-primary me-2">
+                                <i class="fas fa-edit" title="Edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-link p-0 text-danger" onclick="confirmDelete('{{ $promo->id }}', '{{ $promo->code }}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 @empty

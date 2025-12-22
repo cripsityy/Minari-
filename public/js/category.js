@@ -24,12 +24,47 @@ const fmtIDR = v => {
 // ------------------------
 // Cart & Wishlist Functions
 // ------------------------
-// ------------------------
-// Cart & Wishlist Functions
-// ------------------------
 
 // addToCart is now handled by cart.js (window.addToCart)
 
+/**
+ * Updates the visual state of the wishlist button
+ * @param {HTMLElement} btn - The button element
+ * @param {boolean} isActive - Desired state (true = active/red, false = inactive/default)
+ */
+function updateWishlistUI(btn, isActive) {
+  if (!btn) return;
+
+  if (isActive) {
+    btn.classList.add('active');
+
+    // Image
+    const img = btn.querySelector('img');
+    if (img) img.src = "/images/whislist-active.png";
+
+    // Icon
+    const icon = btn.querySelector('i');
+    if (icon) {
+      icon.classList.remove('far');
+      icon.classList.add('fas', 'text-danger');
+    }
+  } else {
+    btn.classList.remove('active');
+
+    // Image
+    const img = btn.querySelector('img');
+    if (img) img.src = "/images/whislist.png";
+
+    // Icon
+    const icon = btn.querySelector('i');
+    if (icon) {
+      icon.classList.remove('fas', 'text-danger');
+      icon.classList.add('far');
+    }
+  }
+}
+
+// Main entry point for wishlist button click
 function addToWishlist(productId, buttonElement) {
   if (isGuestRole()) {
     const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
@@ -41,97 +76,86 @@ function addToWishlist(productId, buttonElement) {
   const productCard = buttonElement?.closest('[data-product-id]');
   const productName = productCard ? productCard.querySelector('.p-name')?.textContent : 'Product';
 
-  // Toggle active state visually
-  // Toggle active state visually
-  if (buttonElement) {
-    buttonElement.classList.toggle('active');
+  // Check current state to decide action
+  const isCurrentlyActive = buttonElement.classList.contains('active');
 
-    // Handle Image (Legacy)
-    const img = buttonElement.querySelector('img');
-    if (img && buttonElement.classList.contains('active')) {
-      img.src = "/images/whislist-active.png";
-    } else if (img) {
-      img.src = "/images/whislist.png";
-    }
+  if (isCurrentlyActive) {
+    // User wants to REMOVE
+    removeFromWishlist(productId, buttonElement, productName);
+  } else {
+    // User wants to ADD
+    performAddWishlist(productId, buttonElement, productName);
+  }
+}
 
-    // Handle Font Awesome Icon
-    const icon = buttonElement.querySelector('i');
-    if (icon) {
-      if (buttonElement.classList.contains('active')) {
-        icon.classList.remove('far');
-        icon.classList.add('fas', 'text-danger');
-      } else {
-        icon.classList.remove('fas', 'text-danger');
-        icon.classList.add('far');
-      }
-    }
+function performAddWishlist(productId, buttonElement, productName) {
+  // Optimistic UI Update: Set to Active
+  updateWishlistUI(buttonElement, true);
+
+  // Optimistic Badge Update
+  if (window.NavbarRole?.updateWishlistCount) {
+    const current = Number(window.WISHLIST_COUNT || 0);
+    window.NavbarRole.updateWishlistCount(current + 1);
   }
 
-  // Send API request
   fetch('/api/wishlist', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'X-CSRF-TOKEN': window.CSRF_TOKEN || document.querySelector('meta[name="csrf-token"]')?.content
     },
-    body: JSON.stringify({
-      product_id: productId
-    })
+    body: JSON.stringify({ product_id: productId })
   })
     .then(response => response.json())
     .then(data => {
       if (data.success) {
         showToast(`"${productName}" has been added to your wishlist.`);
       } else {
-        // If already in wishlist, remove it (logic from original code, assuming API behaves this way or we want toggle)
-        if (data.message && data.message.includes('already')) {
-          removeFromWishlist(productId, buttonElement, productName);
+        // Failed (e.g. already exists, or error)
+        if (data.message && (data.message.includes('already') || data.message.includes('sudah ada'))) {
+          // It's already there. Ensure UI is active.
+          updateWishlistUI(buttonElement, true);
+          showToast(`"${productName}" is already in your wishlist.`);
+          // Revert badge if we optimistic incremented
+          if (window.NavbarRole?.updateWishlistCount) {
+            const current = Number(window.WISHLIST_COUNT || 0);
+            window.NavbarRole.updateWishlistCount(Math.max(0, current - 1));
+          }
         } else {
+          // Generic error, revert UI
+          updateWishlistUI(buttonElement, false);
           showToast(data.message || 'Failed to add to wishlist.', true);
-          // Revert visual state
-          if (buttonElement) {
-            buttonElement.classList.toggle('active');
-            const img = buttonElement.querySelector('img');
-            if (img) img.src = "/images/whislist.png";
-
-            const icon = buttonElement.querySelector('i');
-            if (icon) {
-              if (buttonElement.classList.contains('active')) {
-                icon.classList.remove('far');
-                icon.classList.add('fas', 'text-danger');
-              } else {
-                icon.classList.remove('fas', 'text-danger');
-                icon.classList.add('far');
-              }
-            }
+          // Revert badge
+          if (window.NavbarRole?.updateWishlistCount) {
+            const current = Number(window.WISHLIST_COUNT || 0);
+            window.NavbarRole.updateWishlistCount(Math.max(0, current - 1));
           }
         }
       }
     })
     .catch(error => {
       console.error('Error:', error);
+      // Revert UI on network error
+      updateWishlistUI(buttonElement, false);
       showToast('An error occurred. Please try again.', true);
-      // Revert visual state
-      if (buttonElement) {
-        buttonElement.classList.toggle('active');
-        const img = buttonElement.querySelector('img');
-        if (img) img.src = "/images/whislist.png";
-
-        const icon = buttonElement.querySelector('i');
-        if (icon) {
-          if (buttonElement.classList.contains('active')) {
-            icon.classList.remove('far');
-            icon.classList.add('fas', 'text-danger');
-          } else {
-            icon.classList.remove('fas', 'text-danger');
-            icon.classList.add('far');
-          }
-        }
+      // Revert badge
+      if (window.NavbarRole?.updateWishlistCount) {
+        const current = Number(window.WISHLIST_COUNT || 0);
+        window.NavbarRole.updateWishlistCount(Math.max(0, current - 1));
       }
     });
 }
 
 function removeFromWishlist(productId, buttonElement, productName) {
+  // Optimistic UI Update: Set to Inactive
+  updateWishlistUI(buttonElement, false);
+
+  // Optimistic Badge Update
+  if (window.NavbarRole?.updateWishlistCount) {
+    const current = Number(window.WISHLIST_COUNT || 0);
+    window.NavbarRole.updateWishlistCount(Math.max(0, current - 1));
+  }
+
   fetch(`/api/wishlist/${productId}`, {
     method: 'DELETE',
     headers: {
@@ -143,21 +167,30 @@ function removeFromWishlist(productId, buttonElement, productName) {
     .then(data => {
       if (data.success) {
         showToast(`"${productName}" removed from wishlist.`);
-        if (buttonElement) {
-          buttonElement.classList.remove('active');
-          const img = buttonElement.querySelector('img');
-          if (img) img.src = "/images/whislist.png";
-
-          const icon = buttonElement.querySelector('i');
-          if (icon) {
-            icon.classList.remove('fas', 'text-danger');
-            icon.classList.add('far');
-          }
+        // Update navbar count with server truth
+        if (window.NavbarRole?.updateWishlistCount && data.wishlist_count !== undefined) {
+          window.NavbarRole.updateWishlistCount(data.wishlist_count);
+        }
+      } else {
+        // Failed to remove, revert UI to Active
+        updateWishlistUI(buttonElement, true);
+        showToast(data.message || 'Failed to remove from wishlist.', true);
+        // Revert badge (increment back)
+        if (window.NavbarRole?.updateWishlistCount) {
+          const current = Number(window.WISHLIST_COUNT || 0);
+          window.NavbarRole.updateWishlistCount(current + 1);
         }
       }
     })
     .catch(error => {
       console.error('Error:', error);
+      // Revert UI
+      updateWishlistUI(buttonElement, true);
+      // Revert badge
+      if (window.NavbarRole?.updateWishlistCount) {
+        const current = Number(window.WISHLIST_COUNT || 0);
+        window.NavbarRole.updateWishlistCount(current + 1);
+      }
     });
 }
 

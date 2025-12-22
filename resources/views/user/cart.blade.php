@@ -131,11 +131,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.min.js"></script>
 
-<script>
-    window.APP_ROLE = "{{ Auth::check() ? (Auth::user()->hasRole('admin') ? 'admin' : 'user') : 'guest' }}";
-    window.IS_AUTHENTICATED = {{ Auth::check() ? 'true' : 'false' }};
-    window.CSRF_TOKEN = "{{ csrf_token() }}";
-</script>
+
 
 <script src="{{ asset('js/navbar.js') }}"></script>
 {{-- JS --}}

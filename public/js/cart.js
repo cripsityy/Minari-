@@ -81,7 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // === Remove item via API
     async function removeItem(itemId, isGuest, rowElement) {
-        if (!confirm('Are you sure you want to remove this item?')) return;
+        // Removed blocking alert as per request
+        // if (!confirm('Are you sure you want to remove this item?')) return;
 
         const endpoint = isGuest ? `/api/guest/cart/${itemId}` : `/api/cart/${itemId}`;
         try {
@@ -97,7 +98,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 rowElement.remove();
                 computeTotal();
+                computeTotal();
                 syncSelectAll();
+
+                // Show toast notification
+                if (typeof window.showToast === 'function') {
+                    window.showToast('Item removed from cart', 'success');
+                } else {
+                    console.warn('showToast function not found');
+                }
 
                 // If cart is empty, refresh page
                 if (getRows().length === 0) {
@@ -253,14 +262,9 @@ window.addToCart = async function (productId, productName, price, image = '', qu
         if (data.success) {
             // alert('Item added to cart!'); // REPLACED WITH TOAST
 
-            const toastEl = document.getElementById('miniToast');
-            if (toastEl && window.bootstrap) {
-                const toastBody = document.getElementById('toastMessage');
-                if (toastBody) toastBody.innerText = 'Item has been added to your cart.';
-                const toast = window.bootstrap.Toast.getOrCreateInstance(toastEl);
-                toast.show();
+            if (typeof window.showToast === 'function') {
+                window.showToast('Item has been added to your cart.', 'success');
             } else {
-                // Fallback if toast not present
                 console.log('Item added to cart');
             }
 

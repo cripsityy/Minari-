@@ -354,6 +354,8 @@ body {
     display: flex;
     gap: 12px;
     align-items: center;
+    justify-content: center;
+    /* Added for centering */
 }
 
 .action-icons i {

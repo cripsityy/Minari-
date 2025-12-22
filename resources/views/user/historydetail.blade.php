@@ -31,12 +31,21 @@
     </div>
 
     {{-- Delivery Status --}}
-    <div class="delivery-status-card">
-        <div class="status-icon">
-            <span class="material-icons">check</span>
+    <div class="delivery-status-card" style="background-color: {{ strtolower($order->order_status) == 'cancelled' ? '#f8d7da' : (strtolower($order->order_status) == 'delivered' ? '#d4edda' : '#fff3cd') }};">
+        <div class="status-icon" style="background-color: {{ strtolower($order->order_status) == 'cancelled' ? '#dc3545' : (strtolower($order->order_status) == 'delivered' ? '#28a745' : '#ffc107') }};">
+            <span class="material-icons">
+                @if(strtolower($order->order_status) == 'delivered') check
+                @elseif(strtolower($order->order_status) == 'cancelled') close
+                @elseif(strtolower($order->order_status) == 'shipped' || strtolower($order->order_status) == 'sent') local_shipping
+                @else schedule
+                @endif
+            </span>
         </div>
-        <div class="delivery-text">
-            Delivered to <span style="font-weight: 600;">{{ $order->delivery ?? ($order->shipping_address ?? 'Home') }}</span>
+        <div class="delivery-text" style="color: {{ strtolower($order->order_status) == 'cancelled' ? '#721c24' : (strtolower($order->order_status) == 'delivered' ? '#155724' : '#856404') }};">
+            {{ ucfirst($order->order_status) }} 
+            @if(strtolower($order->order_status) == 'delivered')
+                to <span style="font-weight: 600;">{{ $order->delivery ?? ($order->shipping_address ?? 'Home') }}</span>
+            @endif
         </div>
     </div>
 
@@ -56,7 +65,7 @@
             </div>
             <div class="info-item">
                 <label>Status</label>
-                <span style="color: #317331;">{{ $order->status }}</span>
+                <span style="color: #317331; font-weight:bold;">{{ ucfirst($order->order_status) }}</span>
             </div>
         </div>
     </div>
@@ -75,7 +84,7 @@
                 </div>
                 <div class="product-meta" style="flex:1;">
                     <h4>{{ $item->product_name }}</h4>
-                    <p>Qty: {{ $item->quantity }}</p>
+                    <p>Qty: {{ $item->quantity }} @if($item->size) • Size: {{ $item->size }} @endif</p>
                     <div class="product-price">Rp {{ number_format($item->price, 0, ',', '.') }}</div>
                 </div>
             </div>
@@ -105,7 +114,7 @@
             Need Help?
         </a>
 
-        @if(in_array(strtolower($order->status ?? ''), ['delivered', 'completed', 'done', 'paid']))
+        @if(in_array(strtolower($order->order_status ?? ''), ['delivered', 'completed', 'done', 'paid']))
             <a href="{{ route('rating.page', ['order_id' => $order->id]) }}" class="btn btn-dark rounded-pill px-4" style="background-color: #1D1B20; border: none; font-family: 'Poppins', sans-serif;">
                 Rate Product
             </a>

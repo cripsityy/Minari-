@@ -187,7 +187,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const result = await removeFromWishlist(wishlistId);
                 if (result.success) {
                     showToast('Removed from wishlist');
-                    // Refresh
+
+                    // Update navbar badge
+                    if (result.wishlist_count !== undefined && window.NavbarRole && window.NavbarRole.updateWishlistCount) {
+                        window.NavbarRole.updateWishlistCount(result.wishlist_count);
+                    }
+
+                    // Refresh list
                     const items = await fetchWishlist();
                     renderWishlistItems(items || []);
                 } else {
@@ -200,6 +206,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const result = await addToCart(productId);
                 if (result.success) {
                     showToast('Added to cart');
+                    // Update navbar badge
+                    if (result.cart_count !== undefined && window.NavbarRole && window.NavbarRole.updateCartCount) {
+                        window.NavbarRole.updateCartCount(result.cart_count);
+                    }
                 } else {
                     showToast(result.message);
                 }

@@ -150,6 +150,6 @@
   <!-- Script kategori -->
   <script src="{{ asset('js/cart.js') }}"></script>
   <!-- Script kategori visual only -->
-  <script src="{{ asset('js/category.js') }}"></script>
+  <script src="{{ asset('js/category.js') }}?v={{ time() }}"></script>
 </body>
 </html>

@@ -99,6 +99,8 @@ class Order extends Model
             'paid' => 'badge-delivered',
             'failed' => 'badge-cancelled',
             'refunded' => 'badge-cancelled',
+            'cancelled' => 'badge-cancelled',
+            'returned' => 'badge-cancelled',
             default => 'badge-pending'
         };
     }

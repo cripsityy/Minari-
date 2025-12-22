@@ -162,6 +162,9 @@ Route::prefix('api')->group(function () {
     Route::patch('/guest/cart/{id}', [UserController::class, 'guestCartUpdateAPI'])->name('api.guest.cart.update');
     Route::delete('/guest/cart/{id}', [UserController::class, 'guestCartRemoveAPI'])->name('api.guest.cart.remove');
 
+    // General
+    Route::get('/user/counts', [UserController::class, 'getUserCounts'])->name('api.user.counts');
+
     // Reviews
     Route::post('/submit-review', [UserController::class, 'submitReview'])->name('api.submit.review');
 });

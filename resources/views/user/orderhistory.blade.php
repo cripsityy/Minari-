@@ -34,15 +34,15 @@
                             <h3>Order {{ $order->order_number ?? 'MIN'.str_pad($order->id, 8, '0', STR_PAD_LEFT) }}</h3>
                             <span class="order-date">{{ $order->created_at->format('d M Y') }}</span>
                         </div>
-                        <div class="order-status status-{{ strtolower($order->status) }}">
+                        <div class="order-status status-{{ strtolower($order->order_status) }}">
                             <span class="material-icons" style="font-size:16px;">
-                                @if($order->status == 'Sent' || $order->status == 'Shipped') local_shipping
-                                @elseif($order->status == 'Delivered') check_circle
-                                @elseif($order->status == 'Completed') task_alt
-                                @elseif($order->status == 'Cancelled') cancel
+                                @if(strtolower($order->order_status) == 'sent' || strtolower($order->order_status) == 'shipped') local_shipping
+                                @elseif(strtolower($order->order_status) == 'delivered') check_circle
+                                @elseif(strtolower($order->order_status) == 'completed') task_alt
+                                @elseif(strtolower($order->order_status) == 'cancelled') cancel
                                 @else schedule @endif
                             </span> 
-                            {{ $order->status }}
+                            {{ ucfirst($order->order_status) }}
                         </div>
                     </div>
 
@@ -95,7 +95,7 @@
                     {{-- Footer --}}
                     <div class="order-footer">
                         <a href="{{ route('order.detail', ['id' => $order->id]) }}" class="btn-detail">View Details</a>
-                        @if($order->status == 'Completed' || $order->status == 'Delivered')
+                        @if(strtolower($order->order_status) == 'completed' || strtolower($order->order_status) == 'delivered')
                             <a href="{{ route('rating.page', ['order_id' => $order->id]) }}" class="btn-rate">Rate Product</a>
                         @endif
                     </div>
@@ -117,9 +117,7 @@
 {{-- JS --}}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<script> 
-    window.APP_ROLE = "{{ session('role') ?? 'guest' }}"; 
-</script>
+
 
 <script src="{{ asset('js/navbar.js') }}"></script>
 

@@ -122,7 +122,7 @@
   </main>
 
   <section class="review-section">
-    <h3>Review ({{ $reviews->total() }})</h3>
+    <h3>Review ({{ $reviews->count() }})</h3>
     
     @if($reviews->count() > 0)
         @foreach($reviews as $review)
@@ -140,12 +140,6 @@
           </div>
         </div>
         @endforeach
-        
-        {{ $reviews->links() }} {{-- Pagination links if needed --}}
-        
-        <div class="mt-3">
-             <a class="lihat-lainnya" href="#">Lihat lainnya >></a>
-        </div>
     @else
         <p class="text-muted">Belum ada ulasan untuk produk ini.</p>
     @endif

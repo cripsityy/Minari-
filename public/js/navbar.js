@@ -5,6 +5,63 @@ const Role = {
   ADMIN: 'admin'
 };
 
+// ====== Global Navbar Utils ======
+window.NavbarRole = {
+  updateCartCount: function (count) {
+    window.CART_COUNT = count;
+    const navWrapper = document.querySelector('a[href="/cart"].nav-icon-wrapper');
+    if (navWrapper) {
+      let badge = navWrapper.querySelector('.badge-counter');
+      if (count > 0) {
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'badge-counter';
+          navWrapper.appendChild(badge);
+        }
+        badge.textContent = count;
+      } else if (badge) {
+        badge.remove();
+      }
+    }
+  },
+  updateWishlistCount: function (count) {
+    window.WISHLIST_COUNT = count;
+    const navWrapper = document.querySelector('a[href="/wishlist"].nav-icon-wrapper');
+    if (navWrapper) {
+      let badge = navWrapper.querySelector('.badge-counter');
+      if (count > 0) {
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'badge-counter';
+          navWrapper.appendChild(badge);
+        }
+        badge.textContent = count;
+      } else if (badge) {
+        badge.remove();
+      }
+    }
+  },
+  refreshCounts: function () {
+    fetch('/api/user/counts')
+      .then(response => response.json())
+      .then(data => {
+        if (data) {
+          this.updateCartCount(data.cart_count);
+          this.updateWishlistCount(data.wishlist_count);
+        }
+      })
+      .catch(err => console.error('Failed to sync navbar counts:', err));
+  }
+};
+
+// Auto-refresh on load and restore (BF Cache)
+window.addEventListener('pageshow', (event) => {
+  // If persisting, or just normal load, refresh
+  if (window.NavbarRole && window.NavbarRole.refreshCounts) {
+    window.NavbarRole.refreshCounts();
+  }
+});
+
 // ====== Templates ======
 function tplGuest() {
   return `
@@ -78,9 +135,19 @@ function tplUser() {
         <button id="accBtn" class="btn p-0 border-0" style="background: transparent !important; cursor: pointer;">
           <img src="/images/akun.png" alt="User" width="24" height="24">
         </button>
-        <a href="/wishlist"><img src="/images/whislist.png" alt="Favorite" width="24" height="24"></a>
+        
+        <a href="/wishlist" class="nav-icon-wrapper">
+            <img src="/images/whislist.png" alt="Favorite" width="24" height="24">
+            ${window.WISHLIST_COUNT > 0 ? `<span class="badge-counter">${window.WISHLIST_COUNT}</span>` : ''}
+        </a>
+        
         <a href="/search"><img src="/images/searchnav.png" alt="Search" width="24" height="24"></a>
-        <a href="/cart"><img src="/images/chart.png" alt="Cart" width="24" height="24"></a>
+        
+        <a href="/cart" class="nav-icon-wrapper">
+            <img src="/images/chart.png" alt="Cart" width="24" height="24">
+            ${window.CART_COUNT > 0 ? `<span class="badge-counter">${window.CART_COUNT}</span>` : ''}
+        </a>
+        
         <a href="/menu"><img src="/images/menu.png" alt="Menu" width="24" height="24"></a>
       </div>
     </div>
@@ -159,7 +226,14 @@ function renderNavbar() {
   }
 
   // Get role from global variable set by Laravel
-  const role = window.APP_ROLE || Role.GUEST;
+  let role = window.APP_ROLE || Role.GUEST;
+  const isAuthenticated = window.IS_AUTHENTICATED === true;
+
+  // Safety override: If authenticated but role says guest, force USER
+  if (isAuthenticated && role === Role.GUEST) {
+    console.warn('Authenticated but role was GUEST. Forcing USER role.');
+    role = Role.USER;
+  }
 
   console.log('Rendering navbar with role:', role);
 
@@ -176,6 +250,11 @@ function renderNavbar() {
 
   // Setup event listeners
   setTimeout(attachEventListeners, 100);
+
+  // Sync counts
+  if (window.NavbarRole && window.NavbarRole.refreshCounts) {
+    window.NavbarRole.refreshCounts();
+  }
 }
 
 function attachEventListeners() {

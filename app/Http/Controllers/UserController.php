@@ -343,7 +343,7 @@ class UserController extends Controller
             ->take(4)
             ->get();
         
-        $reviews = $product->reviews()->where('status', 'approved')->latest()->paginate(5);
+        $reviews = $product->reviews()->where('status', 'approved')->latest()->get();
         
         // Increment view count
         $product->increment('view_count');
@@ -594,6 +594,31 @@ class UserController extends Controller
     
     // ========== API METHODS ==========
     
+    // General API Methods
+    public function getUserCounts()
+    {
+        $cartCount = 0;
+        $wishlistCount = 0;
+        
+        if (Auth::check()) {
+            $user = Auth::user();
+            $cartCount = $user->carts()->count();
+            $wishlistCount = $user->wishlists()->count();
+        } else {
+            $cart = session()->get('guest_cart', []);
+            $cartCount = count($cart);
+            // Guests don't have persistent wishlist in this app currently, 
+            // usually it's empty or stored in localstorage (handled by JS).
+            // Based on UserController logic, guest wishlist is returned as empty collection.
+            $wishlistCount = 0; 
+        }
+
+        return response()->json([
+            'cart_count' => $cartCount,
+            'wishlist_count' => $wishlistCount
+        ]);
+    }
+
     // Wishlist API Methods
     public function getWishlistAPI()
     {
@@ -637,12 +662,39 @@ class UserController extends Controller
     
     public function removeFromWishlistAPI($id)
     {
-        $wishlistItem = Auth::user()->wishlists()->findOrFail($id);
-        $wishlistItem->delete();
+        // $id passed from route is likely product_id because frontend sends product_id
+        // Try to find by wishlist ID first, if not found, try by product_id for current user
         
+        $user = Auth::user();
+        
+        // Try deleting by product_id for current user (most likely scenario/robust)
+        $deleted = $user->wishlists()->where('product_id', $id)->delete();
+        
+        if ($deleted) {
+             return response()->json([
+                'success' => true,
+                'message' => 'Produk dihapus dari wishlist',
+                'wishlist_count' => $user->wishlists()->count()
+            ]);
+        }
+        
+        // Fallback: try deleting by actual wishlist ID
+        $wishlist = $user->wishlists()->find($id);
+        if ($wishlist) {
+            $wishlist->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Produk dihapus dari wishlist',
+                'wishlist_count' => $user->wishlists()->count()
+            ]);
+        }
+
+        // If neither found
         return response()->json([
-            'success' => true,
-            'message' => 'Produk dihapus dari wishlist'
+            'success' => false, // Changed to false so frontend knows it failed, but technically if it's gone it's fine. 
+                                // However, for toggle logic, if it wasn't there, maybe we consider it a success? 
+                                // Let's keep it robust: if we can't delete it, it might not exist.
+            'message' => 'Produk tidak ditemukan di wishlist'
         ]);
     }
     

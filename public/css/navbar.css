@@ -206,3 +206,28 @@ body {
         transform: rotate(45deg);
     }
 }
+
+/* NOTIFICATION BADGES */
+.nav-icon-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.badge-counter {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #dc3545;
+    /* Red */
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #FFF6F0;
+    /* Clean separation from icon */
+}

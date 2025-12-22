@@ -6,7 +6,6 @@
     <div class="row mb-4">
         <div class="col-12">
             <h2>Dashboard</h2>
-            <p class="text-muted">Welcome back, Admin</p>
         </div>
     </div>
 
