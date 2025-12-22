@@ -23,6 +23,26 @@ use App\Http\Controllers\Admin\SuggestionAdminController;
 
 Route::get('/', [LandingController::class, 'index'])->name('home');
 
+Route::get('/test-db', function() {
+    try {
+        $dbName = \DB::connection()->getDatabaseName();
+        $userCount = \DB::table('users')->count();
+        // Check for products table if exists, or any other main table
+        $tables = \DB::select('SHOW TABLES');
+        return response()->json([
+            'status' => 'success',
+            'database' => $dbName,
+            'user_count' => $userCount,
+            'tables' => $tables,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+        ]);
+    }
+});
+
 /*
 |--------------------------------------------------------------------------
 | CUSTOMER AUTH (DARI IKON USER)
