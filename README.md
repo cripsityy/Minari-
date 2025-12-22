@@ -1,59 +1,126 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# MINARI E-Commerce 🛍️
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+MINARI adalah aplikasi e-commerce berbasis web yang dibangun menggunakan framework **Laravel**. Aplikasi ini menyediakan platform lengkap untuk pelanggan berbelanja produk fashion dan admin untuk mengelola toko.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🌟 Fitur Utama
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 👤 Halaman Pengunjung (Customer)
+*   **Browsing Produk**: Homepage interaktif, filter Kategori, dan Pencarian produk.
+*   **Detail Produk**: Galeri gambar, deskripsi, harga, dan rekomendasi produk terkait.
+*   **Keranjang & Checkout**:
+    *   Sistem Cart (Keranjang) yang dinamis.
+    *   Penerapan **Kode Promo** (Diskon Tetap/Persen).
+    *   Pilihan Pembayaran: COD (Cash on Delivery) & Transfer Bank (Simulasi).
+    *   Manajemen Alamat Pengiriman.
+*   **User Area**:
+    *   **Login & Register** customer.
+    *   **Wishlist**: Simpan produk favorit.
+    *   **Riwayat Pesanan**: Lacak status pesanan (`Pending`, `Processing`, `Shipped`, `Delivered`).
+    *   **Rating & Review**: 
+        *   Tombol "Rate Product" muncul di halaman **Detail Order** setelah pesanan berstatus `Delivered` atau `Completed`.
+        *   Review ditampilkan dalam bentuk list vertikal di halaman produk.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 🛡️ Halaman Admin
+*   **Dashboard**: Ringkasan statistik (Total Penjualan, Order Baru, Produk Terlaris).
+*   **Manajemen Produk**: Tambah, Edit, Hapus produk (termasuk upload gambar).
+*   **Manajemen Kategori**: Kelola kategori produk.
+*   **Manajemen Promosi**: Buat dan atur kode voucher/diskon.
+*   **Manajemen Pesanan**: Update status pesanan (Terima/Tolak/Kirim Resi) dan update status pembayaran.
+*   **Manajemen Review**: Moderasi ulasan customer.
+*   **Kotak Saran**: Melihat pesan/saran dari customer.
+*   **Fitur Pencarian (Search)**:
+    *   Tersedia di navbar atas untuk mencari Produk, Order, Review, dan Customer.
+    *   Khusus di halaman **Dashboard**, fitur pencarian dinonaktifkan untuk menjaga tampilan ringkasan.
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 🛠️ Teknologi yang Digunakan
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+*   **Framework PHP**: Laravel 10.x
+*   **Bahasa**: PHP, JavaScript (Vanilla/ES6)
+*   **Database**: MySQL
+*   **Frontend**: Blade Templates, Bootstrap 5, Custom CSS
+*   **Icons**: Font Awesome
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🚀 Cara Instalasi
 
-### Premium Partners
+Ikuti langkah berikut untuk menjalankan proyek ini di komputer lokal Anda:
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Prasyarat
+*   PHP >= 8.1
+*   Composer
+*   MySQL
 
-## Contributing
+### Langkah-langkah
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1.  **Clone Repository** (atau ekstrak file zip)
+    ```bash
+    git clone https://github.com/username/minari.git
+    cd minari
+    ```
 
-## Code of Conduct
+2.  **Install Dependencies**
+    ```bash
+    composer install
+    ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+3.  **Setup Environment**
+    *   Duplikasi file `.env.example` menjadi `.env`.
+    *   Sesuaikan konfigurasi database di file `.env`:
+        ```env
+        DB_CONNECTION=mysql
+        DB_HOST=127.0.0.1
+        DB_PORT=3306
+        DB_DATABASE=db_minari  # Sesuaikan dengan nama database Anda
+        DB_USERNAME=root
+        DB_PASSWORD=
+        ```
 
-## Security Vulnerabilities
+4.  **Generate App Key**
+    ```bash
+    php artisan key:generate
+    ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+5.  **Migrate & Seed Database**
+    ```bash
+    php artisan migrate:fresh --seed
+    ```
+    *(Perintah ini akan membuat tabel dan mengisi data dummy awal)*
 
-## License
+6.  **Jalankan Server**
+    ```bash
+    php artisan serve
+    ```
+    Buka `http://127.0.0.1:8000` di browser Anda.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+7.  **Setup Storage Link** (Agar gambar produk muncul)
+    ```bash
+    php artisan storage:link
+    ```
+
+---
+
+## 🔑 Akun Default (Seeder)
+
+Jika Anda menggunakan seeder bawaan, gunakan akun berikut untuk login:
+
+**Admin:**
+*   Email: `admin@paml.com`
+*   Password: `password`
+
+**User (Contoh):**
+*   Email: `user@paml.com` (atau register akun baru)
+*   Password: `password`
+
+---
+
+## 📝 Catatan Implementasi
+*   **Pembayaran**: Status pembayaran default untuk metode transfer adalah `pending`. Admin perlu memverifikasi bukti bayar (manual) dan mengubah status menjadi `paid` di menu Orders. Untuk COD, status awal juga `pending`.
+*   **Rating**: User hanya bisa memberikan rating satu kali per item pesanan.
+
+---
+*Created by Minari Team*
