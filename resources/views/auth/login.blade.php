@@ -65,12 +65,6 @@
 </form>
 
 
-      <div class="text-center my-3 text-muted">— Or —</div>
-
-      <button class="btn w-100 google-btn" type="button">
-        Login with Google
-      </button>
-
       <p class="text-center mt-3">
         Don’t have an account? <a href="{{ url('/register') }}">Sign Up</a>
       </p>

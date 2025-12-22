@@ -401,7 +401,7 @@ class UserController extends Controller
             }
             
             if ($promoableAmount > 0) {
-                 $potentialDiscount = $promo->calculateDiscount($promoableAmount);
+                 $potentialDiscount = $promo->calculateDiscount($promoableAmount, $subtotal);
                  if ($potentialDiscount > $discount) {
                      $discount = $potentialDiscount;
                  }
@@ -482,7 +482,7 @@ class UserController extends Controller
             }
             
             if ($promoableAmount > 0) {
-                 $potentialDiscount = $promo->calculateDiscount($promoableAmount);
+                 $potentialDiscount = $promo->calculateDiscount($promoableAmount, $subtotal);
                  if ($potentialDiscount > $discount) {
                      $discount = $potentialDiscount;
                      // Ideally we would trigger $promo->increment('used_count'); here if we want to track usage

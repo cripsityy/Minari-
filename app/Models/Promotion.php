@@ -79,9 +79,11 @@ class Promotion extends Model
         };
     }
     
-    public function calculateDiscount($amount)
+    public function calculateDiscount($amount, $totalCartAmount = null)
     {
-        if (!$this->is_valid || ($this->min_purchase && $amount < $this->min_purchase)) {
+        $validationAmount = $totalCartAmount ?? $amount;
+
+        if (!$this->is_valid || ($this->min_purchase && $validationAmount < $this->min_purchase)) {
             return 0;
         }
 
