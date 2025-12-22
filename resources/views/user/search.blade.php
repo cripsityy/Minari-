@@ -75,9 +75,9 @@
                                         @endif
                                     </div>
                                     <div class="p-mini-actions">
-                                        <button class="p-wish" aria-label="Wishlist" 
+                                        <button class="p-wish {{ in_array($product->id, $wishlistProductIds ?? []) ? 'active' : '' }}" aria-label="Wishlist" 
                                                 onclick="event.preventDefault(); addToWishlist({{ $product->id }}, this)">
-                                            <i class="far fa-heart"></i>
+                                            <i class="{{ in_array($product->id, $wishlistProductIds ?? []) ? 'fas fa-heart text-danger' : 'far fa-heart' }}"></i>
                                         </button>
                                         <button class="p-cart" aria-label="Add to cart" 
                                                 onclick="event.preventDefault(); window.addToCart({{ $product->id }}, '{{ addslashes($product->name) }}', {{ $product->final_price ?? $product->price }}, '{{ asset('storage/' . $product->image) }}')">

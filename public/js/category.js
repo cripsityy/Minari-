@@ -42,13 +42,28 @@ function addToWishlist(productId, buttonElement) {
   const productName = productCard ? productCard.querySelector('.p-name')?.textContent : 'Product';
 
   // Toggle active state visually
+  // Toggle active state visually
   if (buttonElement) {
     buttonElement.classList.toggle('active');
+
+    // Handle Image (Legacy)
     const img = buttonElement.querySelector('img');
     if (img && buttonElement.classList.contains('active')) {
       img.src = "/images/whislist-active.png";
     } else if (img) {
       img.src = "/images/whislist.png";
+    }
+
+    // Handle Font Awesome Icon
+    const icon = buttonElement.querySelector('i');
+    if (icon) {
+      if (buttonElement.classList.contains('active')) {
+        icon.classList.remove('far');
+        icon.classList.add('fas', 'text-danger');
+      } else {
+        icon.classList.remove('fas', 'text-danger');
+        icon.classList.add('far');
+      }
     }
   }
 
@@ -78,6 +93,17 @@ function addToWishlist(productId, buttonElement) {
             buttonElement.classList.toggle('active');
             const img = buttonElement.querySelector('img');
             if (img) img.src = "/images/whislist.png";
+
+            const icon = buttonElement.querySelector('i');
+            if (icon) {
+              if (buttonElement.classList.contains('active')) {
+                icon.classList.remove('far');
+                icon.classList.add('fas', 'text-danger');
+              } else {
+                icon.classList.remove('fas', 'text-danger');
+                icon.classList.add('far');
+              }
+            }
           }
         }
       }
@@ -90,6 +116,17 @@ function addToWishlist(productId, buttonElement) {
         buttonElement.classList.toggle('active');
         const img = buttonElement.querySelector('img');
         if (img) img.src = "/images/whislist.png";
+
+        const icon = buttonElement.querySelector('i');
+        if (icon) {
+          if (buttonElement.classList.contains('active')) {
+            icon.classList.remove('far');
+            icon.classList.add('fas', 'text-danger');
+          } else {
+            icon.classList.remove('fas', 'text-danger');
+            icon.classList.add('far');
+          }
+        }
       }
     });
 }
@@ -110,6 +147,12 @@ function removeFromWishlist(productId, buttonElement, productName) {
           buttonElement.classList.remove('active');
           const img = buttonElement.querySelector('img');
           if (img) img.src = "/images/whislist.png";
+
+          const icon = buttonElement.querySelector('i');
+          if (icon) {
+            icon.classList.remove('fas', 'text-danger');
+            icon.classList.add('far');
+          }
         }
       }
     })

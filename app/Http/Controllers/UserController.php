@@ -272,7 +272,13 @@ class UserController extends Controller
                         ->available()
                         ->get();
         
-        return view('user.search', compact('products', 'query'));
+        
+        $wishlistProductIds = [];
+        if (Auth::check()) {
+             $wishlistProductIds = Auth::user()->wishlists()->pluck('product_id')->toArray();
+        }
+
+        return view('user.search', compact('products', 'query', 'wishlistProductIds'));
     }
 
     public function menu()
@@ -319,7 +325,13 @@ class UserController extends Controller
         
         $products = $category->products()->available()->get();
         
-        return view('user.category', compact('category', 'products'));
+        
+        $wishlistProductIds = [];
+        if (Auth::check()) {
+             $wishlistProductIds = Auth::user()->wishlists()->pluck('product_id')->toArray();
+        }
+
+        return view('user.category', compact('category', 'products', 'wishlistProductIds'));
     }
     
     public function detailProduk(Request $request, $slug)

@@ -329,9 +329,10 @@ body {
 }
 
 .back-navigation {
-    background: #FFF6F0;
+    background: transparent;
     padding: 15px 0;
     margin-bottom: 20px;
+    margin-top: 10px;
 }
 
 .back-link {

@@ -142,12 +142,8 @@ class AuthController extends Controller
                 $user->assignRole('user');
             }
 
-            Auth::login($user);
-            $request->session()->regenerate();
-            session(['role' => 'user']);
-
-            return redirect()->route('home')
-                ->with('success', 'Registrasi berhasil! Selamat datang di MINARI!');
+            return redirect()->route('login')
+                ->with('success', 'Registrasi berhasil! Silakan login.');
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Registrasi gagal: ' . $e->getMessage())

@@ -54,11 +54,7 @@
                 </a>
             </div>
             
-            <div class="mt-3">
-                 <a href="{{ route('rating.page', ['order_id' => $latestOrder->id ?? '']) }}" class="text-decoration-none" style="font-family: 'Poppins'; font-size: 18px; color: #8B7E74; border-bottom: 1px solid #8B7E74; padding-bottom: 2px;">
-                    Rate our product
-                 </a>
-            </div>
+
 
         </div>
     </div>
