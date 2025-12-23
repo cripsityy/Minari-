@@ -17,7 +17,7 @@
 
   <main class="container-detail">
     <div class="product">
-      <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('images/default-product.jpg') }}" alt="{{ $product->name }}">
+      <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
       <div class="mdet">
         <div class="details">
           <h2>{{ $product->name }}</h2>
@@ -112,7 +112,7 @@
                     const productId = {{ $product->id }};
                     const productName = "{{ $product->name }}";
                     const productPrice = {{ $product->final_price ?? $product->price }};
-                    const productImage = ""; 
+                    const productImage = "{{ $product->image_url }}"; 
                     
                     window.addToCart(productId, productName, productPrice, productImage, quantity, selectedSize);
                 };

@@ -56,7 +56,8 @@
                         $productId = $isGuest ? $item->product_id : $item->product_id;
                         $itemName = $isGuest ? $item->product->name : $item->product->name;
                         $itemPrice = $isGuest ? $item->product->price : ($item->product->final_price ?? $item->product->price);
-                        $itemImage = $isGuest ? $item->product->image : ($item->product->image ? asset('storage/' . $item->product->image) : asset('images/default-product.jpg'));
+                        // For guest, we assume image path is valid or needs processing, for auth user we use accessor
+                        $itemImage = $isGuest ? $item->product->image : $item->product->image_url;
                         $itemQuantity = $item->quantity;
                     @endphp
                     

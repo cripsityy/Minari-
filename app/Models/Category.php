@@ -27,11 +27,17 @@ class Category extends Model
 
     public function getImageUrlAttribute()
     {
-        return $this->image ? asset('storage/' . $this->image) : asset('images/default-category.jpg');
+        if (!$this->image) return asset('images/default-category.jpg');
+        if (filter_var($this->image, FILTER_VALIDATE_URL)) return $this->image;
+        if (env('CLOUDINARY_URL')) return \Illuminate\Support\Facades\Storage::disk('cloudinary')->url($this->image);
+        return asset('storage/' . $this->image);
     }
 
     public function getBackgroundImageUrlAttribute()
     {
-        return $this->background_image ? asset('storage/' . $this->background_image) : asset('images/default-header.jpg');
+        if (!$this->background_image) return asset('images/default-header.jpg');
+        if (filter_var($this->background_image, FILTER_VALIDATE_URL)) return $this->background_image;
+        if (env('CLOUDINARY_URL')) return \Illuminate\Support\Facades\Storage::disk('cloudinary')->url($this->background_image);
+        return asset('storage/' . $this->background_image);
     }
 }

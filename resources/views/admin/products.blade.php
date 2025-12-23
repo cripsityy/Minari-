@@ -29,7 +29,7 @@
                 <tr>
                     <td>
                         <div class="product-img">
-                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" onerror="this.src='{{ asset('images/logofix.png') }}'">
+                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" onerror="this.src='{{ asset('images/logofix.png') }}'">
                         </div>
                     </td>
                     <td>{{ $product->name }}</td>

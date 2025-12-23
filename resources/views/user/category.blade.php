@@ -78,7 +78,7 @@
                                             <i class="{{ in_array($product->id, $wishlistProductIds ?? []) ? 'fas fa-heart text-danger' : 'far fa-heart' }}"></i>
                                         </button>
                                         <button class="p-cart" aria-label="Add to cart" 
-                                                onclick="event.preventDefault(); window.addToCart({{ $product->id }}, '{{ addslashes($product->name) }}', {{ $product->final_price ?? $product->price }}, '{{ asset('storage/' . $product->image) }}')">
+                                                onclick="event.preventDefault(); window.addToCart({{ $product->id }}, '{{ addslashes($product->name) }}', {{ $product->final_price ?? $product->price }}, '{{ $product->image_url }}')">
                                             <i class="fas fa-shopping-cart"></i>
                                         </button>
                                     </div>

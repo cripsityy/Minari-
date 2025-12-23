@@ -68,7 +68,21 @@ class Product extends Model
 
     public function getImageUrlAttribute()
     {
-        return $this->image ? asset('storage/' . $this->image) : asset('images/default-product.jpg');
+        if (!$this->image) return asset('images/default-product.jpg');
+        
+        // If it's already a full URL (Cloudinary), return it
+        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+            return $this->image;
+        }
+        
+        // Check if we are on cloudinary disk (heuristic or env check)
+        // For mixed content, we try to see if the file exists on public or standard logic
+        // But simplifying: logic to return Cloudinary URL if configured
+        if (env('CLOUDINARY_URL')) {
+            return \Illuminate\Support\Facades\Storage::disk('cloudinary')->url($this->image);
+        }
+
+        return asset('storage/' . $this->image);
     }
 
     public function getImagesUrlsAttribute()
@@ -76,6 +90,8 @@ class Product extends Model
         if (!$this->images) return [asset('images/default-product.jpg')];
         
         return array_map(function($image) {
+            if (filter_var($image, FILTER_VALIDATE_URL)) return $image;
+            if (env('CLOUDINARY_URL')) return \Illuminate\Support\Facades\Storage::disk('cloudinary')->url($image);
             return asset('storage/' . $image);
         }, $this->images);
     }
