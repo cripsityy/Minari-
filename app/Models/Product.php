@@ -70,16 +70,19 @@ class Product extends Model
     {
         if (!$this->image) return asset('images/default-product.jpg');
         
-        // If it's already a full URL (Cloudinary), return it
-        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
-            return $this->image;
-        }
+        if (filter_var($this->image, FILTER_VALIDATE_URL)) return $this->image;
         
-        // Check if we are on cloudinary disk (heuristic or env check)
-        // For mixed content, we try to see if the file exists on public or standard logic
-        // But simplifying: logic to return Cloudinary URL if configured
+        // Local Check (Volume)
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($this->image)) {
+            return asset('storage/' . $this->image);
+        }
+
         if (env('CLOUDINARY_URL')) {
-            return \Illuminate\Support\Facades\Storage::disk('cloudinary')->url($this->image);
+            try {
+                return \Illuminate\Support\Facades\Storage::disk('cloudinary')->url($this->image);
+            } catch (\Exception $e) {
+                return asset('storage/' . $this->image);
+            }
         }
 
         return asset('storage/' . $this->image);
@@ -91,7 +94,19 @@ class Product extends Model
         
         return array_map(function($image) {
             if (filter_var($image, FILTER_VALIDATE_URL)) return $image;
-            if (env('CLOUDINARY_URL')) return \Illuminate\Support\Facades\Storage::disk('cloudinary')->url($image);
+
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($image)) {
+                return asset('storage/' . $image);
+            }
+
+            if (env('CLOUDINARY_URL')) {
+                try {
+                    return \Illuminate\Support\Facades\Storage::disk('cloudinary')->url($image);
+                } catch (\Exception $e) {
+                    return asset('storage/' . $image);
+                }
+            }
+            
             return asset('storage/' . $image);
         }, $this->images);
     }
