@@ -39,18 +39,20 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     */
 
-    const priceInput = document.querySelector('input[type="text"][value*="."]');
+    const priceInput = document.getElementById('priceInput');
     if (priceInput) {
-        priceInput.addEventListener('blur', function () {
-            let value = this.value.replace(/[^\d]/g, '');
-            if (value) {
-                const formatted = new Intl.NumberFormat('id-ID').format(value);
-                this.value = formatted;
-            }
-        });
+        // Format on load
+        // (Handled by Blade value attribute, but good to have safeguard)
 
-        priceInput.addEventListener('focus', function () {
-            this.value = this.value.replace(/[^\d]/g, '');
+        priceInput.addEventListener('input', function (e) {
+            let value = this.value.replace(/[^\d]/g, '');
+            if (value === '') {
+                this.value = '';
+                return;
+            }
+            // Parse as integer to remove leading zeros
+            value = parseInt(value, 10);
+            this.value = new Intl.NumberFormat('id-ID').format(value);
         });
     }
 });

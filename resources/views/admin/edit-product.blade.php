@@ -51,7 +51,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label">Price</label>
-                                <input type="number" name="price" class="form-control" value="{{ old('price', $product->price) }}" placeholder="Enter price" required>
+                                <input type="text" name="price" id="priceInput" class="form-control" value="{{ old('price', number_format($product->price, 0, ',', '.')) }}" placeholder="Enter price" required>
                             </div>
                         </div>
                         <div class="col-md-6">
