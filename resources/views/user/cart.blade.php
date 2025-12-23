@@ -10,7 +10,7 @@
   @include('partials.navbar-scripts')
 
   {{-- CSS --}}
-  <link rel="stylesheet" href="{{ asset('css/cart.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/cart.css') }}?v={{ time() }}">
   <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
 </head>
 
@@ -61,7 +61,7 @@
                     @endphp
                     
                     <div class="cart-item d-grid align-items-center"
-                         style="grid-template-columns: 24px 80px 1fr auto; gap:12px;"
+                         style="grid-template-columns: 24px 100px 1fr auto; gap:12px;"
                          data-id="{{ $itemId }}"
                          data-product-id="{{ $productId }}"
                          data-price="{{ $itemPrice }}"
@@ -135,7 +135,6 @@
 
 <script src="{{ asset('js/navbar.js') }}"></script>
 {{-- JS --}}
-<script src="{{ asset('js/cart.js') }}"></script>
-
+<script src="{{ asset('js/cart.js') }}?v={{ time() }}"></script>
 </body>
 </html>
