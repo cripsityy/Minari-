@@ -43,6 +43,7 @@ MINARI adalah aplikasi e-commerce berbasis web yang dibangun menggunakan framewo
 *   **Database**: MySQL
 *   **Frontend**: Blade Templates, Bootstrap 5, Custom CSS
 *   **Icons**: Font Awesome
+*   **Deploy**: Railway 
 
 ---
 
@@ -101,6 +102,14 @@ Ikuti langkah berikut untuk menjalankan proyek ini di komputer lokal Anda:
     ```bash
     php artisan storage:link
     ```
+
+---
+
+## 🚀 Deployment
+Aplikasi ini telah dideploy dan dapat diakses melalui link berikut:
+
+🔗 **Live Demo:**  
+https://minari-production.up.railway.app/
 
 ---
 
