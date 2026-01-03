@@ -25,27 +25,28 @@ document.addEventListener('DOMContentLoaded', function () {
         promotionForm.addEventListener('submit', function (e) {
             // It's better to rely on HTML5 required attributes + Server validation which I added.
 
-            return isValid;
-        }
+            // return isValid;
+        });
+    }
 
     const promoCodeInput = document.getElementById('promoCode');
-        if (promoCodeInput) {
-            promoCodeInput.addEventListener('input', function () {
-                this.value = this.value.toUpperCase();
-            });
-        }
+    if (promoCodeInput) {
+        promoCodeInput.addEventListener('input', function () {
+            this.value = this.value.toUpperCase();
+        });
+    }
 
-        const discountTypeSelect = document.getElementById('discountType');
-        if (discountTypeSelect) {
-            discountTypeSelect.addEventListener('change', function () {
-                const discountValueInput = document.getElementById('discountValue');
-                if (this.value === 'percentage') {
-                    discountValueInput.placeholder = 'Enter percentage (0-100)';
-                    discountValueInput.max = 100;
-                } else {
-                    discountValueInput.placeholder = 'Enter fixed amount';
-                    discountValueInput.max = null;
-                }
-            });
-        }
-    });
+    const discountTypeSelect = document.getElementById('discountType');
+    if (discountTypeSelect) {
+        discountTypeSelect.addEventListener('change', function () {
+            const discountValueInput = document.getElementById('discountValue');
+            if (this.value === 'percentage') {
+                discountValueInput.placeholder = 'Enter percentage (0-100)';
+                discountValueInput.max = 100;
+            } else {
+                discountValueInput.placeholder = 'Enter fixed amount';
+                discountValueInput.max = null;
+            }
+        });
+    }
+});

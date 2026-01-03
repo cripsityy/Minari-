@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class AdminController extends Controller
 {
@@ -115,15 +116,15 @@ class AdminController extends Controller
         $product->status = $request->status;
         
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'cloudinary');
-            $product->image = $imagePath;
+            $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+            $product->image = $uploadedFileUrl;
         }
         
         if ($request->hasFile('images')) {
             $images = [];
             foreach ($request->file('images') as $image) {
-                $path = $image->store('products/gallery', 'cloudinary');
-                $images[] = $path;
+                $uploadedUrl = Cloudinary::upload($image->getRealPath())->getSecurePath();
+                $images[] = $uploadedUrl;
             }
             $product->images = $images;
         }
@@ -182,8 +183,8 @@ class AdminController extends Controller
                 // Storage::disk('cloudinary')->delete($product->image);
             }
             
-            $imagePath = $request->file('image')->store('products', 'cloudinary');
-            $product->image = $imagePath;
+            $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+            $product->image = $uploadedFileUrl;
         }
         
         if ($request->hasFile('images')) {
@@ -191,8 +192,8 @@ class AdminController extends Controller
             
             $images = [];
             foreach ($request->file('images') as $image) {
-                $path = $image->store('products/gallery', 'cloudinary');
-                $images[] = $path;
+                $uploadedUrl = Cloudinary::upload($image->getRealPath())->getSecurePath();
+                $images[] = $uploadedUrl;
             }
             $product->images = $images;
         }
@@ -295,13 +296,13 @@ class AdminController extends Controller
         $category->status = $request->status;
         
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('categories', 'public');
-            $category->image = $imagePath;
+            $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+            $category->image = $uploadedFileUrl;
         }
 
         if ($request->hasFile('background_image')) {
-            $bgPath = $request->file('background_image')->store('categories/backgrounds', 'public');
-            $category->background_image = $bgPath;
+            $bgUrl = Cloudinary::upload($request->file('background_image')->getRealPath())->getSecurePath();
+            $category->background_image = $bgUrl;
         }
         
         $category->save();
@@ -333,20 +334,20 @@ class AdminController extends Controller
         
         if ($request->hasFile('image')) {
             if ($category->image) {
-                Storage::disk('public')->delete($category->image);
+                // Storage::disk('public')->delete($category->image);
             }
             
-            $imagePath = $request->file('image')->store('categories', 'public');
-            $category->image = $imagePath;
+            $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+            $category->image = $uploadedFileUrl;
         }
 
         if ($request->hasFile('background_image')) {
             if ($category->background_image) {
-                Storage::disk('public')->delete($category->background_image);
+                // Storage::disk('public')->delete($category->background_image);
             }
             
-            $bgPath = $request->file('background_image')->store('categories/backgrounds', 'public');
-            $category->background_image = $bgPath;
+            $bgUrl = Cloudinary::upload($request->file('background_image')->getRealPath())->getSecurePath();
+            $category->background_image = $bgUrl;
         }
         
         $category->save();
