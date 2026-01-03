@@ -1,6 +1,6 @@
 <nav class="navbar-custom fixed-top">
     <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center w-100 px-5">
+        <div class="d-flex justify-content-between align-items-center w-100 px-3 px-md-5 flex-nowrap">
             <div class="logo">
                 <a href="{{ route('admin.dashboard') }}">
                     <img src="{{ asset('images/logofix.png') }}" alt="Logo MINARI" style="height: 35px; width: auto;">
