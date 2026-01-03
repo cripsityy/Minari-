@@ -109,10 +109,6 @@
 
     {{-- Footer --}}
     <div class="detail-footer" style="display: flex; justify-content: space-between; align-items: center;">
-        <a href="#" class="btn-help">
-            <span class="material-icons" style="font-size: 16px;">help_outline</span>
-            Need Help?
-        </a>
 
         @if(in_array(strtolower($order->order_status ?? ''), ['delivered', 'completed', 'done', 'paid']))
             <a href="{{ route('rating.page', ['order_id' => $order->id]) }}" class="btn btn-dark rounded-pill px-4" style="background-color: #1D1B20; border: none; font-family: 'Poppins', sans-serif;">
