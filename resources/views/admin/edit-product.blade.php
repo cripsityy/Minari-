@@ -77,7 +77,7 @@
                             <i class="fas fa-cloud-upload-alt"></i>
                             <p>Click to upload new image</p>
                             <small>Recommended: 500x500px</small>
-                            <img id="imagePreview" class="image-preview" src="{{ $product->image ? asset('storage/' . $product->image) : '' }}" style="{{ $product->image ? 'display:block' : '' }}">
+                            <img id="imagePreview" class="image-preview" src="{{ $product->image ? (Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image)) : '' }}" style="{{ $product->image ? 'display:block' : '' }}">
                         </div>
                         <input type="file" name="image" id="imageInput" accept="image/*" class="file-input" onchange="previewImage(event)">
                     </div>

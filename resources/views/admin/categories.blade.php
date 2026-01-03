@@ -26,7 +26,7 @@
                         <td>
                             <div class="product-img">
                                 @if($category->image)
-                                    <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" style="object-fit:cover; width:50px; height:50px;">
+                                    <img src="{{ Str::startsWith($category->image, 'http') ? $category->image : asset('storage/' . $category->image) }}" alt="{{ $category->name }}" style="object-fit:cover; width:50px; height:50px;">
                                 @else
                                     <span class="text-muted small">No Image</span>
                                 @endif

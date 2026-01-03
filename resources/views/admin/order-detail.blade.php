@@ -151,7 +151,7 @@
             <div class="product-info">
                 <div class="product-img"> <!-- Images visible in print -->
                     @if($item->product && $item->product->image)
-                        <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}">
+                        <img src="{{ Str::startsWith($item->product->image, 'http') ? $item->product->image : asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}">
                     @else
                         <div style="width:60px; height:60px; background:#eee; display:flex; justify-content:center; align-items:center;">No Img</div>
                     @endif

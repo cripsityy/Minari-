@@ -102,7 +102,7 @@
                 <div class="card-body">
                     @foreach($topProducts as $product)
                     <div class="d-flex align-items-center mb-3">
-                        <img src="{{ asset('storage/' . $product->image) }}" class="rounded me-3" width="50" height="50" style="object-fit: cover">
+                        <img src="{{ Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image) }}" class="rounded me-3" width="50" height="50" style="object-fit: cover">
                         <div>
                             <h6 class="mb-0">{{ $product->name }}</h6>
                             <small class="text-muted">{{ $product->order_items_sum_quantity ?? 0 }} sold</small>
