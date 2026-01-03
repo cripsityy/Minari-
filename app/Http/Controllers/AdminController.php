@@ -116,15 +116,28 @@ class AdminController extends Controller
         $product->status = $request->status;
         
         if ($request->hasFile('image')) {
-            $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
-            $product->image = $uploadedFileUrl;
+            try {
+                $uploaded = Cloudinary::uploadApi()->upload($request->file('image')->getRealPath(), [
+                    'folder' => 'products'
+                ]);
+                $product->image = $uploaded['secure_url'];
+            } catch (\Exception $e) {
+                \Log::error('Cloudinary Image Upload Failed (Product)', ['error' => $e->getMessage()]);
+                return back()->with('error', 'Gagal upload gambar: ' . $e->getMessage())->withInput();
+            }
         }
         
         if ($request->hasFile('images')) {
             $images = [];
             foreach ($request->file('images') as $image) {
-                $uploadedUrl = Cloudinary::upload($image->getRealPath())->getSecurePath();
-                $images[] = $uploadedUrl;
+                try {
+                    $uploaded = Cloudinary::uploadApi()->upload($image->getRealPath(), [
+                        'folder' => 'products'
+                    ]);
+                    $images[] = $uploaded['secure_url'];
+                } catch (\Exception $e) {
+                    \Log::error('Cloudinary Multiple Image Upload Failed', ['error' => $e->getMessage()]);
+                }
             }
             $product->images = $images;
         }
@@ -179,21 +192,31 @@ class AdminController extends Controller
         
         if ($request->hasFile('image')) {
             if ($product->image) {
-                // Optional: Delete old image from cloudinary/storage
-                // Storage::disk('cloudinary')->delete($product->image);
+                // Optional: Delete old image
             }
             
-            $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
-            $product->image = $uploadedFileUrl;
+            try {
+                $uploaded = Cloudinary::uploadApi()->upload($request->file('image')->getRealPath(), [
+                    'folder' => 'products'
+                ]);
+                $product->image = $uploaded['secure_url'];
+            } catch (\Exception $e) {
+                 \Log::error('Cloudinary Update Failed', ['error' => $e->getMessage()]);
+                 return back()->with('error', 'Gagal upload gambar baru')->withInput();
+            }
         }
         
         if ($request->hasFile('images')) {
-            // Logic for deleting old images skipped for safety
-            
             $images = [];
             foreach ($request->file('images') as $image) {
-                $uploadedUrl = Cloudinary::upload($image->getRealPath())->getSecurePath();
-                $images[] = $uploadedUrl;
+                try {
+                    $uploaded = Cloudinary::uploadApi()->upload($image->getRealPath(), [
+                        'folder' => 'products'
+                    ]);
+                    $images[] = $uploaded['secure_url'];
+                } catch (\Exception $e) {
+                    \Log::error('Cloudinary Gallery Update Failed', ['error' => $e->getMessage()]);
+                }
             }
             $product->images = $images;
         }
@@ -296,13 +319,25 @@ class AdminController extends Controller
         $category->status = $request->status;
         
         if ($request->hasFile('image')) {
-            $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
-            $category->image = $uploadedFileUrl;
+            try {
+                $uploaded = Cloudinary::uploadApi()->upload($request->file('image')->getRealPath(), [
+                    'folder' => 'categories'
+                ]);
+                $category->image = $uploaded['secure_url'];
+            } catch (\Exception $e) {
+                 \Log::error('Category Image Upload Failed', ['error' => $e->getMessage()]);
+            }
         }
 
         if ($request->hasFile('background_image')) {
-            $bgUrl = Cloudinary::upload($request->file('background_image')->getRealPath())->getSecurePath();
-            $category->background_image = $bgUrl;
+            try {
+                $bg = Cloudinary::uploadApi()->upload($request->file('background_image')->getRealPath(), [
+                    'folder' => 'categories/bg'
+                ]);
+                $category->background_image = $bg['secure_url'];
+            } catch (\Exception $e) {
+                 \Log::error('Category BG Upload Failed', ['error' => $e->getMessage()]);
+            }
         }
         
         $category->save();
@@ -333,21 +368,25 @@ class AdminController extends Controller
         $category->status = $request->status;
         
         if ($request->hasFile('image')) {
-            if ($category->image) {
-                // Storage::disk('public')->delete($category->image);
+            try {
+                $uploaded = Cloudinary::uploadApi()->upload($request->file('image')->getRealPath(), [
+                    'folder' => 'categories'
+                ]);
+                $category->image = $uploaded['secure_url'];
+            } catch (\Exception $e) {
+                \Log::error('Category Update Image Failed', ['error' => $e->getMessage()]);
             }
-            
-            $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
-            $category->image = $uploadedFileUrl;
         }
 
         if ($request->hasFile('background_image')) {
-            if ($category->background_image) {
-                // Storage::disk('public')->delete($category->background_image);
+            try {
+                $bg = Cloudinary::uploadApi()->upload($request->file('background_image')->getRealPath(), [
+                    'folder' => 'categories/bg'
+                ]);
+                $category->background_image = $bg['secure_url'];
+            } catch (\Exception $e) {
+                \Log::error('Category Update BG Failed', ['error' => $e->getMessage()]);
             }
-            
-            $bgUrl = Cloudinary::upload($request->file('background_image')->getRealPath())->getSecurePath();
-            $category->background_image = $bgUrl;
         }
         
         $category->save();

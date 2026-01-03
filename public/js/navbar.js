@@ -68,24 +68,24 @@ function tplGuest() {
   <nav class="navbar navbar-expand-lg fixed-top py-2" id="mainNavbar" style="background-color: #FFF6F0; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); transition: all 0.3s ease;">
     <div class="container-fluid px-5">
       <a class="navbar-brand" href="/">
-        <img src="/images/logofix.png" alt="MINARI Logo" height="40" width="auto" class="me-2">
+        <img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432477/minari_static/logofix.png" alt="MINARI Logo" height="40" width="auto" class="me-2">
       </a>
 
       <div class="d-flex align-items-center ms-auto gap-3">
         <button id="accBtn" class="btn p-0 border-0" style="background: transparent !important; cursor: pointer;">
-          <img src="/images/akun.png" alt="User" width="24" height="24">
+          <img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432425/minari_static/akun.png" alt="User" width="24" height="24">
         </button>
-        <a href="/wishlist"><img src="/images/whislist.png" alt="Favorite" width="24" height="24"></a>
-        <a href="/search"><img src="/images/searchnav.png" alt="Search" width="24" height="24"></a>
-        <a href="/cart"><img src="/images/chart.png" alt="Cart" width="24" height="24"></a>
-        <a href="/menu"><img src="/images/menu.png" alt="Menu" width="24" height="24"></a>
+        <a href="/wishlist"><img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432502/minari_static/whislist.png" alt="Favorite" width="24" height="24"></a>
+        <a href="/search"><img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432486/minari_static/searchnav.png" alt="Search" width="24" height="24"></a>
+        <a href="/cart"><img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432428/minari_static/chart.png" alt="Cart" width="24" height="24"></a>
+        <a href="/menu"><img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432478/minari_static/menu.png" alt="Menu" width="24" height="24"></a>
       </div>
     </div>
   </nav>
 
   <div id="accMini" class="accmini" style="display: none; position: fixed; z-index: 9999; background: #FFF6F0; border: 1px solid #ead9d2; border-radius: 12px; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15); padding: 14px 12px 12px; width: 220px;">
     <div class="accmini__row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-      <img src="/images/akun.png" width="16" height="16" class="accmini__icon" alt="">
+      <img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432425/minari_static/akun.png" width="16" height="16" class="accmini__icon" alt="">
       <a class="accmini__name" href="/login" style="font-weight: 500; color: #1f1f1f; text-decoration: none;">Guest</a>
     </div>
     <a id="loginLink" class="accmini__btn" href="/login" onclick="window.location.href='/login'; return false;" style="display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 36px; background-color: #ffffff; border: 1.5px solid #d9c8c1; border-radius: 10px; color: #1e1e1e; font-weight: 600; text-decoration: none; font-size: 14px; cursor: pointer !important; transition: all 0.25s ease; margin-top: 8px; position: relative; z-index: 10000; pointer-events: auto;">Log in</a>
@@ -128,38 +128,38 @@ function tplUser() {
   <nav class="navbar navbar-expand-lg fixed-top py-2" id="mainNavbar" style="background-color: #FFF6F0; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); transition: all 0.3s ease;">
     <div class="container-fluid px-5">
       <a class="navbar-brand" href="/">
-        <img src="/images/logofix.png" alt="MINARI Logo" height="40" width="auto" class="me-2">
+        <img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432477/minari_static/logofix.png" alt="MINARI Logo" height="40" width="auto" class="me-2">
       </a>
 
       <div class="d-flex align-items-center ms-auto gap-3">
         <button id="accBtn" class="btn p-0 border-0" style="background: transparent !important; cursor: pointer;">
-          <img src="/images/akun.png" alt="User" width="24" height="24">
+          <img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432425/minari_static/akun.png" alt="User" width="24" height="24">
         </button>
         
         <a href="/wishlist" class="nav-icon-wrapper">
-            <img src="/images/whislist.png" alt="Favorite" width="24" height="24">
+            <img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432502/minari_static/whislist.png" alt="Favorite" width="24" height="24">
             ${window.WISHLIST_COUNT > 0 ? `<span class="badge-counter">${window.WISHLIST_COUNT}</span>` : ''}
         </a>
         
-        <a href="/search"><img src="/images/searchnav.png" alt="Search" width="24" height="24"></a>
+        <a href="/search"><img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432486/minari_static/searchnav.png" alt="Search" width="24" height="24"></a>
         
         <a href="/cart" class="nav-icon-wrapper">
-            <img src="/images/chart.png" alt="Cart" width="24" height="24">
+            <img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432428/minari_static/chart.png" alt="Cart" width="24" height="24">
             ${window.CART_COUNT > 0 ? `<span class="badge-counter">${window.CART_COUNT}</span>` : ''}
         </a>
         
-        <a href="/menu"><img src="/images/menu.png" alt="Menu" width="24" height="24"></a>
+        <a href="/menu"><img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432478/minari_static/menu.png" alt="Menu" width="24" height="24"></a>
       </div>
     </div>
   </nav>
 
   <div id="accMini" class="accmini" style="display: none; position: fixed; z-index: 9999; background: #FFF6F0; border: 1px solid #ead9d2; border-radius: 12px; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15); padding: 14px 12px 12px; width: 220px;">
     <div class="accmini__row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-      <img src="/images/akun.png" width="16" height="16" class="accmini__icon" alt="">
+      <img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432425/minari_static/akun.png" width="16" height="16" class="accmini__icon" alt="">
       <a class="accmini__link" href="/account" style="font-weight: 500; color: #1f1f1f; text-decoration: none;">Account</a>
     </div>
     <div class="accmini__row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-      <img src="/images/order history.png" width="16" height="16" class="accmini__icon" alt="">
+      <img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432481/minari_static/order_history.png" width="16" height="16" class="accmini__icon" alt="">
       <a class="accmini__link" href="/order-history" style="font-weight: 500; color: #1f1f1f; text-decoration: none;">Order history</a>
     </div>
     <button id="logoutBtn" class="accmini__btn" style="display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 36px; background-color: #ffffff; border: 1.5px solid #d9c8c1; border-radius: 10px; color: #1e1e1e; font-weight: 600; text-decoration: none; font-size: 14px; cursor: pointer; transition: all 0.25s ease; margin-top: 8px;">Log out</button>

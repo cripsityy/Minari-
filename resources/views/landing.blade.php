@@ -28,12 +28,12 @@
                     <div class="col-md-7 position-relative">
                         <div class="hero-images">
                             <!-- Main Bag Object -->
-                            <img src="{{ asset('images/tes.png') }}" class="hero-obj hero-obj-main" alt="Fashion Bag">
+                            <img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432493/minari_static/tes.png" class="hero-obj hero-obj-main" alt="Fashion Bag">
                             
                             <!-- Floating Elements -->
-                            <img src="{{ asset('images/test1.png') }}" class="hero-obj hero-obj-1" alt="Fire Icon">
-                            <img src="{{ asset('images/test2.png') }}" class="hero-obj hero-obj-2" alt="Like Icon">
-                            <img src="{{ asset('images/test3.png') }}" class="hero-obj hero-obj-3" alt="Coin Icon">
+                            <img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432495/minari_static/test1.png" class="hero-obj hero-obj-1" alt="Fire Icon">
+                            <img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432496/minari_static/test2.png" class="hero-obj hero-obj-2" alt="Like Icon">
+                            <img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432499/minari_static/test3.png" class="hero-obj hero-obj-3" alt="Coin Icon">
                             
                             <!-- Optional: Selection Box Overlay (Static for design match) -->
                             <!-- <div class="hero-obj-info">105 x 118</div> -->
@@ -74,17 +74,30 @@
                 <h2 class="section-title">MINARI's Style</h2>
                 <div class="style-scroll-container">
                     <div class="style-scroll-track">
+                        @php
+                        $styleImages = [
+                            1 => 'https://res.cloudinary.com/dcauomunm/image/upload/v1767432440/minari_static/g1.png',
+                            2 => 'https://res.cloudinary.com/dcauomunm/image/upload/v1767432444/minari_static/g2.png',
+                            3 => 'https://res.cloudinary.com/dcauomunm/image/upload/v1767432447/minari_static/g3.png',
+                            4 => 'https://res.cloudinary.com/dcauomunm/image/upload/v1767432450/minari_static/g4.png',
+                            5 => 'https://res.cloudinary.com/dcauomunm/image/upload/v1767432452/minari_static/g5.png',
+                            6 => 'https://res.cloudinary.com/dcauomunm/image/upload/v1767432455/minari_static/g6.png',
+                            7 => 'https://res.cloudinary.com/dcauomunm/image/upload/v1767432458/minari_static/g7.png',
+                            8 => 'https://res.cloudinary.com/dcauomunm/image/upload/v1767432461/minari_static/g8.png',
+                        ];
+                        @endphp
+
                         {{-- First set of items --}}
                         @for($i = 1; $i <= 8; $i++)
                         <div class="style-item">
-                            <img src="{{ asset('images/g' . $i . '.png') }}" alt="Style {{ $i }}">
+                            <img src="{{ $styleImages[$i] ?? asset('images/g' . $i . '.png') }}" alt="Style {{ $i }}">
                         </div>
                         @endfor
                         
                         {{-- Duplicate set for seamless looping --}}
                         @for($i = 1; $i <= 8; $i++)
                         <div class="style-item">
-                            <img src="{{ asset('images/g' . $i . '.png') }}" alt="Style {{ $i }}">
+                            <img src="{{ $styleImages[$i] ?? asset('images/g' . $i . '.png') }}" alt="Style {{ $i }}">
                         </div>
                         @endfor
                     </div>
@@ -168,7 +181,7 @@
                 <div class="row align-items-center">
                     <div class="col-md-6">
                         <div class="logo">
-                            <img src="{{ asset('images/logofix.png') }}" alt="Logo MINARI" style="height: 40px; width: auto;">
+                            <img src="https://res.cloudinary.com/dcauomunm/image/upload/v1767432477/minari_static/logofix.png" alt="Logo MINARI" style="height: 40px; width: auto;">
                         </div>
                         <p>Your everyday fashion boutique</p>
                     </div>
