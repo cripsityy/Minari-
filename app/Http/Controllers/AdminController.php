@@ -596,8 +596,8 @@ class AdminController extends Controller
 
     public function addPromotion()
     {
-        $products = Product::where('status', 'active')->get();
-        return view('admin.add-promotion', compact('products'));
+        $categories = Category::all();
+        return view('admin.add-promotion', compact('categories'));
     }
 
     public function storePromotion(Request $request)
@@ -627,7 +627,9 @@ class AdminController extends Controller
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
                 'is_active' => $isActive,
-                'applicable_products' => $request->applicable_products,
+                'end_date' => $request->end_date,
+                'is_active' => $isActive,
+                'applicable_categories' => $request->applicable_categories,
             ]);
 
             \Illuminate\Support\Facades\Log::info('Promotion Created Successfully', ['id' => $promotion->id]);
@@ -647,8 +649,8 @@ class AdminController extends Controller
     public function editPromotion($id)
     {
         $promotion = Promotion::findOrFail($id);
-        $products = Product::where('status', 'active')->get();
-        return view('admin.edit-promotion', compact('promotion', 'products'));
+        $categories = Category::all();
+        return view('admin.edit-promotion', compact('promotion', 'categories'));
     }
 
     public function updatePromotion(Request $request, $id)
@@ -678,7 +680,7 @@ class AdminController extends Controller
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
                 'is_active' => $isActive,
-                'applicable_products' => $request->applicable_products,
+                'applicable_categories' => $request->applicable_categories,
             ]);
 
             return redirect()->route('admin.promotions')->with('success', 'Promotion updated successfully');

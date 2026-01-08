@@ -1331,14 +1331,14 @@ input:focus,
         min-width: auto;
     }
 
-    .d-flex.justify-content-between,
-    .d-flex.justify-content-end {
+    .d-flex.justify-content-between:not(.navbar-custom .d-flex),
+    .d-flex.justify-content-end:not(.navbar-custom .d-flex) {
         flex-direction: column;
         gap: 15px;
     }
 
-    .d-flex.justify-content-between>*,
-    .d-flex.justify-content-end>* {
+    .d-flex.justify-content-between>*:not(.navbar-custom *),
+    .d-flex.justify-content-end>*:not(.navbar-custom *) {
         width: 100%;
     }
 

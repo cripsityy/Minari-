@@ -126,20 +126,19 @@ function renderWishlistItems(items) {
 
     root.innerHTML = items.map(item => {
         const product = item.product || item;
-        const imageUrl = product.image
-            ? `/storage/${product.image}`
-            : '/images/default-product.jpg';
+        // Use image_url from API if available, otherwise fallback
+        // const imageUrl = product.image_url || ((product.image && product.image.startsWith('http')) ? product.image : `/storage/${product.image}`);
 
         return `
-            <article class="w-item" data-id="${product.id}" data-wishlist-id="${item.id}">
+            <article class="w-item" data-id="${product.id}" data-wishlist-id="${item.id}" data-slug="${product.slug}" style="cursor: pointer;">
                 <div class="w-img">
-                    <img src="${imageUrl}" alt="${product.name}" 
+                    <img src="${product.image_url || product.image}" alt="${product.name}" 
                          onerror="this.src='/images/default-product.jpg'">
                 </div>
                 <div class="w-info">
                     <h6 class="w-name">${product.name}</h6>
                     <div class="w-meta">
-                        <span class="price">${fmtIDR(product.price)}</span>
+                        <span class="price">${fmtIDR(product.final_price || product.price)}</span>
                         ${product.size ? `<span>Size: ${product.size}</span>` : ''}
                     </div>
                 </div>
@@ -184,21 +183,38 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (removeBtn) {
                 const wishlistId = card.dataset.wishlistId;
+                // Immediate UI feedback
+                const previousHtml = card.outerHTML;
+                card.style.opacity = '0.5';
+
                 const result = await removeFromWishlist(wishlistId);
                 if (result.success) {
-                    showToast('Removed from wishlist');
+                    showToast(result.message || 'Removed from wishlist');
 
                     // Update navbar badge
                     if (result.wishlist_count !== undefined && window.NavbarRole && window.NavbarRole.updateWishlistCount) {
                         window.NavbarRole.updateWishlistCount(result.wishlist_count);
                     }
 
-                    // Refresh list
-                    const items = await fetchWishlist();
-                    renderWishlistItems(items || []);
+                    // Refresh list or remove item from DOM
+                    card.remove();
+
+                    // If empty, re-check to show empty state
+                    const remainingItems = document.querySelectorAll('.w-item');
+                    if (remainingItems.length === 0) {
+                        const items = await fetchWishlist(); // Fetch to be sure/render empty state
+                        renderWishlistItems(items || []);
+                    } else {
+                        // Update count text manually if not refetching
+                        const counter = document.getElementById('resultCount');
+                        if (counter) counter.textContent = `Results: ${remainingItems.length} product${remainingItems.length !== 1 ? 's' : ''}`;
+                    }
+
                 } else {
+                    card.style.opacity = '1';
                     showToast(result.message);
                 }
+                return; // Stop here, don't navigate
             }
 
             if (addCartBtn) {
@@ -213,6 +229,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } else {
                     showToast(result.message);
                 }
+                return; // Stop here, don't navigate
+            }
+
+            // Navigation (if not clicking buttons)
+            if (card.dataset.slug) {
+                window.location.href = `/product/${card.dataset.slug}`;
             }
         });
     }

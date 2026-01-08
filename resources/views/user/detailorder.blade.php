@@ -50,7 +50,7 @@
                 @foreach($cartItems as $item)
                 <div class="product-item">
                     <div class="product-image">
-                        <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : asset('images/default-product.jpg') }}" alt="{{ $item->product->name }}">
+                        <img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}" onerror="this.src='{{ asset('images/default-product.jpg') }}'">
                     </div>
                     <div class="product-info">
                         <h3 class="product-name">{{ $item->product->name }}</h3>

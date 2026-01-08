@@ -173,7 +173,7 @@
             <h5>Delivery Information</h5>
             <div class="detail-row">
                 <span class="detail-label">Tracking Number</span>
-                <span class="detail-value">{{ $order->tracking_number ?? '-' }}</span>
+                <span class="detail-value" id="trackingNumberDisplay">{{ $order->tracking_number ?? '-' }}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Shipping Cost</span>
@@ -259,11 +259,20 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const trackingInput = document.querySelector('input[name="tracking_number"]');
+        const trackingDisplay = document.getElementById('trackingNumberDisplay');
+
         if (trackingInput && !trackingInput.value) {
             // Generate random tracking number: TRK + Timestamp + Random 3 chars
             const timestamp = Date.now().toString().substr(-6);
             const random = Math.random().toString(36).substring(2, 5).toUpperCase();
-            trackingInput.value = 'TRK' + timestamp + random;
+            const newCode = 'TRK' + timestamp + random;
+            
+            trackingInput.value = newCode;
+            
+            // Sync to display if it exists and is currently empty/-
+            if (trackingDisplay) {
+                trackingDisplay.innerText = newCode;
+            }
         }
     });
 </script>

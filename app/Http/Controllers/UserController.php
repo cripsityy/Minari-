@@ -348,7 +348,12 @@ class UserController extends Controller
         // Increment view count
         $product->increment('view_count');
         
-        return view('user.detailproduk', compact('product', 'relatedProducts', 'reviews'));
+        $wishlistProductIds = [];
+        if (Auth::check()) {
+             $wishlistProductIds = Auth::user()->wishlists()->pluck('product_id')->toArray();
+        }
+
+        return view('user.detailproduk', compact('product', 'relatedProducts', 'reviews', 'wishlistProductIds'));
     }
     
     public function payment(Request $request)
@@ -397,16 +402,17 @@ class UserController extends Controller
                 continue;
             }
 
-            $applicableIds = $promo->applicable_products ?? [];
-            $isAll = in_array('all', $applicableIds) || empty($applicableIds);
+            $applicableCategories = $promo->applicable_categories ?? [];
+            $isAll = in_array('all', $applicableCategories) || empty($applicableCategories);
             
             $promoableAmount = 0;
             
             if ($isAll) {
                 $promoableAmount = $subtotal;
             } else {
-                $promoableAmount = $cartItems->filter(function($item) use ($applicableIds) {
-                    return in_array($item->product_id, $applicableIds);
+                $promoableAmount = $cartItems->filter(function($item) use ($applicableCategories) {
+                    // Check if item's category is in applicable categories
+                    return in_array($item->product->category_id, $applicableCategories);
                 })->sum(function($item) {
                     return ($item->product->final_price ?? $item->product->price ?? 0) * $item->quantity;
                 });
@@ -478,16 +484,16 @@ class UserController extends Controller
                 continue;
             }
 
-            $applicableIds = $promo->applicable_products ?? [];
-            $isAll = in_array('all', $applicableIds) || empty($applicableIds);
+            $applicableCategories = $promo->applicable_categories ?? [];
+            $isAll = in_array('all', $applicableCategories) || empty($applicableCategories);
             
             $promoableAmount = 0;
             
             if ($isAll) {
                 $promoableAmount = $subtotal;
             } else {
-                $promoableAmount = $cartItems->filter(function($item) use ($applicableIds) {
-                    return in_array($item->product_id, $applicableIds);
+                $promoableAmount = $cartItems->filter(function($item) use ($applicableCategories) {
+                     return in_array($item->product->category_id, $applicableCategories);
                 })->sum(function($item) {
                     return ($item->product->final_price ?? $item->product->price ?? 0) * $item->quantity;
                 });
@@ -564,7 +570,6 @@ class UserController extends Controller
             
             // Delete this specific item from cart
             $cartItem->delete();
-            dump($paymentMethod);
         }
 
         return redirect()->route('order.confirm')->with('success', 'Pesanan berhasil dibuat');
@@ -645,7 +650,7 @@ class UserController extends Controller
         if ($exists) {
             return response()->json([
                 'success' => false,
-                'message' => 'Produk sudah ada di wishlist'
+                'message' => 'Product is already in wishlist'
             ]);
         }
         
@@ -655,7 +660,7 @@ class UserController extends Controller
         
         return response()->json([
             'success' => true,
-            'message' => 'Produk berhasil ditambahkan ke wishlist',
+            'message' => 'Product added to wishlist',
             'wishlist_count' => $user->wishlists()->count()
         ]);
     }
@@ -673,7 +678,7 @@ class UserController extends Controller
         if ($deleted) {
              return response()->json([
                 'success' => true,
-                'message' => 'Produk dihapus dari wishlist',
+                'message' => 'Product removed from wishlist',
                 'wishlist_count' => $user->wishlists()->count()
             ]);
         }
@@ -684,7 +689,7 @@ class UserController extends Controller
             $wishlist->delete();
             return response()->json([
                 'success' => true,
-                'message' => 'Produk dihapus dari wishlist',
+                'message' => 'Product removed from wishlist',
                 'wishlist_count' => $user->wishlists()->count()
             ]);
         }
@@ -694,7 +699,7 @@ class UserController extends Controller
             'success' => false, // Changed to false so frontend knows it failed, but technically if it's gone it's fine. 
                                 // However, for toggle logic, if it wasn't there, maybe we consider it a success? 
                                 // Let's keep it robust: if we can't delete it, it might not exist.
-            'message' => 'Produk tidak ditemukan di wishlist'
+            'message' => 'Product not found in wishlist'
         ]);
     }
     
@@ -715,7 +720,7 @@ class UserController extends Controller
         if ($product->stock < $request->quantity) {
             return response()->json([
                 'success' => false,
-                'message' => 'Stok produk tidak mencukupi'
+                'message' => 'Insufficient product stock'
             ], 400);
         }
         
@@ -756,7 +761,7 @@ class UserController extends Controller
         
         return response()->json([
             'success' => true,
-            'message' => 'Produk berhasil ditambahkan ke keranjang',
+            'message' => 'Product added to cart',
             'cart_count' => $user->carts()->count()
         ]);
     }
@@ -773,7 +778,7 @@ class UserController extends Controller
         if ($product->stock < $request->quantity) {
             return response()->json([
                 'success' => false,
-                'message' => 'Stok produk tidak mencukupi'
+                'message' => 'Insufficient product stock'
             ], 400);
         }
         

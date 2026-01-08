@@ -96,21 +96,21 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Applicable Products</label>
+                <label class="form-label">Applicable Categories</label>
                 <div class="card p-3" style="max-height: 200px; overflow-y: auto;">
                     <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" name="applicable_products[]" id="prod_all" value="all" 
-                            {{ in_array('all', old('applicable_products', $promotion->applicable_products ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="prod_all">
-                            All Products
+                        <input class="form-check-input" type="checkbox" name="applicable_categories[]" id="cat_all" value="all" 
+                            {{ in_array('all', old('applicable_categories', $promotion->applicable_categories ?? [])) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="cat_all">
+                            All Categories
                         </label>
                     </div>
-                    @foreach($products as $product)
+                    @foreach($categories as $category)
                     <div class="form-check mb-1">
-                        <input class="form-check-input product-checkbox" type="checkbox" name="applicable_products[]" id="prod_{{ $product->id }}" value="{{ $product->id }}"
-                            {{ in_array($product->id, old('applicable_products', $promotion->applicable_products ?? [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="prod_{{ $product->id }}">
-                            {{ $product->name }}
+                        <input class="form-check-input category-checkbox" type="checkbox" name="applicable_categories[]" id="cat_{{ $category->id }}" value="{{ $category->id }}"
+                            {{ in_array($category->id, old('applicable_categories', $promotion->applicable_categories ?? [])) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="cat_{{ $category->id }}">
+                            {{ $category->name }}
                         </label>
                     </div>
                     @endforeach
@@ -120,25 +120,25 @@
             @push('scripts')
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
-                    const allCheckbox = document.getElementById('prod_all');
-                    const productCheckboxes = document.querySelectorAll('.product-checkbox');
+                    const allCheckbox = document.getElementById('cat_all');
+                    const categoryCheckboxes = document.querySelectorAll('.category-checkbox');
 
-                    // Handle "All Products" click
+                    // Handle "All Categories" click
                     allCheckbox.addEventListener('change', function() {
                         const isChecked = this.checked;
-                        productCheckboxes.forEach(checkbox => {
+                        categoryCheckboxes.forEach(checkbox => {
                             checkbox.checked = isChecked;
                         });
                     });
 
-                    // Handle individual product click
-                    productCheckboxes.forEach(checkbox => {
+                    // Handle individual category click
+                    categoryCheckboxes.forEach(checkbox => {
                         checkbox.addEventListener('change', function() {
                             if (!this.checked) {
                                 allCheckbox.checked = false;
                             } else {
                                 // Check if all are checked
-                                const allChecked = Array.from(productCheckboxes).every(cb => cb.checked);
+                                const allChecked = Array.from(categoryCheckboxes).every(cb => cb.checked);
                                 if (allChecked) {
                                     allCheckbox.checked = true;
                                 }

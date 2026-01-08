@@ -68,9 +68,13 @@
                          data-price="{{ $itemPrice }}"
                          data-is-guest="{{ $isGuest ? 'true' : 'false' }}">
                         <input type="checkbox" class="form-check-input item-check"/>
-                        <img src="{{ $itemImage }}" class="item-thumb" alt="{{ $itemName }}">
+                        <a href="{{ route('product.detail', $item->product->slug) }}" class="text-decoration-none">
+                            <img src="{{ $itemImage }}" class="item-thumb" alt="{{ $itemName }}">
+                        </a>
                         <div>
-                            <div class="fw-semibold">{{ $itemName }}</div>
+                            <a href="{{ route('product.detail', $item->product->slug) }}" class="text-decoration-none text-dark">
+                                <div class="fw-semibold">{{ $itemName }}</div>
+                            </a>
                             <div class="text-muted small">Rp {{ number_format($itemPrice, 0, ',', '.') }}</div>
                             @if($item->size || $item->color)
                             <div class="text-muted small mt-1">

@@ -53,8 +53,10 @@
                             @foreach($order->items->take(4) as $item) {{-- Limit to 4 to prevent overcrowding --}}
                                 <div class="product-item">
                                     <div class="product-image">
-                                        <img src="{{ $item->product_image ?? (optional($item->product ?? null)->image ? asset('storage/'.optional($item->product)->image) : asset('images/default-product.jpg')) }}" 
-                                             alt="{{ $item->product_name }}">
+                                        <img src="{{ optional($item->product)->image_url ?? asset('images/default-product.jpg') }}" 
+                                             alt="{{ $item->product_name }}" 
+                                             class="img-fluid rounded" 
+                                             style="width: 80px; height: 80px; object-fit: cover;">
                                     </div>
                                     <div class="product-details">
                                         <h4>{{ $item->product_name }}</h4>

@@ -140,7 +140,6 @@ body {
 
 .w-img {
     width: 112px;
-    height: 112px;
     border: 1px solid var(--line);
     border-radius: 8px;
     display: grid;
@@ -151,7 +150,6 @@ body {
 
 .w-img img {
     width: 100%;
-    height: 100%;
     object-fit: contain;
 }
 
@@ -228,7 +226,6 @@ body {
     .w-img {
         grid-area: img;
         width: 90px;
-        height: 90px;
     }
 
     .w-info {
@@ -249,7 +246,6 @@ body {
 
     .w-img {
         width: 80px;
-        height: 80px;
     }
 
     .w-name {

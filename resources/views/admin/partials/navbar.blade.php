@@ -53,7 +53,7 @@
                     </div>
                 </form>
                 @else
-                <div style="width: 220px;"></div> {{-- Spacer to keep layout balanced if needed, or just nothing --}}
+                {{-- No spacer needed, let flexbox handle it --}}
                 @endif
 
                 <!-- Notifications Dropdown -->

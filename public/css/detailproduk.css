@@ -142,6 +142,77 @@ body {
   transform: translateY(-1px);
 }
 
+.add-to-cart:hover {
+  background-color: #f9e4db;
+  transform: translateY(-1px);
+}
+
+.btn-wishlist {
+  background: none;
+  border: none;
+  padding: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 15px;
+  border: 1px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-wishlist:hover {
+  background-color: #f2f2f2;
+}
+
+.btn-wishlist.active {
+  background-color: #fff0f3;
+  border-color: #ffb5c3;
+}
+
+/* Base image style */
+.btn-wishlist img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  transition: all 0.2s ease;
+  filter: grayscale(100%);
+  /* Start with neutral grayscale if desired, or keep original */
+}
+
+/* Hover: Slightly darker/pinkish tint or scale */
+.btn-wishlist:hover img {
+  transform: scale(1.1);
+  /* Filter to make it look active/hover color if needed */
+}
+
+/* Active: Red color filter to simulate 'whislist-active.png' */
+.btn-wishlist.active img {
+  /* Filter to turn black/grayscale into Red (#ff5978) 
+       Generated approximation for #ff5978
+    */
+  filter: invert(48%) sepia(35%) saturate(3065%) hue-rotate(328deg) brightness(102%) contrast(101%);
+}
+
+
+.action-buttons {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+/* Toast Styling */
+#toastIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#toastMessage {
+  font-weight: 500;
+}
+
 /* ===== Review ===== */
 .review-section {
   max-width: 1200px;

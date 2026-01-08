@@ -60,7 +60,7 @@
                                 <div class="expiry-date text-danger small">
                                     <i class="far fa-clock me-1"></i> Valid until {{ \Carbon\Carbon::parse($promo->end_date)->format('d M Y') }}
                                 </div>
-                                <button class="btn btn-sm btn-outline-dark mt-3" onclick="navigator.clipboard.writeText('{{ $promo->code }}'); alert('Code copied!')">Copy Code</button>
+
                             </div>
                         </div>
                     </div>
