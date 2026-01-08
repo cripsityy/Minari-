@@ -59,7 +59,7 @@
 <style>
     .toast-notification {
         position: fixed;
-        top: 20px;
+        top: 100px;
         right: 20px;
         z-index: 99999; /* Higher z-index to ensure it's above everything */
         background: white;

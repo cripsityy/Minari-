@@ -936,7 +936,7 @@ footer .text-end .footer-form button:hover {
 
 .custom-notification {
     position: fixed;
-    top: 80px;
+    top: 100px;
     right: 20px;
     z-index: 9999;
     min-width: 300px;

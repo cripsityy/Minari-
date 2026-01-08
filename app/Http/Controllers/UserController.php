@@ -90,17 +90,23 @@ class UserController extends Controller
             // Ambil cart dari session
             $guestCart = session()->get('guest_cart', []);
             
+            // Ambil slug produk untuk link detail
+            $productIds = collect($guestCart)->pluck('product_id')->unique();
+            $slugs = Product::whereIn('id', $productIds)->pluck('slug', 'id');
+
             // Format cart items untuk view - menggunakan nama variabel $cartItems
-            $cartItems = collect($guestCart)->map(function($item) {
+            $cartItems = collect($guestCart)->map(function($item) use ($slugs) {
+                $productId = $item['product_id'] ?? ($item['id'] ?? 0);
                 return (object)[
                     'id' => $item['id'] ?? uniqid('guest_'),
-                    'product_id' => $item['product_id'] ?? ($item['id'] ?? 0),
+                    'product_id' => $productId,
                     'product' => (object)[
-                        'id' => $item['product_id'] ?? ($item['id'] ?? 0),
+                        'id' => $productId,
                         'name' => $item['name'] ?? 'Product',
                         'price' => $item['price'] ?? 0,
                         'final_price' => $item['price'] ?? 0,
-                        'image' => $item['image'] ?? '/images/default-product.jpg'
+                        'image' => $item['image'] ?? '/images/default-product.jpg',
+                        'slug' => $slugs[$productId] ?? \Illuminate\Support\Str::slug($item['name'] ?? 'product')
                     ],
                     'quantity' => $item['quantity'] ?? 1,
                     'size' => $item['size'] ?? '',
